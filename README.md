@@ -38,7 +38,7 @@ rocketry_website/
 │   ├── layout.tsx         # Root layout
 │   └── page.tsx           # Home page
 ├── components/            # Reusable components
-│   ├── ui/               # UI components (Button, Card, Badge)
+│   ├── ui/               # UI components
 │   └── navigation.tsx    # Navigation component
 ├── lib/                  # Utility functions
 │   ├── prisma.ts         # Prisma client
@@ -85,4 +85,4 @@ This project is licensed under the MIT License.
 ## Contact
 
 For questions about the website or the University of Auckland Rocketry Club:
-- Email: rocketry@auckland.ac.nz
+- Email: uoarocketryclub@auckland.ac.nz
