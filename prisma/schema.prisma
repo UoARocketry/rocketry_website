@@ -1,0 +1,52 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Event {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  date        DateTime
+  location    String
+  isPast      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model Rocket {
+  id          Int      @id @default(autoincrement())
+  name        String
+  slug        String   @unique
+  description String
+  image       String
+  launchedAt  DateTime?
+}
+
+model Exec {
+  id        Int     @id @default(autoincrement())
+  name      String
+  role      String
+  bio       String
+  photo     String
+  order     Int     // for custom sorting on the exec page
+}
+
+model BlogPost {
+  id        Int      @id @default(autoincrement())
+  slug      String   @unique
+  title     String
+  content   String   // MDX raw or CMS reference
+  category  String   // "recent", "projects", "other"
+  date      DateTime
+}
+
+model Sponsor {
+  id     Int    @id @default(autoincrement())
+  name   String
+  logo   String
+  url    String
+}
