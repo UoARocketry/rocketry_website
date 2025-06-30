@@ -22,7 +22,7 @@ export default function Navigation() {
             </Link>
           </div>
 
-          {/* Desktop Navigation */}
+          {/* Desktop nav */}
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-8">
               <Link
@@ -57,7 +57,7 @@ export default function Navigation() {
               </Link>
               <Link
                 href="/signup"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
               >
                 Sign Up
               </Link>
@@ -72,7 +72,31 @@ export default function Navigation() {
           </div>
         </div>
 
-        
+        {/* Burger nav */}
+        {isMenuOpen && (
+          <div className="md:hidden">
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t">
+              <Link href="/about" className="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
+                About
+              </Link>
+              <Link href="/events" className="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
+                Events
+              </Link>
+              <Link href="/blogs" className="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
+                Blog
+              </Link>
+              <Link href="/rockets" className="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
+                Rockets
+              </Link>
+              <Link href="/sponsors" className="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
+                Sponsors
+              </Link>
+              <Link href="/signup" className="bg-red-600 hover:bg-red-700 text-white block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
+                Sign Up
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );
