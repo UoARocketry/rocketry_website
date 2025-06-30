@@ -32,30 +32,30 @@ export default function Footer() {
           {/* Quick Links */}
           <div>
             <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
-            <ul className="space-y-2">
+            <ul className="space-y-2 text-left">
               <li>
-                <Link href="/about" className="text-gray-300 hover:text-white transition-colors">
-                  About
+                <Link href="/about" className="underline-animate text-gray-300 hover:text-white transition-colors uppercase py-2 rounded-none">
+                  ABOUT
                 </Link>
               </li>
               <li>
-                <Link href="/events" className="text-gray-300 hover:text-white transition-colors">
-                  Events
+                <Link href="/events" className="underline-animate text-gray-300 hover:text-white transition-colors uppercase py-2 rounded-none">
+                  EVENTS
                 </Link>
               </li>
               <li>
-                <Link href="/blogs" className="text-gray-300 hover:text-white transition-colors">
-                  Blog
+                <Link href="/blogs" className="underline-animate text-gray-300 hover:text-white transition-colors uppercase py-2 rounded-none">
+                  BLOG
                 </Link>
               </li>
               <li>
-                <Link href="/rockets" className="text-gray-300 hover:text-white transition-colors">
-                  Rockets
+                <Link href="/rockets" className="underline-animate text-gray-300 hover:text-white transition-colors uppercase py-2 rounded-none">
+                  ROCKETS
                 </Link>
               </li>
               <li>
-                <Link href="/sponsors" className="text-gray-300 hover:text-white transition-colors">
-                  Sponsors
+                <Link href="/sponsors" className="underline-animate text-gray-300 hover:text-white transition-colors uppercase py-2 rounded-none">
+                  SPONSORS
                 </Link>
               </li>
             </ul>

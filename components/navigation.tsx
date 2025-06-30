@@ -27,39 +27,39 @@ export default function Navigation() {
             <div className="ml-10 flex items-baseline space-x-8">
               <Link
                 href="/about"
-                className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                className="underline-animate text-gray-700 hover:text-gray-900 px-4 py-2 rounded-none text-sm font-medium transition-colors uppercase"
               >
-                About
+                ABOUT
               </Link>
               <Link
                 href="/events"
-                className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                className="underline-animate text-gray-700 hover:text-gray-900 px-4 py-2 rounded-none text-sm font-medium transition-colors uppercase"
               >
-                Events
+                EVENTS
               </Link>
               <Link
                 href="/blogs"
-                className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                className="underline-animate text-gray-700 hover:text-gray-900 px-4 py-2 rounded-none text-sm font-medium transition-colors uppercase"
               >
-                Blog
+                BLOG
               </Link>
               <Link
                 href="/rockets"
-                className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                className="underline-animate text-gray-700 hover:text-gray-900 px-4 py-2 rounded-none text-sm font-medium transition-colors uppercase"
               >
-                Rockets
+                ROCKETS
               </Link>
               <Link
                 href="/sponsors"
-                className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                className="underline-animate text-gray-700 hover:text-gray-900 px-4 py-2 rounded-none text-sm font-medium transition-colors uppercase"
               >
-                Sponsors
+                SPONSORS
               </Link>
               <Link
                 href="/signup"
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-none text-sm font-medium transition-colors uppercase text-center"
               >
-                Sign Up
+                SIGN UP
               </Link>
             </div>
           </div>
@@ -76,23 +76,23 @@ export default function Navigation() {
         {isMenuOpen && (
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t">
-              <Link href="/about" className="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
-                About
+              <Link href="/about" className="underline-animate text-gray-700 hover:text-gray-900 block px-4 py-2 rounded-none text-base font-medium uppercase" onClick={() => setIsMenuOpen(false)}>
+                ABOUT
               </Link>
-              <Link href="/events" className="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
-                Events
+              <Link href="/events" className="underline-animate text-gray-700 hover:text-gray-900 block px-4 py-2 rounded-none text-base font-medium uppercase" onClick={() => setIsMenuOpen(false)}>
+                EVENTS
               </Link>
-              <Link href="/blogs" className="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
-                Blog
+              <Link href="/blogs" className="underline-animate text-gray-700 hover:text-gray-900 block px-4 py-2 rounded-none text-base font-medium uppercase" onClick={() => setIsMenuOpen(false)}>
+                BLOG
               </Link>
-              <Link href="/rockets" className="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
-                Rockets
+              <Link href="/rockets" className="underline-animate text-gray-700 hover:text-gray-900 block px-4 py-2 rounded-none text-base font-medium uppercase" onClick={() => setIsMenuOpen(false)}>
+                ROCKETS
               </Link>
-              <Link href="/sponsors" className="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
-                Sponsors
+              <Link href="/sponsors" className="underline-animate text-gray-700 hover:text-gray-900 block px-4 py-2 rounded-none text-base font-medium uppercase" onClick={() => setIsMenuOpen(false)}>
+                SPONSORS
               </Link>
-              <Link href="/signup" className="bg-red-600 hover:bg-red-700 text-white block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
-                Sign Up
+              <Link href="/signup" className="bg-red-600 hover:bg-red-700 text-white block px-4 py-2 rounded-none text-base font-medium uppercase text-center" onClick={() => setIsMenuOpen(false)}>
+                SIGN UP
               </Link>
             </div>
           </div>
