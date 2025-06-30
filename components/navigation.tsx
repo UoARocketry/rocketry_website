@@ -1,8 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import BurgerMenu from "./ui/burger-menu";
 
 export default function Navigation() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
 
   return (
     <nav className="bg-white shadow-md fixed w-full top-0 z-50">
@@ -56,7 +63,16 @@ export default function Navigation() {
               </Link>
             </div>
           </div>
+
+          {/* Burger menu button */}
+          <div className="md:hidden">
+            <button onClick={toggleMenu} className="text-gray-700 hover:text-gray-900 cursor-pointer focus:outline-none focus:text-gray-900">
+              <BurgerMenu isOpen={isMenuOpen} />
+            </button>
+          </div>
         </div>
+
+        
       </div>
     </nav>
   );
