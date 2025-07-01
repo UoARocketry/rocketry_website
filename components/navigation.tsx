@@ -27,38 +27,32 @@ export default function Navigation() {
             <div className="ml-10 flex items-baseline space-x-8">
               <Link
                 href="/about"
-                className="underline-animate text-gray-700 hover:text-gray-900 px-4 py-2 rounded-none text-sm font-medium transition-colors uppercase"
-              >
+                className="underline-animate text-gray-700 hover:text-gray-900 px-4 py-2 rounded-none text-sm font-medium transition-colors uppercase">
                 ABOUT
               </Link>
               <Link
                 href="/events"
-                className="underline-animate text-gray-700 hover:text-gray-900 px-4 py-2 rounded-none text-sm font-medium transition-colors uppercase"
-              >
+                className="underline-animate text-gray-700 hover:text-gray-900 px-4 py-2 rounded-none text-sm font-medium transition-colors uppercase">
                 EVENTS
               </Link>
               <Link
                 href="/blogs"
-                className="underline-animate text-gray-700 hover:text-gray-900 px-4 py-2 rounded-none text-sm font-medium transition-colors uppercase"
-              >
+                className="underline-animate text-gray-700 hover:text-gray-900 px-4 py-2 rounded-none text-sm font-medium transition-colors uppercase">
                 BLOG
               </Link>
               <Link
                 href="/rockets"
-                className="underline-animate text-gray-700 hover:text-gray-900 px-4 py-2 rounded-none text-sm font-medium transition-colors uppercase"
-              >
+                className="underline-animate text-gray-700 hover:text-gray-900 px-4 py-2 rounded-none text-sm font-medium transition-colors uppercase">
                 ROCKETS
               </Link>
               <Link
                 href="/sponsors"
-                className="underline-animate text-gray-700 hover:text-gray-900 px-4 py-2 rounded-none text-sm font-medium transition-colors uppercase"
-              >
+                className="underline-animate text-gray-700 hover:text-gray-900 px-4 py-2 rounded-none text-sm font-medium transition-colors uppercase">
                 SPONSORS
               </Link>
               <Link
                 href="/signup"
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-none text-sm font-medium transition-colors uppercase text-center"
-              >
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-none text-sm font-medium transition-colors uppercase text-center">
                 SIGN UP
               </Link>
             </div>
