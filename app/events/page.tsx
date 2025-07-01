@@ -2,16 +2,16 @@ import Card from "@/components/ui/card";
 
 export default function EventsPage() {
   return (
-    <main className="min-h-screen bg-gray-50 pb-16">
-      <section className="max-w-7xl mx-auto pt-12 pb-6 px-4 text-left">
-        <h1 className="text-5xl font-extrabold mb-4">Events</h1>
-        <p className="text-lg text-gray-700">
+    <main className="min-h-screen bg-background pb-16 text-text-main">
+      <section className="max-w-7xl mx-auto pt-16 pb-8 px-4 text-left">
+        <h1 className="text-5xl font-extrabold mb-4 text-primary">Events</h1>
+        <p className="text-lg text-text-secondary max-w-2xl">
           Discover and join our upcoming and past events! From launches to workshops, our events are open to all members and enthusiasts. Stay tuned for more updates and relive the highlights from our past activities.
         </p>
       </section>
 
       <section className="max-w-7xl mx-auto px-4">
-        <h2 className="text-3xl font-bold mb-4 mt-10 text-left">Upcoming Events</h2>
+        <h2 className="text-3xl font-bold mb-4 mt-10 text-primary">Upcoming Events</h2>
         <div className="grid gap-8 grid-cols-1 sm:grid-cols-2">
           <Card
             image="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80"
@@ -40,8 +40,8 @@ export default function EventsPage() {
         </div>
       </section>
 
-      <section className="max-w-7xl mx-auto px-4">
-        <h2 className="text-3xl font-bold mb-4 mt-10 text-left">Past Events</h2>
+      <section className="max-w-7xl mx-auto px-4 mt-16">
+        <h2 className="text-3xl font-bold mb-4 text-primary">Past Events</h2>
         <div className="grid gap-8 grid-cols-1 sm:grid-cols-2">
           <Card
             image="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80"
