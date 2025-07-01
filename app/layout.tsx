@@ -24,10 +24,10 @@ export default function RootLayout({ children, }: Readonly<{ children: React.Rea
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`dark ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Navigation />
-        <main className="pt-16 min-h-screen">
+        <main className="pt-16 min-h-screen mt-16">
           {children}
         </main>
         <Footer />
