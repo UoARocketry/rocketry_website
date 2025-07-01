@@ -37,6 +37,7 @@ export default function BlogsPage() {
         </p>
       </section>
       <section className="max-w-7xl mx-auto px-4">
+        <h2 className="text-3xl font-bold mb-4 text-primary">Recent</h2>
         <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
           {dummyBlogs.map((blog) => (
             <a key={blog.id} href={`/blogs/${blog.slug}`} className="block h-full">
@@ -49,6 +50,40 @@ export default function BlogsPage() {
               />
             </a>
           ))}
+        </div>
+      </section>
+
+      <section className="max-w-7xl mx-auto px-4 mt-16">
+        <h2 className="text-3xl font-bold mb-4 text-primary">Projects</h2>
+        <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+          {dummyBlogs.map((blog) => (
+              <a key={blog.id} href={`/blogs/${blog.slug}`} className="block h-full">
+                <Card
+                  image={blog.image}
+                  title={blog.title}
+                  date={new Date(blog.date).toLocaleDateString()}
+                  description={blog.description}
+                  vertical
+                />
+              </a>
+            ))}
+        </div>
+      </section>
+
+      <section className="max-w-7xl mx-auto px-4 mt-16">
+        <h2 className="text-3xl font-bold mb-4 text-primary">Other</h2>
+        <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+          {dummyBlogs.map((blog) => (
+              <a key={blog.id} href={`/blogs/${blog.slug}`} className="block h-full">
+                <Card
+                  image={blog.image}
+                  title={blog.title}
+                  date={new Date(blog.date).toLocaleDateString()}
+                  description={blog.description}
+                  vertical
+                />
+              </a>
+            ))}
         </div>
       </section>
 
