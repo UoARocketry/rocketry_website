@@ -57,8 +57,20 @@ export default function Navigation() {
               </Link>
               <Link
                 href="/signup"
-                className="bg-primary hover:bg-[#a94425] text-white px-6 py-2 rounded-full text-base font-bold shadow transition-colors uppercase text-center"
-                style={{ boxShadow: '0 2px 8px 0 rgba(0,0,0,0.15)' }}>
+                className="text-white px-6 py-2 rounded-lg text-base font-bold uppercase text-center"
+                style={{ 
+                  boxShadow: '0 4px 12px 0 rgba(0,0,0,0.25)',
+                  background: '#ea580c',
+                  color: '#ffffff',
+                  transition: 'all 0.2s ease-in-out',
+                  transform: 'scale(1)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'scale(1.02)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)';
+                }}>
                 SIGN UP
               </Link>
             </div>
@@ -75,25 +87,48 @@ export default function Navigation() {
         {/* Burger nav */}
         {isMenuOpen && (
           <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-surface border-t border-surface">
-              <Link href="/about" className="underline-animate text-text-main hover:text-primary block px-4 py-2 rounded-none text-base font-medium uppercase" onClick={() => setIsMenuOpen(false)}>
-                ABOUT
-              </Link>
-              <Link href="/events" className="underline-animate text-text-main hover:text-primary block px-4 py-2 rounded-none text-base font-medium uppercase" onClick={() => setIsMenuOpen(false)}>
-                EVENTS
-              </Link>
-              <Link href="/blogs" className="underline-animate text-text-main hover:text-primary block px-4 py-2 rounded-none text-base font-medium uppercase" onClick={() => setIsMenuOpen(false)}>
-                BLOG
-              </Link>
-              <Link href="/rockets" className="underline-animate text-text-main hover:text-primary block px-4 py-2 rounded-none text-base font-medium uppercase" onClick={() => setIsMenuOpen(false)}>
-                ROCKETS
-              </Link>
-              <Link href="/sponsors" className="underline-animate text-text-main hover:text-primary block px-4 py-2 rounded-none text-base font-medium uppercase" onClick={() => setIsMenuOpen(false)}>
-                SPONSORS
-              </Link>
-              <Link href="/signup" className="bg-primary hover:bg-[#a94425] text-white block px-4 py-2 rounded-none text-base font-medium uppercase text-center" onClick={() => setIsMenuOpen(false)}>
-                SIGN UP
-              </Link>
+            <div className="px-2 pt-2 pb-3 space-y-4 sm:px-3 bg-surface border-t border-surface">
+              {/* Links row - centered */}
+              <div className="flex flex-wrap justify-center items-center gap-4">
+                <Link href="/about" className="underline-animate text-text-main hover:text-primary px-3 py-2 rounded-none text-sm font-medium uppercase text-center" onClick={() => setIsMenuOpen(false)}>
+                  ABOUT
+                </Link>
+                <Link href="/events" className="underline-animate text-text-main hover:text-primary px-3 py-2 rounded-none text-sm font-medium uppercase text-center" onClick={() => setIsMenuOpen(false)}>
+                  EVENTS
+                </Link>
+                <Link href="/blogs" className="underline-animate text-text-main hover:text-primary px-3 py-2 rounded-none text-sm font-medium uppercase text-center" onClick={() => setIsMenuOpen(false)}>
+                  BLOG
+                </Link>
+                <Link href="/rockets" className="underline-animate text-text-main hover:text-primary px-3 py-2 rounded-none text-sm font-medium uppercase text-center" onClick={() => setIsMenuOpen(false)}>
+                  ROCKETS
+                </Link>
+                <Link href="/sponsors" className="underline-animate text-text-main hover:text-primary px-3 py-2 rounded-none text-sm font-medium uppercase text-center" onClick={() => setIsMenuOpen(false)}>
+                  SPONSORS
+                </Link>
+              </div>
+              
+              {/* Button - centered below links */}
+              <div className="flex justify-center w-full">
+                <Link 
+                  href="/signup" 
+                  className="bg-primary hover:bg-[#a94425] text-white px-6 py-3 rounded-lg text-base font-bold uppercase text-center w-full" 
+                  style={{ 
+                    boxShadow: '0 4px 12px 0 rgba(0,0,0,0.25)',
+                    background: '#ea580c',
+                    color: '#ffffff',
+                    transition: 'all 0.2s ease-in-out',
+                    transform: 'scale(1)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'scale(1.02)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }}
+                  onClick={() => setIsMenuOpen(false)}>
+                  SIGN UP
+                </Link>
+              </div>
             </div>
           </div>
         )}
