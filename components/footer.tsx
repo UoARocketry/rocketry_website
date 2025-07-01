@@ -31,7 +31,7 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-lg font-semibold mb-4 text-primary">Quick Links</h4>
+            <h4 className="text-lg font-semibold mb-4 text-primary text-shadow-lg">Quick Links</h4>
             <ul className="space-y-2 text-left">
               <li>
                 <Link href="/about" className="underline-animate text-text-secondary hover:text-primary transition-colors uppercase py-2 rounded-none">
@@ -63,7 +63,7 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h4 className="text-lg font-semibold mb-4 text-primary">Contact</h4>
+            <h4 className="text-lg font-semibold mb-4 text-primary text-shadow-lg">Contact</h4>
             <div className="space-y-2">
               <p className="text-text-secondary">
                 <a href="mailto:uoarocketryclub@auckland.ac.nz" className="hover:text-primary transition-colors">
