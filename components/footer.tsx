@@ -5,25 +5,25 @@ import InstagramIcon from "./ui/instagram-icon";
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-900 text-white">
+    <footer className="!bg-surface text-text-main border-t border-background shadow-lg" style={{backgroundColor: '#232323',}}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
 
           {/* Logo and Description */}
-          <div className="col-span-1 md:col-span-2">
-            <h3 className="text-2xl font-bold mb-4">UARC</h3>
-            <p className="text-gray-300 mb-4 max-w-md">
+          <div className="col-span-1 md:col-span-2 flex flex-col items-start">
+            <img src="/UARC logo.png" alt="UARC Logo" className="h-12 mb-4 drop-shadow-lg" style={{ filter: 'drop-shadow(0 10px 8px rgba(0,0,0,0.5))' }} />
+            <p className="text-text-secondary mb-4 max-w-md">
               The University of Auckland Rocketry Club is a student-led rocketry club dedicated to designing, 
               building, and launching rockets. Join us in exploring aerospace engineering and space exploration.
             </p>
             <div className="flex space-x-4">
-              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-colors">
+              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-text-secondary hover:text-primary transition-colors">
                 <LinkedInIcon />
               </a>
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-colors">
+              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-text-secondary hover:text-primary transition-colors">
                 <FacebookIcon />
               </a>
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-colors">
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-text-secondary hover:text-primary transition-colors">
                 <InstagramIcon />
               </a>
             </div>
@@ -31,30 +31,30 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
+            <h4 className="text-lg font-semibold mb-4 text-primary">Quick Links</h4>
             <ul className="space-y-2 text-left">
               <li>
-                <Link href="/about" className="underline-animate text-gray-300 hover:text-white transition-colors uppercase py-2 rounded-none">
+                <Link href="/about" className="underline-animate text-text-secondary hover:text-primary transition-colors uppercase py-2 rounded-none">
                   ABOUT
                 </Link>
               </li>
               <li>
-                <Link href="/events" className="underline-animate text-gray-300 hover:text-white transition-colors uppercase py-2 rounded-none">
+                <Link href="/events" className="underline-animate text-text-secondary hover:text-primary transition-colors uppercase py-2 rounded-none">
                   EVENTS
                 </Link>
               </li>
               <li>
-                <Link href="/blogs" className="underline-animate text-gray-300 hover:text-white transition-colors uppercase py-2 rounded-none">
+                <Link href="/blogs" className="underline-animate text-text-secondary hover:text-primary transition-colors uppercase py-2 rounded-none">
                   BLOG
                 </Link>
               </li>
               <li>
-                <Link href="/rockets" className="underline-animate text-gray-300 hover:text-white transition-colors uppercase py-2 rounded-none">
+                <Link href="/rockets" className="underline-animate text-text-secondary hover:text-primary transition-colors uppercase py-2 rounded-none">
                   ROCKETS
                 </Link>
               </li>
               <li>
-                <Link href="/sponsors" className="underline-animate text-gray-300 hover:text-white transition-colors uppercase py-2 rounded-none">
+                <Link href="/sponsors" className="underline-animate text-text-secondary hover:text-primary transition-colors uppercase py-2 rounded-none">
                   SPONSORS
                 </Link>
               </li>
@@ -63,17 +63,17 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h4 className="text-lg font-semibold mb-4">Contact</h4>
+            <h4 className="text-lg font-semibold mb-4 text-primary">Contact</h4>
             <div className="space-y-2">
-              <p className="text-gray-300">
-                <a href="mailto:uoarocketryclub@auckland.ac.nz" className="hover:text-white transition-colors">
+              <p className="text-text-secondary">
+                <a href="mailto:uoarocketryclub@auckland.ac.nz" className="hover:text-primary transition-colors">
                   uoarocketryclub@auckland.ac.nz
                 </a>
               </p>
-              <p className="text-gray-300">
+              <p className="text-text-secondary">
                 University of Auckland
               </p>
-              <p className="text-gray-300">
+              <p className="text-text-secondary">
                 Auckland, New Zealand
               </p>
             </div>
@@ -81,8 +81,8 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-gray-800 mt-8 pt-8 text-center">
-          <p className="text-gray-400">
+        <div className="border-t border-background mt-8 pt-8 text-center">
+          <p className="text-text-secondary">
             © Copyright 2025 University of Auckland Rocketry Club. All rights reserved.
           </p>
         </div>
