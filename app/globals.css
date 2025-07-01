@@ -1,5 +1,42 @@
 @import "tailwindcss";
 
+body {
+  background: #181818;
+  color: #fff;
+  font-family: var(--font-geist-sans), sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #fff;
+}
+
+a {
+  color: #C25632;
+  transition: color 0.2s;
+}
+a:hover, a:focus {
+  color: #E0E0E0;
+}
+
+.button, .btn {
+  background: #C25632;
+  color: #fff;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+.button:hover, .btn:hover {
+  background: #a94425;
+}
+
+.card, .section {
+  background: #232323;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.12);
+  padding: 1.5rem;
+}
+
 /* Underline animation for links */
 .underline-animate {
   position: relative;
@@ -13,7 +50,7 @@
   bottom: 0;
   width: 100%;
   height: 2px;
-  background: currentColor;
+  background: #C25632;
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.3s ease;
