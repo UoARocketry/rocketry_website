@@ -1,4 +1,4 @@
- import Link from "next/link";
+import Link from "next/link";
 import Card from "../components/ui/card";
 
 // Dummy data for the home page
@@ -163,6 +163,32 @@ export default function HomePage() {
                 </div>
             </div>
         </section>
+
+      {/* Sponsors Section */}
+      <section className="py-16 px-4 bg-background">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center md:items-stretch gap-12">
+          <div className="flex-1 flex flex-col justify-center">
+            <h2 className="text-4xl font-extrabold mb-4">Our Sponsors</h2>
+            <p className="text-lg text-text-secondary max-w-2xl">
+              We are grateful for the generous support of our sponsors who make our rocketry projects possible.
+            </p>
+            <div className="text-start mt-8">
+              <Link href="/sponsors" className="button bg-primary text-white px-6 py-3 rounded-full font-bold hover:bg-[#a94425] transition-all duration-200">
+                View Our Sponsors
+              </Link>
+            </div>
+          </div>
+          {/* Placeholder Sponsor Image*/}
+          <div className="flex-1 flex items-center justify-center min-h-[300px] w-full">
+            <img
+              src="/sponsors-placeholder.png"
+              alt="Sponsors Placeholder"
+              className="w-full max-w-md object-contain rounded-xl border border-accent shadow-md bg-white"
+              style={{ minHeight: 200 }}
+            />
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
