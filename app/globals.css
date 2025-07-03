@@ -17,17 +17,6 @@ h1 {
   position: relative;
 }
 
-h1::after {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  left: 0;
-  width: 60px;
-  height: 3px;
-  background: linear-gradient(90deg, #C25632, #E0E0E0);
-  border-radius: 2px;
-}
-
 h2 {
   background: linear-gradient(90deg, #C25632, #E0E0E0);
   background-clip: text;
@@ -36,17 +25,6 @@ h2 {
   color: transparent;
   font-weight: 800;
   position: relative;
-}
-
-h2::after {
-  content: '';
-  position: absolute;
-  bottom: -4px;
-  left: 0;
-  width: 40px;
-  height: 2px;
-  background: linear-gradient(90deg, #C25632, #E0E0E0);
-  border-radius: 1px;
 }
 
 h3, h4, h5, h6 {
