@@ -103,6 +103,36 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      
+      {/* Featured Rockets Section */}
+      <section className="py-16 px-4 bg-surface">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-extrabold mb-4">Featured Rockets</h2>
+            <p className="text-lg text-text-secondary max-w-2xl mx-auto">
+              Explore our latest rocket projects and achievements!
+            </p>
+          </div>
+          <div className="grid grid-cols-1 gap-8">
+            {featuredRockets.map((rocket, idx) => (
+              <Link key={rocket.id} href={`/rockets/${rocket.slug}`} className="block h-full">
+                <Card
+                  image={rocket.image}
+                  title={rocket.name}
+                  date={rocket.launchedAt ? new Date(rocket.launchedAt).toLocaleDateString() : 'TBA'}
+                  description={rocket.description}
+                  reverse={idx % 2 === 1}
+                />
+              </Link>
+            ))}
+          </div>
+          <div className="text-center mt-8">
+            <Link href="/rockets" className="button bg-primary text-white px-6 py-3 font-bold hover:bg-[#a94425] transition-all duration-200">
+              View All Rockets
+            </Link>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
