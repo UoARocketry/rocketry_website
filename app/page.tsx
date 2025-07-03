@@ -85,54 +85,84 @@ const featuredSponsors = [
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-background text-text-main">
-      {/* Hero Section */}
-      <section className="flex flex-col items-center justify-center text-center py-24 px-4 bg-background relative overflow-hidden">
-        <div className="relative z-10">
-          <img src="/UARC logo.png" alt="UARC Logo" className="h-24 mb-6 drop-shadow-xl mx-auto" />
-          <h1 className="text-5xl md:text-6xl font-extrabold mb-4">University of Auckland Rocketry Club</h1>
-          <p className="text-xl md:text-2xl text-text-secondary mb-8 max-w-3xl mx-auto">
-            The University Of Auckland Rocketry Club is a club dedicated to all things rockets. We give students the opportunity to design, build and fly rockets as we learn about aerospace.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link href="/signup" className="button bg-primary text-white text-lg px-8 py-3 font-bold shadow-lg hover:bg-[#a94425] transition-all duration-300 hover:scale-103">
-              Join The Club
-            </Link>
-            <Link href="/rockets" className="button bg-primary text-white text-lg px-8 py-3 font-bold shadow-lg hover:bg-[#a94425] transition-all duration-300 hover:scale-103">
-              View Our Rockets
-            </Link>
-          </div>
-        </div>
-      </section>
-      
-      {/* Featured Rockets Section */}
-      <section className="py-16 px-4 bg-surface">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-extrabold mb-4">Featured Rockets</h2>
-            <p className="text-lg text-text-secondary max-w-2xl mx-auto">
-              Explore our latest rocket projects and achievements!
-            </p>
-          </div>
-          <div className="grid grid-cols-1 gap-8">
-            {featuredRockets.map((rocket, idx) => (
-              <Link key={rocket.id} href={`/rockets/${rocket.slug}`} className="block h-full">
-                <Card
-                  image={rocket.image}
-                  title={rocket.name}
-                  date={rocket.launchedAt ? new Date(rocket.launchedAt).toLocaleDateString() : 'TBA'}
-                  description={rocket.description}
-                  reverse={idx % 2 === 1}
-                />
-              </Link>
-            ))}
-          </div>
-          <div className="text-center mt-8">
-            <Link href="/rockets" className="button bg-primary text-white px-6 py-3 font-bold hover:bg-[#a94425] transition-all duration-200">
-              View All Rockets
-            </Link>
-          </div>
-        </div>
-      </section>
+        {/* Hero Section */}
+        <section className="flex flex-col items-center justify-center text-center py-24 px-4 bg-background relative overflow-hidden">
+            <div className="relative z-10">
+                <img src="/UARC logo.png" alt="UARC Logo" className="h-24 mb-6 drop-shadow-xl mx-auto" />
+                <h1 className="text-5xl md:text-6xl font-extrabold mb-4">University of Auckland Rocketry Club</h1>
+                <p className="text-xl md:text-2xl text-text-secondary mb-8 max-w-3xl mx-auto">
+                    The University Of Auckland Rocketry Club is a club dedicated to all things rockets. We give students the opportunity to design, build and fly rockets as we learn about aerospace.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <Link href="/signup" className="button bg-primary text-white text-lg px-8 py-3 font-bold shadow-lg hover:bg-[#a94425] transition-all duration-300 hover:scale-103">
+                    Join The Club
+                    </Link>
+                    <Link href="/rockets" className="button bg-primary text-white text-lg px-8 py-3 font-bold shadow-lg hover:bg-[#a94425] transition-all duration-300 hover:scale-103">
+                    View Our Rockets
+                    </Link>
+                </div>
+            </div>
+        </section>
+        
+        {/* Featured Rockets Section */}
+        <section className="py-16 px-4 bg-surface">
+            <div className="max-w-7xl mx-auto">
+                <div className="text-center mb-12">
+                    <h2 className="text-4xl font-extrabold mb-4">Featured Rockets</h2>
+                    <p className="text-lg text-text-secondary max-w-2xl mx-auto">
+                    Explore our latest rocket projects and achievements!
+                    </p>
+                </div>
+                <div className="grid grid-cols-1 gap-8">
+                    {featuredRockets.map((rocket, idx) => (
+                        <Link key={rocket.id} href={`/rockets/${rocket.slug}`} className="block h-full">
+                            <Card
+                            image={rocket.image}
+                            title={rocket.name}
+                            date={rocket.launchedAt ? new Date(rocket.launchedAt).toLocaleDateString() : 'TBA'}
+                            description={rocket.description}
+                            reverse={idx % 2 === 1}
+                            />
+                        </Link>
+                    ))}
+                </div>
+                <div className="text-center mt-8">
+                    <Link href="/rockets" className="button bg-primary text-white px-6 py-3 font-bold hover:bg-[#a94425] transition-all duration-200">
+                    View All Rockets
+                    </Link>
+                </div>
+            </div>
+        </section>
+        
+        {/* Latest Blogs Section */}
+        <section className="py-16 px-4 bg-background">
+            <div className="max-w-7xl mx-auto">
+                <div className="text-center mb-12">
+                    <h2 className="text-4xl font-extrabold mb-4">Latest Updates</h2>
+                    <p className="text-lg text-text-secondary max-w-2xl mx-auto">
+                    Stay up to date with our latest projects, competitions, and blogs!
+                    </p>
+                </div>
+                <div className="grid gap-8 grid-cols-1 sm:grid-cols-2">
+                    {latestBlogs.map((blog) => (
+                        <Link key={blog.id} href={`/blogs/${blog.slug}`} className="block h-full">
+                            <Card
+                            image={blog.image}
+                            title={blog.title}
+                            date={new Date(blog.date).toLocaleDateString()}
+                            description={blog.description}
+                            vertical
+                            />
+                        </Link>
+                    ))}
+                </div>
+                <div className="text-center mt-8">
+                    <Link href="/blogs" className="button bg-primary text-white px-6 py-3 font-bold hover:bg-[#a94425] transition-all duration-200">
+                    Read All Blogs
+                    </Link>
+                </div>
+            </div>
+        </section>
     </main>
   );
 }
