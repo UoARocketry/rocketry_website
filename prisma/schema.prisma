@@ -50,3 +50,12 @@ model Sponsor {
   logo   String
   url    String
 }
+
+model Member {
+  id      Int    @id @default(autoincrement())
+  name    String
+  role    String
+  bio     String
+  photo   String
+  isExec  Boolean @default(false) // true for exec, false for general members
+}
