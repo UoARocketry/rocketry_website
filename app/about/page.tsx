@@ -213,6 +213,26 @@ export default async function AboutPage() {
           </div>
         </div>
       </section>
+
+      {/* Call to Action Section */}
+      <section className="py-16 px-4 bg-background">
+        <div className="max-w-2xl mx-auto">
+          <div className="bg-surface rounded-xl p-8 text-center border border-accent shadow-md" style={{ backgroundColor: '#232323' }}>
+            <h2 className="text-2xl font-bold text-primary mb-2">Ready to Join?</h2>
+            <p className="text-text-secondary mb-4">
+              Whether you're an experienced engineer or just starting your journey in aerospace, there's a place for you in UARC. Join us in pushing the boundaries of student rocketry!
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Link href="https://docs.google.com/forms/d/e/1FAIpQLSfS7PS--UX-fQinUfuYzVLV3-rM92cW7uVFOqoEVczgYLb8Qg/viewform?usp=sf_link" className="button bg-primary text-white px-6 py-3 font-bold hover:bg-[#a94425] transition-all duration-200" target="_blank" rel="noopener noreferrer">
+                Become a Member
+              </Link>
+              <Link href="/events" className="button bg-primary text-white px-6 py-3 font-bold hover:bg-[#a94425] transition-all duration-200">
+                Attend an Event
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
   );
 } 
