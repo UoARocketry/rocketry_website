@@ -79,6 +79,41 @@ export default async function AboutPage() {
           </div>
         </div>
       </section>
+
+      {/* History Section */}
+      <section className="py-16 px-4 bg-background">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-extrabold mb-4">Our Journey</h2>
+            <p className="text-lg text-text-secondary max-w-2xl mx-auto">
+              From humble beginnings to launching rockets that reach new heights
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-surface rounded-lg p-6 border border-accent">
+              <div className="text-4xl mb-4">🚀</div>
+              <h3 className="text-xl font-bold text-primary mb-3">2024 - Foundation</h3>
+              <p className="text-text-secondary">
+                UARC was established by Laura with a vision to bring rocketry to the University of Auckland.
+              </p>
+            </div>
+            <div className="bg-surface rounded-lg p-6 border border-accent">
+              <div className="text-4xl mb-4">🏆</div>
+              <h3 className="text-xl font-bold text-primary mb-3">2025 - First Launch</h3>
+              <p className="text-text-secondary">
+                Successfully launched our first rocket, marking a major milestone in our club's history and proving our engineering capabilities.
+              </p>
+            </div>
+            <div className="bg-surface rounded-lg p-6 border border-accent">
+              <div className="text-4xl mb-4">🌟</div>
+              <h3 className="text-xl font-bold text-primary mb-3">2 - Years Active</h3>
+              <p className="text-text-secondary">
+                Continuing to push boundaries with advanced rocket designs, expanded team, and growing influence in the aerospace community.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
   );
 } 
