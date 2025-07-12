@@ -1,47 +1,13 @@
 import Link from "next/link";
 import Card from "../../components/ui/card";
 
-// Define the Exec type
-type Exec = {
-  id: number;
-  name: string;
-  role: string;
-  bio: string;
-  photo: string;
-  order: number;
-};
-
-// Function to fetch exec data
-async function getExecMembers(): Promise<Exec[]> {
-  try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/exec`, {
-      cache: 'no-store'
-    });
-    
-    if (!response.ok) {
-      console.error('Failed to fetch exec members');
-      return [];
-    }
-    
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching exec members:', error);
-    return [];
-  }
-}
-
 export default async function AboutPage() {
-  const execMembers = await getExecMembers();
   return (
     <main className="min-h-screen bg-background text-text-main pt-20">
       {/* Hero Section */}
       <section className="flex flex-col items-center justify-center text-center py-24 px-4 bg-background relative overflow-hidden">
         <div className="relative z-10 max-w-4xl mx-auto">
-          <img
-            src="https://via.placeholder.com/800x250?text=About+UARC+Placeholder"
-            alt="About UARC Placeholder"
-            className="rounded-xl shadow-2xl w-full max-w-3xl mx-auto"
-          />
+          <img src="" alt="UARC Team" className="rounded-xl shadow-2xl w-full max-w-3xl mx-auto"/>
         </div>
       </section>
 
@@ -131,7 +97,7 @@ export default async function AboutPage() {
             </div>
             <div className="bg-background rounded-lg p-6 text-center border border-accent">
               <div className="text-3xl font-bold text-primary mb-2">50+</div>
-              <p className="text-text-secondary">Active Members</p>
+              <p className="text-text-secondary">Members</p>
             </div>
             <div className="bg-background rounded-lg p-6 text-center border border-accent">
               <div className="text-3xl font-bold text-primary mb-2">100m+</div>
@@ -151,7 +117,7 @@ export default async function AboutPage() {
           <div className="text-center mb-12">
             <h2 className="text-4xl font-extrabold mb-4">Our Team Structure</h2>
             <p className="text-lg text-text-secondary max-w-2xl mx-auto">
-              Organized teams working together to achieve our rocketry goals
+              Organised teams working together to achieve our rocketry goals
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
