@@ -56,7 +56,7 @@ export default function Navigation() {
                 SPONSORS
               </Link>
               <Link
-                href="/signup"
+                href="https://docs.google.com/forms/d/e/1FAIpQLSfS7PS--UX-fQinUfuYzVLV3-rM92cW7uVFOqoEVczgYLb8Qg/viewform?usp=sf_link"
                 className="text-white px-6 py-2 rounded-lg text-base font-bold uppercase text-center"
                 style={{ 
                   boxShadow: '0 4px 12px 0 rgba(0,0,0,0.25)',
@@ -70,7 +70,9 @@ export default function Navigation() {
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = 'scale(1)';
-                }}>
+                }}
+                target="_blank"
+                rel="noopener noreferrer">
                 SIGN UP
               </Link>
             </div>
@@ -110,7 +112,7 @@ export default function Navigation() {
               {/* Button - centered below links */}
               <div className="flex justify-center w-full">
                 <Link 
-                  href="/signup" 
+                  href="https://docs.google.com/forms/d/e/1FAIpQLSfS7PS--UX-fQinUfuYzVLV3-rM92cW7uVFOqoEVczgYLb8Qg/viewform?usp=sf_link" 
                   className="bg-primary hover:bg-[#a94425] text-white px-6 py-3 rounded-lg text-base font-bold uppercase text-center w-full" 
                   style={{ 
                     boxShadow: '0 4px 12px 0 rgba(0,0,0,0.25)',
@@ -125,7 +127,9 @@ export default function Navigation() {
                   onMouseLeave={(e) => {
                     e.currentTarget.style.transform = 'scale(1)';
                   }}
-                  onClick={() => setIsMenuOpen(false)}>
+                  onClick={() => setIsMenuOpen(false)}
+                  target="_blank"
+                  rel="noopener noreferrer">
                   SIGN UP
                 </Link>
               </div>

@@ -94,7 +94,7 @@ export default function HomePage() {
                     The University Of Auckland Rocketry Club is a club dedicated to all things rockets. We give students the opportunity to design, build and fly rockets as we learn about aerospace.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                    <Link href="/signup" className="button bg-primary text-white text-lg px-8 py-3 font-bold shadow-lg hover:bg-[#a94425] transition-all duration-300 hover:scale-103">
+                    <Link href="https://docs.google.com/forms/d/e/1FAIpQLSfS7PS--UX-fQinUfuYzVLV3-rM92cW7uVFOqoEVczgYLb8Qg/viewform?usp=sf_link" className="button bg-primary text-white text-lg px-8 py-3 font-bold shadow-lg hover:bg-[#a94425] transition-all duration-300 hover:scale-103" target="_blank" rel="noopener noreferrer">
                     Join The Club
                     </Link>
                     <Link href="/rockets" className="button bg-primary text-white text-lg px-8 py-3 font-bold shadow-lg hover:bg-[#a94425] transition-all duration-300 hover:scale-103">
