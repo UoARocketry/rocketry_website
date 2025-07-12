@@ -114,6 +114,36 @@ export default async function AboutPage() {
           </div>
         </div>
       </section>
+
+      {/* Achievements Section */}
+      <section className="py-16 px-4 bg-surface">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-extrabold mb-4">Our Achievements</h2>
+            <p className="text-lg text-text-secondary max-w-2xl mx-auto">
+              Milestones that showcase our commitment to excellence in rocketry
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-background rounded-lg p-6 text-center border border-accent">
+              <div className="text-3xl font-bold text-primary mb-2">4+</div>
+              <p className="text-text-secondary">Rockets Launched</p>
+            </div>
+            <div className="bg-background rounded-lg p-6 text-center border border-accent">
+              <div className="text-3xl font-bold text-primary mb-2">50+</div>
+              <p className="text-text-secondary">Active Members</p>
+            </div>
+            <div className="bg-background rounded-lg p-6 text-center border border-accent">
+              <div className="text-3xl font-bold text-primary mb-2">100m+</div>
+              <p className="text-text-secondary">Maximum Altitude</p>
+            </div>
+            <div className="bg-background rounded-lg p-6 text-center border border-accent">
+              <div className="text-3xl font-bold text-primary mb-2">0+</div>
+              <p className="text-text-secondary">Competitions</p>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
   );
 } 
