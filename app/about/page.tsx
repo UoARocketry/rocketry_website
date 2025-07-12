@@ -144,6 +144,75 @@ export default async function AboutPage() {
           </div>
         </div>
       </section>
+
+      {/* Team Structure Section */}
+      <section className="py-16 px-4 bg-background">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-extrabold mb-4">Our Team Structure</h2>
+            <p className="text-lg text-text-secondary max-w-2xl mx-auto">
+              Organized teams working together to achieve our rocketry goals
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="bg-surface rounded-lg p-6 border border-accent">
+              <h3 className="text-xl font-bold text-primary mb-4">Ground Station Team</h3>
+              <p className="text-text-secondary mb-4">
+                Manage launch operations, tracking systems, and communication with rockets during flight.
+              </p>
+              <ul className="text-text-secondary text-sm space-y-2">
+                <li>• Launch coordination</li>
+                <li>• Telemetry tracking</li>
+                <li>• Communication systems</li>
+              </ul>
+            </div>
+            <div className="bg-surface rounded-lg p-6 border border-accent">
+              <h3 className="text-xl font-bold text-primary mb-4">Recovery Team</h3>
+              <p className="text-text-secondary mb-4">
+                Develop parachute systems and recovery mechanisms to safely return rockets to the ground.
+              </p>
+              <ul className="text-text-secondary text-sm space-y-2">
+                <li>• Parachute design</li>
+                <li>• Deployment mechanisms</li>
+                <li>• Landing zone analysis</li>
+              </ul>
+            </div>
+            <div className="bg-surface rounded-lg p-6 border border-accent">
+              <h3 className="text-xl font-bold text-primary mb-4">Structural Team</h3>
+              <p className="text-text-secondary mb-4">
+                Design and manufacture rocket airframes, ensuring structural integrity and aerodynamic efficiency.
+              </p>
+              <ul className="text-text-secondary text-sm space-y-2">
+                <li>• Airframe design</li>
+                <li>• Material selection</li>
+                <li>• Manufacturing processes</li>
+              </ul>
+            </div>
+            <div className="bg-surface rounded-lg p-6 border border-accent">
+              <h3 className="text-xl font-bold text-primary mb-4">Avionics Team</h3>
+              <p className="text-text-secondary mb-4">
+                Handle all electronic systems including flight computers, sensors, and communication systems.
+              </p>
+              <ul className="text-text-secondary text-sm space-y-2">
+                <li>• Flight computer programming</li>
+                <li>• Sensor integration</li>
+                <li>• Telemetry systems</li>
+              </ul>
+            </div>
+            <div className="bg-surface rounded-lg p-6 border border-accent">
+              <h3 className="text-xl font-bold text-primary mb-4">Control Systems Team</h3>
+              <p className="text-text-secondary mb-4">
+                Design and implement guidance, navigation, and control systems for rocket stability and trajectory.
+              </p>
+              <ul className="text-text-secondary text-sm space-y-2">
+                <li>• Guidance algorithms</li>
+                <li>• Navigation systems</li>
+                <li>• Flight control</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
   );
 } 
