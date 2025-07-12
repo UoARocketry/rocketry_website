@@ -164,31 +164,65 @@ export default function HomePage() {
             </div>
         </section>
 
-      {/* Sponsors Section */}
-      <section className="py-16 px-4 bg-background">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center md:items-stretch gap-12">
-          <div className="flex-1 flex flex-col justify-center">
-            <h2 className="text-4xl font-extrabold mb-4">Our Sponsors</h2>
-            <p className="text-lg text-text-secondary max-w-2xl">
-              We are grateful for the generous support of our sponsors who make our rocketry projects possible.
-            </p>
-            <div className="text-start mt-8">
-              <Link href="/sponsors" className="button bg-primary text-white px-6 py-3 rounded-full font-bold hover:bg-[#a94425] transition-all duration-200">
-                View Our Sponsors
-              </Link>
+        {/* Sponsors Section */}
+        <section className="py-16 px-4 bg-background">
+            <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center md:items-stretch gap-12">
+                <div className="flex-1 flex flex-col justify-center">
+                    <h2 className="text-4xl font-extrabold mb-4">Our Sponsors</h2>
+                    <p className="text-lg text-text-secondary max-w-2xl">
+                    We are grateful for the generous support of our sponsors who make our rocketry projects possible.
+                    </p>
+                    <div className="text-start mt-8">
+                        <Link href="/sponsors" className="button bg-primary text-white px-6 py-3 rounded-full font-bold hover:bg-[#a94425] transition-all duration-200">
+                            View Our Sponsors
+                        </Link>
+                    </div>
+                </div>
+                {/* Placeholder Sponsor Image*/}
+                <div className="flex-1 flex items-center justify-center min-h-[300px] w-full">
+                    <img
+                    src="/sponsors-placeholder.png"
+                    alt="Sponsors Placeholder"
+                    className="w-full max-w-md object-contain rounded-xl border border-accent shadow-md bg-white"
+                    style={{ minHeight: 200 }}
+                    />
+                </div>
             </div>
-          </div>
-          {/* Placeholder Sponsor Image*/}
-          <div className="flex-1 flex items-center justify-center min-h-[300px] w-full">
-            <img
-              src="/sponsors-placeholder.png"
-              alt="Sponsors Placeholder"
-              className="w-full max-w-md object-contain rounded-xl border border-accent shadow-md bg-white"
-              style={{ minHeight: 200 }}
-            />
-          </div>
-        </div>
-      </section>
+        </section>
+
+        {/* Quick Navigation Section */}
+        <section className="py-16 px-4 bg-surface">
+            <div className="max-w-7xl mx-auto">
+                <div className="text-center mb-12">
+                    <h2 className="text-4xl font-extrabold mb-4">Explore More</h2>
+                    <p className="text-lg text-text-secondary max-w-2xl mx-auto">
+                    Discover everything the University of Auckland Rocketry Club has to offer.
+                    </p>
+                </div>
+                <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
+                    <Link href="/events" className="bg-background rounded-lg p-6 text-center hover:bg-primary/10 transition-all duration-200 border border-accent hover:border-primary">
+                        <div className="text-4xl mb-3">📅</div>
+                        <h3 className="text-lg font-bold text-primary mb-2">Events</h3>
+                        <p className="text-text-secondary text-sm">Check out upcoming events and competitions</p>
+                    </Link>
+                    <Link href="/blogs" className="bg-background rounded-lg p-6 text-center hover:bg-primary/10 transition-all duration-200 border border-accent hover:border-primary">
+                        <div className="text-4xl mb-3">📝</div>
+                        <h3 className="text-lg font-bold text-primary mb-2">Blogs</h3>
+                        <p className="text-text-secondary text-sm">Read our latest articles and updates</p>
+                    </Link>
+                    <Link href="/rockets" className="bg-background rounded-lg p-6 text-center hover:bg-primary/10 transition-all duration-200 border border-accent hover:border-primary">
+                        <div className="text-4xl mb-3">🚀</div>
+                        <h3 className="text-lg font-bold text-primary mb-2">Our Rockets</h3>
+                        <p className="text-text-secondary text-sm">View our rocket projects and achievements</p>
+                    </Link>
+                    <Link href="/sponsors" className="bg-background rounded-lg p-6 text-center hover:bg-primary/10 transition-all duration-200 border border-accent hover:border-primary">
+                        <div className="text-4xl mb-3">🤝</div>
+                        <h3 className="text-lg font-bold text-primary mb-2">Sponsors</h3>
+                        <p className="text-text-secondary text-sm">Meet our generous sponsors</p>
+                    </Link>
+                </div>
+            </div>
+        </section>
     </main>
   );
 }
