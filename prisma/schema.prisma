@@ -10,6 +10,7 @@ generator client {
 model Event {
   id          Int      @id @default(autoincrement())
   title       String
+  slug        String   @unique
   description String
   date        DateTime
   location    String

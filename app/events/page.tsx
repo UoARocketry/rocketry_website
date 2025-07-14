@@ -1,6 +1,31 @@
+import Link from "next/link";
 import Card from "@/components/ui/card";
+import prisma from "@/lib/prisma";
 
-export default function EventsPage() {
+export default async function EventsPage() {
+  // Fetch all events from the database, including all used fields
+  const events = await prisma.event.findMany({
+    orderBy: { date: "desc" },
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      description: true,
+      date: true,
+      isPast: true,
+      location: true,
+      createdAt: true,
+    },
+  });
+
+  // Split into upcoming and past
+  const now = new Date();
+  const upcoming = events.filter(e => !e.isPast && new Date(e.date) >= now);
+  const past = events.filter(e => e.isPast || new Date(e.date) < now);
+
+  // Placeholder image for all events
+  const placeholder = "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80";
+
   return (
     <main className="min-h-screen bg-background pb-16 text-text-main">
       <section className="max-w-7xl mx-auto pt-16 pb-8 px-4 text-left">
@@ -13,68 +38,40 @@ export default function EventsPage() {
       <section className="max-w-7xl mx-auto px-4">
         <h2 className="text-3xl font-bold mb-4 mt-10 text-primary">Upcoming Events</h2>
         <div className="grid gap-8 grid-cols-1 sm:grid-cols-2">
-          <Card
-            image="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80"
-            title="Rocket Launch Day 2024"
-            date="July 20, 2024"
-            description="Join us for our annual Rocket Launch Day! Experience the thrill of launching model rockets and learn about the science behind rocketry. Open to all skill levels."
-            vertical
-          />
-          <Card
-            image="https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=600&q=80"
-            title="Rocket Design Workshop"
-            date="August 10, 2024"
-            description="Learn the basics of rocket design and construction in this hands-on workshop. Materials provided, just bring your curiosity!"
-            vertical
-          />
-          <Card
-            image="https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80"
-            title="Propulsion Seminar"
-            date="September 5, 2024"
-            description="A deep dive into rocket propulsion systems, featuring guest speakers from the aerospace industry."
-            vertical
-          />
-          <Card
-            image="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80"
-            title="Team Social Night"
-            date="October 2, 2024"
-            description="Meet fellow rocketry enthusiasts, play games, and enjoy some snacks at our club social night!"
-            vertical
-          />
+          {upcoming.length === 0 && (
+            <p className="text-text-secondary col-span-2">No upcoming events at the moment. Check back soon!</p>
+          )}
+          {upcoming.map(event => (
+            <Link key={event.id} href={`/events/${event.slug}`} className="block h-full">
+              <Card
+                image={placeholder}
+                title={event.title}
+                date={new Date(event.date).toLocaleDateString()}
+                description={event.description}
+                vertical
+              />
+            </Link>
+          ))}
         </div>
       </section>
 
       <section className="max-w-7xl mx-auto px-4 mt-16">
         <h2 className="text-3xl font-bold mb-4 text-primary">Past Events</h2>
         <div className="grid gap-8 grid-cols-1 sm:grid-cols-2">
-          <Card
-            image="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80"
-            title="Rocketry Workshop 2023"
-            date="October 15, 2023"
-            description="A hands-on workshop where members built and launched their own model rockets. Thanks to everyone who participated and made it a blast!"
-            vertical
-          />
-          <Card
-            image="https://images.unsplash.com/photo-1468421870903-4df1664ac249?auto=format&fit=crop&w=600&q=80"
-            title="Annual General Meeting 2023"
-            date="September 12, 2023"
-            description="Our yearly AGM where we discussed club progress, elected new execs, and planned for the future."
-            vertical
-          />
-          <Card
-            image="https://images.unsplash.com/photo-1465101178521-c1a9136a3fd8?auto=format&fit=crop&w=600&q=80"
-            title="Rocket Build Night"
-            date="August 18, 2023"
-            description="Members gathered to build and decorate their own rockets, with prizes for the most creative designs."
-            vertical
-          />
-          <Card
-            image="https://images.unsplash.com/photo-1468449032589-876ed4b3eefe?auto=format&fit=crop&w=600&q=80"
-            title="Intro to Rocketry Seminar"
-            date="July 5, 2023"
-            description="An introductory seminar for new members covering the basics of rocketry and club activities."
-            vertical
-          />
+          {past.length === 0 && (
+            <p className="text-text-secondary col-span-2">No past events yet.</p>
+          )}
+          {past.map(event => (
+            <Link key={event.id} href={`/events/${event.slug}`} className="block h-full">
+              <Card
+                image={placeholder}
+                title={event.title}
+                date={new Date(event.date).toLocaleDateString()}
+                description={event.description}
+                vertical
+              />
+            </Link>
+          ))}
         </div>
       </section>
     </main>
