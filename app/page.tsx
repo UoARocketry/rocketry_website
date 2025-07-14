@@ -1,25 +1,15 @@
 import Link from "next/link";
 import Card from "../components/ui/card";
+import prisma from "../lib/prisma";
 
-// Dummy data for the home page
-const featuredRockets = [
-  {
-    id: 1,
-    name: 'Aurora',
-    slug: 'aurora',
-    description: 'Our flagship high-altitude research rocket, designed for maximum altitude and payload capacity.',
-    image: 'https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80',
-    launchedAt: '2023-05-12',
-  },
-  {
-    id: 2,
-    name: 'Pioneer',
-    slug: 'pioneer',
-    description: 'A compact, reusable rocket built for rapid prototyping and testing new avionics.',
-    image: 'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=600&q=80',
-    launchedAt: '2022-11-03',
-  },
-];
+export default async function HomePage() {
+  // Fetch featured rockets from the database (latest 2)
+  const featuredRockets = await prisma.rocket.findMany({
+    take: 2,
+    orderBy: {
+      launchedAt: 'desc'
+    }
+  });
 
 const latestBlogs = [
   {
@@ -82,7 +72,6 @@ const featuredSponsors = [
   },
 ];
 
-export default function HomePage() {
   return (
     <main className="min-h-screen bg-background text-text-main">
         {/* Hero Section */}
