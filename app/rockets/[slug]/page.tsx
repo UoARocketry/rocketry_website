@@ -1,22 +1,20 @@
-import { notFound } from 'next/navigation';
-import prisma from '../../../lib/prisma';
+import { notFound } from 'next/navigation'
+import prisma from '../../../lib/prisma'
 
 interface RocketPageProps {
-  params: {
-    slug: string;
-  };
+  params: Promise<{ slug: string }>
 }
 
-export default async function RocketPage(props: RocketPageProps) {
-  const { params } = await props;
+export default async function RocketPage({ params }: RocketPageProps) {
+  // await the params promise to pull out slug
+  const { slug } = await params
+
   const rocket = await prisma.rocket.findUnique({
-    where: {
-      slug: params.slug,
-    },
-  });
+    where: { slug },
+  })
 
   if (!rocket) {
-    notFound();
+    notFound()
   }
 
   return (
@@ -35,10 +33,13 @@ export default async function RocketPage(props: RocketPageProps) {
           {/* Rocket Details */}
           <div className="space-y-6">
             <div>
-              <h1 className="text-5xl font-extrabold mb-4 text-primary">{rocket.name}</h1>
+              <h1 className="text-5xl font-extrabold mb-4 text-primary">
+                {rocket.name}
+              </h1>
               {rocket.launchedAt && (
                 <p className="text-lg text-text-secondary mb-4">
-                  Launched: {new Date(rocket.launchedAt).toLocaleDateString()}
+                  Launched:{' '}
+                  {new Date(rocket.launchedAt).toLocaleDateString()}
                 </p>
               )}
             </div>
@@ -51,7 +52,9 @@ export default async function RocketPage(props: RocketPageProps) {
 
             {/* Additional Details */}
             <div className="bg-surface rounded-lg p-6 border border-accent">
-              <h3 className="text-xl font-bold text-primary mb-4">Technical Specifications</h3>
+              <h3 className="text-xl font-bold text-primary mb-4">
+                Technical Specifications
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-text-secondary">Rocket Name</p>
@@ -65,13 +68,18 @@ export default async function RocketPage(props: RocketPageProps) {
                 </div>
                 {rocket.launchedAt && (
                   <div>
-                    <p className="text-sm text-text-secondary">Launch Date</p>
+                    <p className="text-sm text-text-secondary">
+                      Launch Date
+                    </p>
                     <p className="font-semibold">
-                      {new Date(rocket.launchedAt).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      })}
+                      {new Date(rocket.launchedAt).toLocaleDateString(
+                        'en-US',
+                        {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                        }
+                      )}
                     </p>
                   </div>
                 )}
@@ -91,5 +99,5 @@ export default async function RocketPage(props: RocketPageProps) {
         </div>
       </section>
     </main>
-  );
-} 
+  )
+}
