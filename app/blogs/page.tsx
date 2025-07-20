@@ -1,33 +1,23 @@
 import Card from "@/components/ui/card";
+import prisma from '@/lib/prisma';
+import { BlogPost } from '@prisma/client';
 
-const dummyBlogs = [
-  {
-    id: 1,
-    title: "How We Built Aurora: Behind the Scenes",
-    date: "2024-06-15",
-    image: "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80",
-    description: "A deep dive into the engineering, teamwork, and challenges behind our flagship rocket, Aurora.",
-    slug: "how-we-built-aurora"
-  },
-  {
-    id: 2,
-    title: "Rocketry 101: Getting Started as a Student",
-    date: "2024-05-28",
-    image: "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=600&q=80",
-    description: "Tips, resources, and advice for students interested in joining the world of rocketry.",
-    slug: "rocketry-101"
-  },
-  {
-    id: 3,
-    title: "Competition Recap: Our Experience at Spaceport America Cup",
-    date: "2024-04-10",
-    image: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80",
-    description: "Highlights and lessons learned from our recent competition at Spaceport America Cup.",
-    slug: "spaceport-america-cup-recap"
-  },
-];
+async function getBlogsByCategory() {
+  const blogs: BlogPost[] = await prisma.blogPost.findMany({
+    orderBy: { date: 'desc' }
+  });
+  // Group blogs by category
+  const grouped = {
+    recent: blogs.filter((b: BlogPost) => b.category === 'recent'),
+    projects: blogs.filter((b: BlogPost) => b.category === 'projects'),
+    other: blogs.filter((b: BlogPost) => b.category === 'other'),
+  };
+  return grouped;
+}
 
-export default function BlogsPage() {
+export default async function BlogsPage() {
+  const blogsByCategory = await getBlogsByCategory();
+
   return (
     <main className="min-h-screen bg-background pb-16 text-text-main">
       <section className="max-w-7xl mx-auto pt-16 pb-8 px-4 text-left">
@@ -39,13 +29,13 @@ export default function BlogsPage() {
       <section className="max-w-7xl mx-auto px-4">
         <h2 className="text-3xl font-bold mb-4 text-primary">Recent</h2>
         <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
-          {dummyBlogs.map((blog) => (
+          {blogsByCategory.recent.map((blog: BlogPost) => (
             <a key={blog.id} href={`/blogs/${blog.slug}`} className="block h-full">
               <Card
-                image={blog.image}
+                image={"/UARC logo.png"}
                 title={blog.title}
                 date={new Date(blog.date).toLocaleDateString()}
-                description={blog.description}
+                description={blog.content}
                 vertical
               />
             </a>
@@ -56,34 +46,34 @@ export default function BlogsPage() {
       <section className="max-w-7xl mx-auto px-4 mt-16">
         <h2 className="text-3xl font-bold mb-4 text-primary">Projects</h2>
         <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
-          {dummyBlogs.map((blog) => (
-              <a key={blog.id} href={`/blogs/${blog.slug}`} className="block h-full">
-                <Card
-                  image={blog.image}
-                  title={blog.title}
-                  date={new Date(blog.date).toLocaleDateString()}
-                  description={blog.description}
-                  vertical
-                />
-              </a>
-            ))}
+          {blogsByCategory.projects.map((blog: BlogPost) => (
+            <a key={blog.id} href={`/blogs/${blog.slug}`} className="block h-full">
+              <Card
+                image={"/UARC logo.png"}
+                title={blog.title}
+                date={new Date(blog.date).toLocaleDateString()}
+                description={blog.content}
+                vertical
+              />
+            </a>
+          ))}
         </div>
       </section>
 
       <section className="max-w-7xl mx-auto px-4 mt-16">
         <h2 className="text-3xl font-bold mb-4 text-primary">Other</h2>
         <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
-          {dummyBlogs.map((blog) => (
-              <a key={blog.id} href={`/blogs/${blog.slug}`} className="block h-full">
-                <Card
-                  image={blog.image}
-                  title={blog.title}
-                  date={new Date(blog.date).toLocaleDateString()}
-                  description={blog.description}
-                  vertical
-                />
-              </a>
-            ))}
+          {blogsByCategory.other.map((blog: BlogPost) => (
+            <a key={blog.id} href={`/blogs/${blog.slug}`} className="block h-full">
+              <Card
+                image={"/UARC logo.png"}
+                title={blog.title}
+                date={new Date(blog.date).toLocaleDateString()}
+                description={blog.content}
+                vertical
+              />
+            </a>
+          ))}
         </div>
       </section>
 
