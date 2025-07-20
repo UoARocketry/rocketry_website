@@ -11,51 +11,24 @@ export default async function HomePage() {
     }
   });
 
-const latestBlogs = [
-  {
-    id: 1,
-    title: "How We Built Aurora: Behind the Scenes",
-    date: "2024-06-15",
-    image: "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80",
-    description: "A deep dive into the engineering, teamwork, and challenges behind our flagship rocket, Aurora.",
-    slug: "how-we-built-aurora"
-  },
-  {
-    id: 2,
-    title: "Rocketry 101: Getting Started as a Student",
-    date: "2024-05-28",
-    image: "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=600&q=80",
-    description: "Tips, resources, and advice for students interested in joining the world of rocketry.",
-    slug: "rocketry-101"
-  },
-];
-
-const execTeam = [
-  {
-    id: 1,
-    name: "Alex Chen",
-    role: "President",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80",
-    description: "Leading the club's strategic vision and operations.",
-    slug: "alex-chen"
-  },
-  {
-    id: 2,
-    name: "Sarah Johnson",
-    role: "Vice President",
-    image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?auto=format&fit=crop&w=400&q=80",
-    description: "Overseeing project management and team coordination.",
-    slug: "sarah-johnson"
-  },
-  {
-    id: 3,
-    name: "Michael Rodriguez",
-    role: "Technical Lead",
-    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=400&q=80",
-    description: "Managing technical development and engineering standards.",
-    slug: "michael-rodriguez"
-  },
-];
+  // Fetch latest 2 upcoming events from the database
+  const now = new Date();
+  const latestEvents = await prisma.event.findMany({
+    where: {
+      isPast: false,
+      date: { gte: now }
+    },
+    orderBy: { date: 'asc' },
+    take: 2,
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      description: true,
+      date: true,
+    },
+  });
+  const eventPlaceholder = "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80";
 
 const featuredSponsors = [
   {
@@ -123,31 +96,34 @@ const featuredSponsors = [
             </div>
         </section>
         
-        {/* Latest Blogs Section */}
+        {/* Latest Events Section */}
         <section className="py-16 px-4 bg-background">
             <div className="max-w-7xl mx-auto">
                 <div className="text-center mb-12">
-                    <h2 className="text-4xl font-extrabold mb-4">Latest Updates</h2>
+                    <h2 className="text-4xl font-extrabold mb-4">Upcoming Events</h2>
                     <p className="text-lg text-text-secondary max-w-2xl mx-auto">
-                    Stay up to date with our latest projects, competitions, and blogs!
+                    Join our next events and be part of the excitement!
                     </p>
                 </div>
                 <div className="grid gap-8 grid-cols-1 sm:grid-cols-2">
-                    {latestBlogs.map((blog) => (
-                        <Link key={blog.id} href={`/blogs/${blog.slug}`} className="block h-full">
+                    {latestEvents.length === 0 && (
+                        <p className="text-text-secondary col-span-2">No upcoming events at the moment. Check back soon!</p>
+                    )}
+                    {latestEvents.map((event) => (
+                        <Link key={event.id} href={`/events/${event.slug}`} className="block h-full">
                             <Card
-                            image={blog.image}
-                            title={blog.title}
-                            date={new Date(blog.date).toLocaleDateString()}
-                            description={blog.description}
+                            image={eventPlaceholder}
+                            title={event.title}
+                            date={new Date(event.date).toLocaleDateString()}
+                            description={event.description}
                             vertical
                             />
                         </Link>
                     ))}
                 </div>
                 <div className="text-center mt-8">
-                    <Link href="/blogs" className="button bg-primary text-white px-6 py-3 font-bold hover:bg-[#a94425] transition-all duration-200">
-                    Read All Blogs
+                    <Link href="/events" className="button bg-primary text-white px-6 py-3 font-bold hover:bg-[#a94425] transition-all duration-200">
+                    View All Events
                     </Link>
                 </div>
             </div>
