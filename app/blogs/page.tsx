@@ -76,15 +76,6 @@ export default async function BlogsPage() {
           ))}
         </div>
       </section>
-
-      {/* Contact Section */}
-      <section className="max-w-2xl mx-auto mt-20 px-4">
-        <div className="bg-surface rounded-xl p-8 text-center border border-accent shadow-md" style={{ backgroundColor: '#232323' }}>
-          <h3 className="text-2xl font-bold text-primary mb-2">Want to Contribute?</h3>
-          <p className="text-text-secondary mb-4">Have a story, project, or insight to share? Reach out and get featured on our blog!</p>
-          <a href="mailto:uoarocketryclub@gmail.com" className="button">Contact Us</a>
-        </div>
-      </section>
     </main>
   );
 } 
