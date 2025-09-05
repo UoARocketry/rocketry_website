@@ -1,6 +1,7 @@
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  // directUrl = env("DIRECT_URL") // Uncomment when using supabase
 }
 
 generator client {
@@ -46,17 +47,9 @@ model BlogPost {
 }
 
 model Sponsor {
-  id     Int    @id @default(autoincrement())
-  name   String
-  logo   String
-  url    String
-}
-
-model Member {
-  id      Int    @id @default(autoincrement())
-  name    String
-  role    String
-  bio     String
-  photo   String
-  isExec  Boolean @default(false) // true for exec, false for general members
+  id          Int    @id @default(autoincrement())
+  name        String
+  logo        String
+  url         String
+  description String
 }

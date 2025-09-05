@@ -1,7 +1,14 @@
 import Link from "next/link";
 import Card from "../../components/ui/card";
+import prisma from "../../lib/prisma";
 
 export default async function AboutPage() {
+  // Fetch executive team members
+  const executives = await prisma.exec.findMany({
+    orderBy: {
+      order: 'asc'
+    }
+  });
   return (
     <main className="min-h-screen bg-background text-text-main pt-20">
       {/* Hero Section */}
@@ -77,6 +84,34 @@ export default async function AboutPage() {
                 Continuing to push boundaries with advanced rocket designs, expanded team, and growing influence in the aerospace community.
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Executive Team Section */}
+      <section className="py-16 px-4 bg-surface">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-extrabold mb-4">Our Executive Team</h2>
+            <p className="text-lg text-text-secondary max-w-2xl mx-auto">
+              Meet the dedicated leaders driving UARC forward with their passion for rocketry and aerospace engineering
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {executives.map((exec) => (
+              <div key={exec.id} className="bg-background rounded-lg p-6 border border-accent text-center">
+                <div className="mb-4">
+                  <img 
+                    src={exec.photo} 
+                    alt={exec.name}
+                    className="w-32 h-32 rounded-full mx-auto object-cover border-2 border-accent"
+                  />
+                </div>
+                <h3 className="text-xl font-bold text-primary mb-2">{exec.name}</h3>
+                <p className="text-accent font-semibold mb-3">{exec.role}</p>
+                <p className="text-text-secondary text-sm leading-relaxed">{exec.bio}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
