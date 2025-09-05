@@ -1,4 +1,3 @@
-import prisma from '../../../lib/prisma';
 import { notFound } from 'next/navigation';
 
 interface EventPageProps {
@@ -7,21 +6,19 @@ interface EventPageProps {
 
 const placeholder = "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=800&q=80";
 
-async function getEvent(slug: string) {
-  try {
-    const event = await prisma.event.findUnique({
-      where: { slug: slug },
-    });
-    return event;
-  } catch (error) {
-    console.error('Error fetching event:', error);
+async function getEventFromApi(slug: string) {
+  const base = process.env.NEXT_PUBLIC_BASE_URL ??
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : `http://localhost:${process.env.PORT ?? 3000}`);
+  const res = await fetch(new URL(`/api/events/${slug}`, base).toString(), { cache: 'no-store' });
+  if (!res.ok) {
     return null;
   }
+  return res.json();
 }
 
 export default async function EventPage({ params }: EventPageProps) {
   const { slug } = await params; 
-  const event = await getEvent(slug);
+  const event = await getEventFromApi(slug);
 
   if (!event) {
     notFound();
@@ -100,4 +97,4 @@ export default async function EventPage({ params }: EventPageProps) {
       </section>
     </main>
   );
-} 
+}
