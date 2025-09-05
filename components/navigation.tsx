@@ -41,11 +41,6 @@ export default function Navigation() {
                 EVENTS
               </Link>
               <Link
-                href="/blogs"
-                className="underline-animate text-text-main hover:text-primary px-4 py-2 rounded-none text-sm font-medium transition-colors uppercase">
-                BLOG
-              </Link>
-              <Link
                 href="/rockets"
                 className="underline-animate text-text-main hover:text-primary px-4 py-2 rounded-none text-sm font-medium transition-colors uppercase">
                 ROCKETS

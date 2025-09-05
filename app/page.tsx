@@ -164,16 +164,11 @@ const featuredSponsors = [
                     Discover everything the University of Auckland Rocketry Club has to offer.
                     </p>
                 </div>
-                <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
+                <div className="grid gap-6 grid-cols-1 sm:grid-cols-1 md:grid-cols-3">
                     <Link href="/events" className="bg-background rounded-lg p-6 text-center hover:bg-primary/10 transition-all duration-200 border border-accent hover:border-primary">
                         <div className="text-4xl mb-3">📅</div>
                         <h3 className="text-lg font-bold text-primary mb-2">Events</h3>
                         <p className="text-text-secondary text-sm">Check out upcoming events and competitions</p>
-                    </Link>
-                    <Link href="/blogs" className="bg-background rounded-lg p-6 text-center hover:bg-primary/10 transition-all duration-200 border border-accent hover:border-primary">
-                        <div className="text-4xl mb-3">📝</div>
-                        <h3 className="text-lg font-bold text-primary mb-2">Blogs</h3>
-                        <p className="text-text-secondary text-sm">Read our latest articles and updates</p>
                     </Link>
                     <Link href="/rockets" className="bg-background rounded-lg p-6 text-center hover:bg-primary/10 transition-all duration-200 border border-accent hover:border-primary">
                         <div className="text-4xl mb-3">🚀</div>

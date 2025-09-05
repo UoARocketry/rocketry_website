@@ -44,11 +44,6 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/blogs" className="underline-animate text-text-secondary hover:text-primary transition-colors uppercase py-2 rounded-none">
-                  BLOG
-                </Link>
-              </li>
-              <li>
                 <Link href="/rockets" className="underline-animate text-text-secondary hover:text-primary transition-colors uppercase py-2 rounded-none">
                   ROCKETS
                 </Link>
