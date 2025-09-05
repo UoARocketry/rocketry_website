@@ -1,39 +1,16 @@
 import React from "react";
-import { PrismaClient } from "@prisma/client";
+import SponsorCard from "@/components/ui/sponsor-card";
 
-const prisma = new PrismaClient();
-
-// ...existing code...
-function SponsorCard({ sponsor }: { sponsor: any }) {
-  return (
-    <a
-      href={sponsor.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="bg-surface rounded border border-accent flex flex-col items-center p-6 shadow-[0_2px_12px_0_rgba(194,86,50,0.15)] hover:shadow-[0_6px_24px_0_rgba(194,86,50,0.25)] hover:scale-101 hover:-translate-y-1 hover:ring-1 hover:ring-primary/60 transition-all duration-200"
-      style={{ backgroundColor: '#232323' }}
-    >
-      <img
-        src={sponsor.logo}
-        alt={sponsor.name}
-        className="mb-4 object-contain"
-        style={{ maxHeight: 80, maxWidth: 200, background: '#fff', borderRadius: 8, padding: 8 }}
-      />
-      <h3 className="text-lg font-bold text-primary mb-1 text-center">{sponsor.name}</h3>
-      {sponsor.description ? (
-        <p className="text-sm text-text-secondary text-center mt-1">{sponsor.description}</p>
-      ) : null}
-    </a>
-  );
-}
-
-// ...existing code...
 export default async function SponsorsPage() {
   let sponsors: any[] = [];
   try {
-    sponsors = await prisma.sponsor.findMany({ orderBy: { id: "asc" } });
+    const base = process.env.NEXT_PUBLIC_BASE_URL ??
+      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : `http://localhost:${process.env.PORT ?? 3000}`);
+    const res = await fetch(new URL('/api/sponsors', base).toString(), { cache: 'no-store' });
+    if (res.ok) sponsors = await res.json();
+    else console.warn('Failed to load sponsors from API:', await res.text());
   } catch (e) {
-    console.warn("⚠️  Could not load sponsors from DB:", (e as Error).message);
+    console.warn("⚠️  Could not load sponsors from API:", (e as Error).message);
   }
 
   const tierMap: Record<string, "gold" | "silver" | "bronze"> = {

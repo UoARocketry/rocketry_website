@@ -3,27 +3,27 @@ import Card from "@/components/ui/card";
 import prisma from "@/lib/prisma";
 
 export default async function EventsPage() {
-  // Fetch all events from the database, including all used fields
-  const events = await prisma.event.findMany({
-    orderBy: { date: "desc" },
-    select: {
-      id: true,
-      title: true,
-      slug: true,
-      description: true,
-      date: true,
-      isPast: true,
-      location: true,
-      createdAt: true,
-    },
-  });
+  const base = process.env.NEXT_PUBLIC_BASE_URL ??
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : `http://localhost:${process.env.PORT ?? 3000}`);
+  const res = await fetch(new URL('/api/events', base).toString(), { cache: 'no-store' });
 
-  // Split into upcoming and past
+  if (!res.ok) {
+    console.error('Failed to load events from API:', await res.text());
+    return (
+      <main className="min-h-screen bg-background pb-16 text-text-main">
+        <section className="max-w-7xl mx-auto pt-16 pb-8 px-4 text-left">
+          <h1 className="text-5xl font-extrabold mb-4 text-primary">Events</h1>
+          <p className="text-lg text-text-secondary max-w-2xl">Could not load events.</p>
+        </section>
+      </main>
+    );
+  }
+  const events = await res.json();
+
   const now = new Date();
-  const upcoming = events.filter(e => !e.isPast && new Date(e.date) >= now);
-  const past = events.filter(e => e.isPast || new Date(e.date) < now);
+  const upcoming = events.filter((e: any) => !e.isPast && new Date(e.date) >= now);
+  const past = events.filter((e: any) => e.isPast || new Date(e.date) < now);
 
-  // Placeholder image for all events
   const placeholder = "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80";
 
   return (
@@ -41,7 +41,7 @@ export default async function EventsPage() {
           {upcoming.length === 0 && (
             <p className="text-text-secondary col-span-2">No upcoming events at the moment. Check back soon!</p>
           )}
-          {upcoming.map(event => (
+          {upcoming.map((event: any) => (
             <Link key={event.id} href={`/events/${event.slug}`} className="block h-full">
               <Card
                 image={placeholder}
@@ -61,7 +61,7 @@ export default async function EventsPage() {
           {past.length === 0 && (
             <p className="text-text-secondary col-span-2">No past events yet.</p>
           )}
-          {past.map(event => (
+          {past.map((event: any) => (
             <Link key={event.id} href={`/events/${event.slug}`} className="block h-full">
               <Card
                 image={placeholder}
@@ -76,4 +76,4 @@ export default async function EventsPage() {
       </section>
     </main>
   );
-} 
+}
