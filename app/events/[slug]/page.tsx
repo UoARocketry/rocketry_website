@@ -75,7 +75,7 @@ export default async function EventPage({ params }: EventPageProps) {
                   Join Us!
                 </h3>
                 <p className="text-text-secondary mb-4">
-                  Don't miss out on this exciting event! Make sure to mark your calendar and join us for an unforgettable experience.
+                  Don&apos;t miss out on this exciting event! Make sure to mark your calendar and join us for an unforgettable experience.
                 </p>
                 <button className="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors font-medium">
                   Register Interest

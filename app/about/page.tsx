@@ -79,7 +79,7 @@ export default async function AboutPage() {
               <div className="text-4xl mb-4">🏆</div>
               <h3 className="text-xl font-bold text-primary mb-3">2025 - First Launch</h3>
               <p className="text-text-secondary">
-                Successfully launched our first rocket, marking a major milestone in our club's history and proving our engineering capabilities.
+                Successfully launched our first rocket, marking a major milestone in our club&apos;s history and proving our engineering capabilities.
               </p>
             </div>
             <div className="bg-surface rounded-lg p-6 border border-accent">
@@ -103,7 +103,7 @@ export default async function AboutPage() {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {executives.map((exec: any) => (
+            {executives.map((exec: Exec) => (
               <div key={exec.id} className="bg-background rounded-lg p-6 border border-accent text-center">
                 <div className="mb-4">
                   <img 
@@ -226,7 +226,7 @@ export default async function AboutPage() {
           <div className="bg-surface rounded-xl p-8 text-center border border-accent shadow-md" style={{ backgroundColor: '#232323' }}>
             <h2 className="text-2xl font-bold text-primary mb-2">Ready to Join?</h2>
             <p className="text-text-secondary mb-4">
-              Whether you're an experienced engineer or just starting your journey in aerospace, there's a place for you in UARC. Join us in pushing the boundaries of student rocketry!
+              Whether you&apos;re an experienced engineer or just starting your journey in aerospace, there&apos;s a place for you in UARC. Join us in pushing the boundaries of student rocketry!
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link href="https://docs.google.com/forms/d/e/1FAIpQLSfS7PS--UX-fQinUfuYzVLV3-rM92cW7uVFOqoEVczgYLb8Qg/viewform?usp=sf_link" className="button bg-primary text-white px-6 py-3 font-bold hover:bg-[#a94425] transition-all duration-200" target="_blank" rel="noopener noreferrer">
