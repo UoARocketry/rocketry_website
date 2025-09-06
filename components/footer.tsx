@@ -1,6 +1,5 @@
 import Link from "next/link";
 import LinkedInIcon from "./ui/linkedin-icon";
-import FacebookIcon from "./ui/facebook-icon";
 import InstagramIcon from "./ui/instagram-icon";
 
 export default function Footer() {
@@ -19,9 +18,6 @@ export default function Footer() {
             <div className="flex space-x-4">
               <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-text-secondary hover:text-primary transition-colors">
                 <LinkedInIcon />
-              </a>
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-text-secondary hover:text-primary transition-colors">
-                <FacebookIcon />
               </a>
               <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-text-secondary hover:text-primary transition-colors">
                 <InstagramIcon />
