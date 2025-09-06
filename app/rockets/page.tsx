@@ -1,10 +1,8 @@
 import Card from '../../components/ui/card';
 import Link from 'next/link';
-import prisma from '../../lib/prisma';
 
 export default async function RocketsPage() {
-  const base = process.env.NEXT_PUBLIC_BASE_URL ??
-    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : `http://localhost:${process.env.PORT ?? 3000}`);
+  const base = process.env.NEXT_PUBLIC_BASE_URL ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : `http://localhost:${process.env.PORT ?? 3000}`);
   const res = await fetch(new URL('/api/rockets', base).toString(), { cache: 'no-store' });
 
   if (!res.ok) {

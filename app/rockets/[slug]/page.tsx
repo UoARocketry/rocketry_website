@@ -1,18 +1,14 @@
-// ...existing code...
 import { notFound } from 'next/navigation'
-// remove direct prisma import
-// ...existing code...
 
 interface RocketPageProps {
-  params: Promise<{ slug: string }>
+  readonly params: Promise<{ slug: string }>
 }
 
 export default async function RocketPage({ params }: RocketPageProps) {
   // await the params promise to pull out slug
   const { slug } = await params
 
-  const base = process.env.NEXT_PUBLIC_BASE_URL ??
-    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : `http://localhost:${process.env.PORT ?? 3000}`);
+  const base = process.env.NEXT_PUBLIC_BASE_URL ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : `http://localhost:${process.env.PORT ?? 3000}`);
   const res = await fetch(new URL(`/api/rockets/${slug}`, base).toString(), { cache: 'no-store' });
 
   if (!res.ok) {
@@ -28,7 +24,6 @@ export default async function RocketPage({ params }: RocketPageProps) {
     notFound()
   }
 
-  // ...existing rendering code...
   return (
     <main className="min-h-screen max-w-7xl mx-auto pb-16">
       <section className="max-w-7xl mx-auto pt-16 pb-8 px-4">

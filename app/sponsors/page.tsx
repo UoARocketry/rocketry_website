@@ -4,9 +4,7 @@ import SponsorCard from "@/components/ui/sponsor-card";
 export default async function SponsorsPage() {
   let sponsors: any[] = [];
   try {
-    const base =
-      process.env.NEXT_PUBLIC_BASE_URL ??
-      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : `http://localhost:${process.env.PORT ?? 3000}`);
+    const base = process.env.NEXT_PUBLIC_BASE_URL ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : `http://localhost:${process.env.PORT ?? 3000}`);
     const res = await fetch(new URL("/api/sponsors", base).toString(), { cache: "no-store" });
     if (res.ok) sponsors = await res.json();
     else console.warn("Failed to load sponsors from API:", await res.text());

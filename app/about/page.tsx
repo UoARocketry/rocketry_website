@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 export default async function AboutPage() {
-  // Fetch executive team members via API route instead of calling Prisma directly
+  // Fetch executive team members via API route
   const origin = process.env.NEXT_PUBLIC_SITE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : `http://localhost:${process.env.PORT ?? 3000}`);
 
   const res = await fetch(new URL("/api/about", origin).toString(), { cache: "no-store" });

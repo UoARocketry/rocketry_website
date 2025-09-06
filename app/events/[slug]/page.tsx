@@ -1,14 +1,13 @@
 import { notFound } from 'next/navigation';
 
 interface EventPageProps {
-  params: Promise<{ slug: string }>
+  readonly params: Promise<{ slug: string }>
 }
 
 const placeholder = "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=800&q=80";
 
 async function getEventFromApi(slug: string) {
-  const base = process.env.NEXT_PUBLIC_BASE_URL ??
-    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : `http://localhost:${process.env.PORT ?? 3000}`);
+  const base = process.env.NEXT_PUBLIC_BASE_URL ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : `http://localhost:${process.env.PORT ?? 3000}`);
   const res = await fetch(new URL(`/api/events/${slug}`, base).toString(), { cache: 'no-store' });
   if (!res.ok) {
     return null;
