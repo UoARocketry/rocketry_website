@@ -14,7 +14,12 @@ export default async function SponsorsPage() {
   let sponsors: Sponsor[] = [];
   try {
     const base = process.env.NEXT_PUBLIC_BASE_URL ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : `http://localhost:${process.env.PORT ?? 3000}`);
-    const res = await fetch(new URL("/api/sponsors", base).toString(), { cache: "no-store" });
+    const res = await fetch(new URL("/api/sponsors", base).toString(), { 
+      cache: "no-store",
+      headers: {
+        'Cache-Control': 'no-cache',
+      }
+    });
     if (res.ok) sponsors = await res.json();
     else console.warn("Failed to load sponsors from API:", await res.text());
   } catch (e) {

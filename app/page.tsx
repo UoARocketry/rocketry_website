@@ -1,5 +1,4 @@
-'use client';
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Link from "next/link";
 import Card from "../components/ui/card";
 
@@ -20,33 +19,27 @@ type EventItem = {
   date: string;
 };
 
-export default function HomePage() {
-  const [featuredRockets, setFeaturedRockets] = useState<Rocket[]>([]);
-  const [latestEvents, setLatestEvents] = useState<EventItem[]>([]);
-  const [loading, setLoading] = useState(true);
+export default async function HomePage() {
+  let featuredRockets: Rocket[] = [];
+  let latestEvents: EventItem[] = [];
 
-  useEffect(() => {
-    let mounted = true;
-    async function load() {
-      try {
-        const [rRes, eRes] = await Promise.all([
-          fetch("/api/rockets"),
-          fetch("/api/events"),
-        ]);
-        if (!mounted) return;
-        if (rRes.ok) setFeaturedRockets(await rRes.json());
-        if (eRes.ok) setLatestEvents(await eRes.json());
-      } catch (err) {
-        console.error("Failed to load homepage data", err);
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    }
-    load();
-    return () => {
-      mounted = false;
-    };
-  }, []);
+  try {
+    const base =
+      process.env.NEXT_PUBLIC_BASE_URL ??
+      (process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : `http://localhost:${process.env.PORT ?? 3000}`);
+
+    const [rRes, eRes] = await Promise.all([
+      fetch(new URL("/api/rockets", base).toString(), { cache: "no-store" }),
+      fetch(new URL("/api/events", base).toString(), { cache: "no-store" }),
+    ]);
+
+    if (rRes.ok) featuredRockets = await rRes.json();
+    if (eRes.ok) latestEvents = await eRes.json();
+  } catch (err) {
+    console.error("Failed to load homepage data", err);
+  }
 
   const eventPlaceholder =
     "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80";
@@ -98,27 +91,30 @@ export default function HomePage() {
             </p>
           </div>
           <div className="grid grid-cols-1 gap-8">
-            {loading && <p className="text-text-secondary">Loading...</p>}
-            {!loading &&
-              featuredRockets.map((rocket, idx) => (
-                <Link
-                  key={rocket.id}
-                  href={`/rockets/${rocket.slug}`}
-                  className="block h-full"
-                >
-                  <Card
-                    image={rocket.image ?? ""}
-                    title={rocket.name}
-                    date={
-                      rocket.launchedAt
-                        ? new Date(rocket.launchedAt).toLocaleDateString()
-                        : "TBA"
-                    }
-                    description={rocket.description ?? ""}
-                    reverse={idx % 2 === 1}
-                  />
-                </Link>
-              ))}
+            {featuredRockets.length === 0 && (
+              <p className="text-text-secondary text-center">
+                No rockets available at the moment.
+              </p>
+            )}
+            {featuredRockets.map((rocket, idx) => (
+              <Link
+                key={rocket.id}
+                href={`/rockets/${rocket.slug}`}
+                className="block h-full"
+              >
+                <Card
+                  image={rocket.image ?? ""}
+                  title={rocket.name}
+                  date={
+                    rocket.launchedAt
+                      ? new Date(rocket.launchedAt).toLocaleDateString()
+                      : "TBA"
+                  }
+                  description={rocket.description ?? ""}
+                  reverse={idx % 2 === 1}
+                />
+              </Link>
+            ))}
           </div>
           <div className="text-center mt-8">
             <Link
@@ -141,28 +137,26 @@ export default function HomePage() {
             </p>
           </div>
           <div className="grid gap-8 grid-cols-1 sm:grid-cols-2">
-            {!loading && latestEvents.length === 0 && (
+            {latestEvents.length === 0 && (
               <p className="text-text-secondary col-span-2">
                 No upcoming events at the moment. Check back soon!
               </p>
             )}
-            {loading && <p className="text-text-secondary col-span-2">Loading...</p>}
-            {!loading &&
-              latestEvents.map((event) => (
-                <Link
-                  key={event.id}
-                  href={`/events/${event.slug}`}
-                  className="block h-full"
-                >
-                  <Card
-                    image={eventPlaceholder}
-                    title={event.title}
-                    date={new Date(event.date).toLocaleDateString()}
-                    description={event.description ?? ""}
-                    vertical
-                  />
-                </Link>
-              ))}
+            {latestEvents.map((event) => (
+              <Link
+                key={event.id}
+                href={`/events/${event.slug}`}
+                className="block h-full"
+              >
+                <Card
+                  image={eventPlaceholder}
+                  title={event.title}
+                  date={new Date(event.date).toLocaleDateString()}
+                  description={event.description ?? ""}
+                  vertical
+                />
+              </Link>
+            ))}
           </div>
           <div className="text-center mt-8">
             <Link
@@ -193,7 +187,6 @@ export default function HomePage() {
               </Link>
             </div>
           </div>
-          {/* Placeholder Sponsor Image*/}
           <div className="flex-1 flex items-center justify-center min-h-[300px] w-full">
             <img
               src="/sponsors-placeholder.png"

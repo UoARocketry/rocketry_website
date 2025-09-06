@@ -11,21 +11,38 @@ type RocketItem = {
 };
 
 export default async function RocketsPage() {
-  const base = process.env.NEXT_PUBLIC_BASE_URL ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : `http://localhost:${process.env.PORT ?? 3000}`);
-  const res = await fetch(new URL('/api/rockets', base).toString(), { cache: 'no-store' });
+  let rockets: RocketItem[] = [];
+  
+  try {
+    const base = process.env.NEXT_PUBLIC_BASE_URL ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : `http://localhost:${process.env.PORT ?? 3000}`);
+    const res = await fetch(new URL('/api/rockets', base).toString(), { 
+      cache: 'no-store',
+      headers: {
+        'Cache-Control': 'no-cache',
+      }
+    });
 
-  if (!res.ok) {
-    console.error('Failed to load rockets from API:', await res.text());
+    if (res.ok) {
+      rockets = await res.json();
+    } else {
+      console.error('Failed to load rockets from API:', await res.text());
+    }
+  } catch (error) {
+    console.error('Error fetching rockets:', error);
+  }
+
+  if (rockets.length === 0) {
     return (
       <main className="min-h-screen max-w-7xl mx-auto pb-16">
         <section className="max-w-7xl mx-auto pt-16 pb-8 px-4 text-left">
           <h1 className="text-5xl font-extrabold mb-4 text-primary">Our Rockets</h1>
-          <p className="text-lg text-text-secondary max-w-2xl">Could not load rockets right now.</p>
+          <p className="text-lg text-text-secondary max-w-2xl">
+            No rockets available at the moment. Check back soon!
+          </p>
         </section>
       </main>
     );
   }
-  const rockets = await res.json();
 
   return (
     <main className="min-h-screen max-w-7xl mx-auto pb-16">

@@ -11,21 +11,25 @@ type EventLocal = {
 };
 
 export default async function EventsPage() {
-  const base = process.env.NEXT_PUBLIC_BASE_URL ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : `http://localhost:${process.env.PORT ?? 3000}`);
-  const res = await fetch(new URL('/api/events', base).toString(), { cache: 'no-store' });
+  let events: EventLocal[] = [];
+  
+  try {
+    const base = process.env.NEXT_PUBLIC_BASE_URL ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : `http://localhost:${process.env.PORT ?? 3000}`);
+    const res = await fetch(new URL('/api/events', base).toString(), { 
+      cache: 'no-store',
+      headers: {
+        'Cache-Control': 'no-cache',
+      }
+    });
 
-  if (!res.ok) {
-    console.error('Failed to load events from API:', await res.text());
-    return (
-      <main className="min-h-screen bg-background pb-16 text-text-main">
-        <section className="max-w-7xl mx-auto pt-16 pb-8 px-4 text-left">
-          <h1 className="text-5xl font-extrabold mb-4 text-primary">Events</h1>
-          <p className="text-lg text-text-secondary max-w-2xl">Could not load events.</p>
-        </section>
-      </main>
-    );
+    if (res.ok) {
+      events = await res.json();
+    } else {
+      console.error('Failed to load events from API:', await res.text());
+    }
+  } catch (error) {
+    console.error('Error fetching events:', error);
   }
-  const events: EventLocal[] = await res.json();
 
   const now = new Date();
   const upcoming = events.filter((e: EventLocal) => !e.isPast && new Date(e.date) >= now);

@@ -78,6 +78,10 @@ The project uses Tailwind CSS with custom UI components. All components are in `
 2. Generate the Prisma client: `npx prisma generate`
 3. Create and run migrations: `npx prisma migrate dev`
 
+### Need to do
+- Implement CMS system
+- Implement conditional rendering for when there are failed API calls or there is nothing in the DB
+
 ## License
 
 This project is licensed under the MIT License.
