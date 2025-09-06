@@ -1,4 +1,4 @@
-export default function SponsorCard({ sponsor }: { sponsor: any }) {
+export default function SponsorCard({ sponsor }: { readonly sponsor: any }) {
   return (
     <a
       href={sponsor.url}

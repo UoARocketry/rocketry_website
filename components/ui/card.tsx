@@ -1,12 +1,12 @@
 import React from "react";
 
 interface CardProps {
-  image: string;
-  title: string;
-  date: string;
-  description: string;
-  reverse?: boolean;
-  vertical?: boolean;
+  readonly image: string;
+  readonly title: string;
+  readonly date: string;
+  readonly description: string;
+  readonly reverse?: boolean;
+  readonly vertical?: boolean;
 }
 
 export default function Card({ image, title, date, description, reverse = false, vertical = false }: CardProps) {

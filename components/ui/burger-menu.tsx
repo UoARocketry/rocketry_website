@@ -1,6 +1,6 @@
 interface BurgerMenuProps {
-  isOpen: boolean;
-  className?: string;
+  readonly isOpen: boolean;
+  readonly className?: string;
 }
 
 export default function BurgerMenu({ isOpen, className = "h-6 w-6" }: BurgerMenuProps) {
