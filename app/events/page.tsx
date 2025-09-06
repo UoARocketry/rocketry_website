@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Card from "@/components/ui/card";
-import prisma from "@/lib/prisma";
 
 export default async function EventsPage() {
   const base = process.env.NEXT_PUBLIC_BASE_URL ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : `http://localhost:${process.env.PORT ?? 3000}`);
