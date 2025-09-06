@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 interface EventPageProps {
@@ -84,12 +85,12 @@ export default async function EventPage({ params }: EventPageProps) {
 
             {/* Back to Events */}
             <div className="pt-6">
-              <a
+              <Link
                 href="/events"
                 className="inline-flex items-center text-primary hover:text-primary/80 transition-colors"
               >
                 ← Back to All Events
-              </a>
+              </Link>
             </div>
           </div>
         </div>

@@ -1,11 +1,18 @@
 import Link from "next/link";
 
+type Exec = {
+  id: number;
+  name: string;
+  role: string;
+  bio: string;
+  photo: string;
+};
+
 export default async function AboutPage() {
   // Fetch executive team members via API route
   const origin = process.env.NEXT_PUBLIC_SITE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : `http://localhost:${process.env.PORT ?? 3000}`);
-
   const res = await fetch(new URL("/api/about", origin).toString(), { cache: "no-store" });
-  const executives = await res.json();
+  const executives: Exec[] = await res.json();
 
   return (
     <main className="min-h-screen bg-background text-text-main pt-20">

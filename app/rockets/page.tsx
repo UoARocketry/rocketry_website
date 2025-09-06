@@ -1,6 +1,15 @@
 import Card from '../../components/ui/card';
 import Link from 'next/link';
 
+type RocketItem = {
+  id: number;
+  name: string;
+  slug: string;
+  image?: string | null;
+  description?: string | null;
+  launchedAt?: string | null;
+};
+
 export default async function RocketsPage() {
   const base = process.env.NEXT_PUBLIC_BASE_URL ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : `http://localhost:${process.env.PORT ?? 3000}`);
   const res = await fetch(new URL('/api/rockets', base).toString(), { cache: 'no-store' });
@@ -27,13 +36,13 @@ export default async function RocketsPage() {
         </p>
       </section>
       <div className="grid grid-cols-1 gap-8">
-        {rockets.map((rocket: any, idx: number) => (
+        {rockets.map((rocket: RocketItem, idx: number) => (
           <Link key={rocket.id} href={`/rockets/${rocket.slug}`} className="block h-full">
             <Card
-              image={rocket.image}
+              image={rocket.image ?? ''}
               title={rocket.name}
               date={rocket.launchedAt ? new Date(rocket.launchedAt).toLocaleDateString() : 'TBA'}
-              description={rocket.description}
+              description={rocket.description ?? ''}
               reverse={idx % 2 === 1}
             />
           </Link>

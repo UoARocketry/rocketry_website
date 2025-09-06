@@ -1,4 +1,13 @@
-export default function SponsorCard({ sponsor }: { readonly sponsor: any }) {
+interface Sponsor {
+  id: number;
+  name: string;
+  logo: string;
+  url: string;
+  description?: string | null;
+  tier?: string | null;
+}
+
+export default function SponsorCard({ sponsor }: { readonly sponsor: Sponsor }) {
   return (
     <a
       href={sponsor.url}

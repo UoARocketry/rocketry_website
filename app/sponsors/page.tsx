@@ -1,8 +1,17 @@
 import React from "react";
 import SponsorCard from "@/components/ui/sponsor-card";
 
+type Sponsor = {
+  id: number;
+  name: string;
+  logo: string;
+  url: string;
+  description?: string | null;
+  tier?: string | null;
+};
+
 export default async function SponsorsPage() {
-  let sponsors: any[] = [];
+  let sponsors: Sponsor[] = [];
   try {
     const base = process.env.NEXT_PUBLIC_BASE_URL ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : `http://localhost:${process.env.PORT ?? 3000}`);
     const res = await fetch(new URL("/api/sponsors", base).toString(), { cache: "no-store" });
@@ -13,7 +22,7 @@ export default async function SponsorsPage() {
   }
 
   // group by sponsor.tier
-  const grouped: Record<string, any[]> = { gold: [], silver: [], bronze: [] };
+  const grouped: Record<string, Sponsor[]> = { gold: [], silver: [], bronze: [] };
 
   if (sponsors && sponsors.length > 0) {
     sponsors.forEach((s) => {
@@ -47,7 +56,7 @@ export default async function SponsorsPage() {
           <section className="max-w-7xl mx-auto px-4 mt-12">
             <h2 className="text-3xl font-bold mb-6 text-primary text-left">Gold Sponsors</h2>
             <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
-              {grouped.gold.map((sponsor) => (
+              {grouped.gold.map((sponsor: Sponsor) => (
                 <SponsorCard sponsor={sponsor} key={sponsor.id} />
               ))}
             </div>
@@ -59,7 +68,7 @@ export default async function SponsorsPage() {
           <section className="max-w-7xl mx-auto px-4 mt-16">
             <h2 className="text-2xl font-bold mb-6 text-primary text-left">Silver Sponsors</h2>
             <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
-              {grouped.silver.map((sponsor) => (
+              {grouped.silver.map((sponsor: Sponsor) => (
                 <SponsorCard sponsor={sponsor} key={sponsor.id} />
               ))}
             </div>
@@ -71,7 +80,7 @@ export default async function SponsorsPage() {
           <section className="max-w-7xl mx-auto px-4 mt-16">
             <h2 className="text-xl font-bold mb-6 text-primary text-left">Bronze Sponsors</h2>
             <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
-              {grouped.bronze.map((sponsor) => (
+              {grouped.bronze.map((sponsor: Sponsor) => (
                 <SponsorCard sponsor={sponsor} key={sponsor.id} />
               ))}
             </div>

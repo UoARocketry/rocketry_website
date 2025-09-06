@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Card from "../components/ui/card";
-// ...existing code...
 
 type Rocket = {
   id: string;

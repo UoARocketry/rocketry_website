@@ -1,6 +1,15 @@
 import Link from "next/link";
 import Card from "@/components/ui/card";
 
+type EventLocal = {
+  id: number;
+  title: string;
+  slug: string;
+  description?: string | null;
+  date: string;
+  isPast?: boolean;
+};
+
 export default async function EventsPage() {
   const base = process.env.NEXT_PUBLIC_BASE_URL ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : `http://localhost:${process.env.PORT ?? 3000}`);
   const res = await fetch(new URL('/api/events', base).toString(), { cache: 'no-store' });
@@ -16,11 +25,11 @@ export default async function EventsPage() {
       </main>
     );
   }
-  const events = await res.json();
+  const events: EventLocal[] = await res.json();
 
   const now = new Date();
-  const upcoming = events.filter((e: any) => !e.isPast && new Date(e.date) >= now);
-  const past = events.filter((e: any) => e.isPast || new Date(e.date) < now);
+  const upcoming = events.filter((e: EventLocal) => !e.isPast && new Date(e.date) >= now);
+  const past = events.filter((e: EventLocal) => e.isPast || new Date(e.date) < now);
 
   const placeholder = "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80";
 
@@ -39,13 +48,13 @@ export default async function EventsPage() {
           {upcoming.length === 0 && (
             <p className="text-text-secondary col-span-2">No upcoming events at the moment. Check back soon!</p>
           )}
-          {upcoming.map((event: any) => (
+          {upcoming.map((event: EventLocal) => (
             <Link key={event.id} href={`/events/${event.slug}`} className="block h-full">
               <Card
                 image={placeholder}
                 title={event.title}
                 date={new Date(event.date).toLocaleDateString()}
-                description={event.description}
+                description={event.description ?? ""}
                 vertical
               />
             </Link>
@@ -59,13 +68,13 @@ export default async function EventsPage() {
           {past.length === 0 && (
             <p className="text-text-secondary col-span-2">No past events yet.</p>
           )}
-          {past.map((event: any) => (
+          {past.map((event: EventLocal) => (
             <Link key={event.id} href={`/events/${event.slug}`} className="block h-full">
               <Card
                 image={placeholder}
                 title={event.title}
                 date={new Date(event.date).toLocaleDateString()}
-                description={event.description}
+                description={event.description ?? ""}
                 vertical
               />
             </Link>

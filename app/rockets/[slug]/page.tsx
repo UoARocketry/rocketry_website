@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { notFound } from 'next/navigation'
 
 interface RocketPageProps {
@@ -95,12 +96,12 @@ export default async function RocketPage({ params }: RocketPageProps) {
 
             {/* Back to Rockets */}
             <div className="pt-6">
-              <a
+              <Link
                 href="/rockets"
                 className="inline-flex items-center text-primary hover:text-primary/80 transition-colors"
               >
                 ← Back to All Rockets
-              </a>
+              </Link>
             </div>
           </div>
         </div>
