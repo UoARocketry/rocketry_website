@@ -1,6 +1,8 @@
 import Link from "next/link";
 import Card from "@/components/ui/card";
 
+export const dynamic = 'force-dynamic';
+
 type EventLocal = {
   id: number;
   title: string;

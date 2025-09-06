@@ -2,6 +2,9 @@ import React from "react";
 import Link from "next/link";
 import Card from "../components/ui/card";
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
 type Rocket = {
   id: string;
   name: string;

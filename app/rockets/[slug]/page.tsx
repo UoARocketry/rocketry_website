@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation'
 
+export const dynamic = 'force-dynamic';
+
 interface RocketPageProps {
   readonly params: Promise<{ slug: string }>
 }
