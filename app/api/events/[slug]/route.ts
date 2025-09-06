@@ -1,11 +1,16 @@
 import { NextResponse } from 'next/server';
 import prisma from '../../../../lib/prisma';
 
-export async function GET(request: Request, context: any) {
-  const params = context?.params ?? {};
+type RouteContextParams = {
+  params?: { slug?: string | string[] };
+};
+
+export async function GET(request: Request, context: unknown) {
+  // Narrow `context` safely to the shape we expect (no `any`)
+  const params = (context as RouteContextParams)?.params ?? {};
   const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
 
-  if (!slug) {
+  if (!slug || typeof slug !== 'string') {
     return NextResponse.json({ error: 'Missing slug' }, { status: 400 });
   }
 
@@ -17,9 +22,6 @@ export async function GET(request: Request, context: any) {
     return NextResponse.json(event);
   } catch (error) {
     console.error('Error fetching event by slug:', error);
-    return NextResponse.json(
-      { error: 'Internal Server Error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
