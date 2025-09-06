@@ -37,15 +37,6 @@ model Exec {
   order     Int     // for custom sorting on the exec page
 }
 
-model BlogPost {
-  id        Int      @id @default(autoincrement())
-  slug      String   @unique
-  title     String
-  content   String   // MDX raw or CMS reference
-  category  String   // "recent", "projects", "other"
-  date      DateTime
-}
-
 model Sponsor {
   id          Int    @id @default(autoincrement())
   name        String

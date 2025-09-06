@@ -1,14 +1,12 @@
 import Link from "next/link";
-import Card from "../../components/ui/card";
-import prisma from "../../lib/prisma";
 
 export default async function AboutPage() {
-  // Fetch executive team members
-  const executives = await prisma.exec.findMany({
-    orderBy: {
-      order: 'asc'
-    }
-  });
+  // Fetch executive team members via API route instead of calling Prisma directly
+  const origin = process.env.NEXT_PUBLIC_SITE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : `http://localhost:${process.env.PORT ?? 3000}`);
+
+  const res = await fetch(new URL("/api/about", origin).toString(), { cache: "no-store" });
+  const executives = await res.json();
+
   return (
     <main className="min-h-screen bg-background text-text-main pt-20">
       {/* Hero Section */}
@@ -98,7 +96,7 @@ export default async function AboutPage() {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {executives.map((exec) => (
+            {executives.map((exec: any) => (
               <div key={exec.id} className="bg-background rounded-lg p-6 border border-accent text-center">
                 <div className="mb-4">
                   <img 
@@ -236,4 +234,4 @@ export default async function AboutPage() {
       </section>
     </main>
   );
-} 
+}
