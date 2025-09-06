@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import 'dotenv/config';
 
+// Create a new Prisma client instance specifically for seeding
 const prisma = new PrismaClient();
 
 async function main() {
