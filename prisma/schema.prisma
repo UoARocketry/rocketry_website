@@ -38,9 +38,10 @@ model Exec {
 }
 
 model Sponsor {
-  id          Int    @id @default(autoincrement())
+  id          Int     @id @default(autoincrement())
   name        String
   logo        String
   url         String
   description String
+  tier        String  @default("BRONZE")
 }

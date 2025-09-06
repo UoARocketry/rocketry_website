@@ -4,45 +4,33 @@ import SponsorCard from "@/components/ui/sponsor-card";
 export default async function SponsorsPage() {
   let sponsors: any[] = [];
   try {
-    const base = process.env.NEXT_PUBLIC_BASE_URL ??
+    const base =
+      process.env.NEXT_PUBLIC_BASE_URL ??
       (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : `http://localhost:${process.env.PORT ?? 3000}`);
-    const res = await fetch(new URL('/api/sponsors', base).toString(), { cache: 'no-store' });
+    const res = await fetch(new URL("/api/sponsors", base).toString(), { cache: "no-store" });
     if (res.ok) sponsors = await res.json();
-    else console.warn('Failed to load sponsors from API:', await res.text());
+    else console.warn("Failed to load sponsors from API:", await res.text());
   } catch (e) {
     console.warn("⚠️  Could not load sponsors from API:", (e as Error).message);
   }
 
-  const tierMap: Record<string, "gold" | "silver" | "bronze"> = {
-    "AeroTech Industries": "gold",
-    "Launch Labs": "gold",
-    "RotorWorks": "silver",
-    "PartsCo": "silver",
-    "Community Makers": "bronze",
-    "Cafe Support": "bronze"
-  };
-
+  // group by sponsor.tier
   const grouped: Record<string, any[]> = { gold: [], silver: [], bronze: [] };
 
   if (sponsors && sponsors.length > 0) {
     sponsors.forEach((s) => {
-      const tier = tierMap[s.name] ?? "bronze";
-      grouped[tier].push(s);
+      const raw = (s.tier ?? "BRONZE").toString();
+      const tierKey = raw.trim().toLowerCase();
+      if (tierKey === "gold" || tierKey === "silver" || tierKey === "bronze") {
+        grouped[tierKey].push(s);
+      } else if (tierKey === "g" || tierKey === "s" || tierKey === "b") {
+        // tolerate single-letter values if present
+        const map: Record<string, string> = { g: "gold", s: "silver", b: "bronze" };
+        grouped[map[tierKey]].push(s);
+      } else {
+        grouped.bronze.push(s);
+      }
     });
-  } else {
-    // fallback local data (keeps page usable when DB empty)
-    grouped.gold = [
-      { name: "Gold Sponsor 1", logo: "https://via.placeholder.com/200x100?text=Gold+1", url: "#", description: "Leading supporter." },
-      { name: "Gold Sponsor 2", logo: "https://via.placeholder.com/200x100?text=Gold+2", url: "#", description: "Major contributor." }
-    ];
-    grouped.silver = [
-      { name: "Silver Sponsor 1", logo: "https://via.placeholder.com/180x90?text=Silver+1", url: "#", description: "Supports workshops." },
-      { name: "Silver Sponsor 2", logo: "https://via.placeholder.com/180x90?text=Silver+2", url: "#", description: "Provides parts." }
-    ];
-    grouped.bronze = [
-      { name: "Bronze Sponsor 1", logo: "https://via.placeholder.com/150x75?text=Bronze+1", url: "#", description: "Community supporter." },
-      { name: "Bronze Sponsor 2", logo: "https://via.placeholder.com/150x75?text=Bronze+2", url: "#", description: "Event supporter." }
-    ];
   }
 
   return (
@@ -57,34 +45,40 @@ export default async function SponsorsPage() {
         </section>
 
         {/* Gold Sponsors */}
-        <section className="max-w-7xl mx-auto px-4 mt-12">
-          <h2 className="text-3xl font-bold mb-6 text-primary text-left">Gold Sponsors</h2>
-          <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
-            {grouped.gold.map((sponsor, idx) => (
-              <SponsorCard sponsor={sponsor} key={idx} />
-            ))}
-          </div>
-        </section>
+        {grouped.gold.length > 0 && (
+          <section className="max-w-7xl mx-auto px-4 mt-12">
+            <h2 className="text-3xl font-bold mb-6 text-primary text-left">Gold Sponsors</h2>
+            <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+              {grouped.gold.map((sponsor, idx) => (
+                <SponsorCard sponsor={sponsor} key={idx} />
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Silver Sponsors */}
-        <section className="max-w-7xl mx-auto px-4 mt-16">
-          <h2 className="text-2xl font-bold mb-6 text-primary text-left">Silver Sponsors</h2>
-          <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
-            {grouped.silver.map((sponsor, idx) => (
-              <SponsorCard sponsor={sponsor} key={idx} />
-            ))}
-          </div>
-        </section>
+        {grouped.silver.length > 0 && (
+          <section className="max-w-7xl mx-auto px-4 mt-16">
+            <h2 className="text-2xl font-bold mb-6 text-primary text-left">Silver Sponsors</h2>
+            <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+              {grouped.silver.map((sponsor, idx) => (
+                <SponsorCard sponsor={sponsor} key={idx} />
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Bronze Sponsors */}
-        <section className="max-w-7xl mx-auto px-4 mt-16">
-          <h2 className="text-xl font-bold mb-6 text-primary text-left">Bronze Sponsors</h2>
-          <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
-            {grouped.bronze.map((sponsor, idx) => (
-              <SponsorCard sponsor={sponsor} key={idx} />
-            ))}
-          </div>
-        </section>
+        {grouped.bronze.length > 0 && (
+          <section className="max-w-7xl mx-auto px-4 mt-16">
+            <h2 className="text-xl font-bold mb-6 text-primary text-left">Bronze Sponsors</h2>
+            <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+              {grouped.bronze.map((sponsor, idx) => (
+                <SponsorCard sponsor={sponsor} key={idx} />
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Contact */}
         <section className="max-w-7xl mx-auto mt-20 px-4">
