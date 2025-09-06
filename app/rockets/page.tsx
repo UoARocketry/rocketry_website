@@ -1,8 +1,6 @@
 import Card from '../../components/ui/card';
 import Link from 'next/link';
 
-export const dynamic = 'force-dynamic';
-
 type RocketItem = {
   id: number;
   name: string;

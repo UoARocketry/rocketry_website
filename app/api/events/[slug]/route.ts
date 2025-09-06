@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '../../../../lib/prisma';
 
@@ -13,17 +12,17 @@ export async function GET(
   }
 
   try {
-    const rocket = await prisma.rocket.findUnique({ 
+    const event = await prisma.event.findUnique({ 
       where: { slug } 
     });
     
-    if (!rocket) {
-      return NextResponse.json({ error: 'Rocket not found' }, { status: 404 });
+    if (!event) {
+      return NextResponse.json({ error: 'Event not found' }, { status: 404 });
     }
     
-    return NextResponse.json(rocket);
+    return NextResponse.json(event);
   } catch (error) {
-    console.error('Error fetching rocket by slug:', error);
+    console.error('Error fetching event by slug:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

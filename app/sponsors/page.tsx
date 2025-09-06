@@ -1,8 +1,6 @@
 import React from "react";
 import SponsorCard from "@/components/ui/sponsor-card";
 
-export const dynamic = 'force-dynamic'
-
 type Sponsor = {
   id: number;
   name: string;
