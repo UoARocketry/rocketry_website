@@ -49,8 +49,8 @@ export default async function SponsorsPage() {
           <section className="max-w-7xl mx-auto px-4 mt-12">
             <h2 className="text-3xl font-bold mb-6 text-primary text-left">Gold Sponsors</h2>
             <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
-              {grouped.gold.map((sponsor, idx) => (
-                <SponsorCard sponsor={sponsor} key={idx} />
+              {grouped.gold.map((sponsor) => (
+                <SponsorCard sponsor={sponsor} key={sponsor.id} />
               ))}
             </div>
           </section>
@@ -61,8 +61,8 @@ export default async function SponsorsPage() {
           <section className="max-w-7xl mx-auto px-4 mt-16">
             <h2 className="text-2xl font-bold mb-6 text-primary text-left">Silver Sponsors</h2>
             <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
-              {grouped.silver.map((sponsor, idx) => (
-                <SponsorCard sponsor={sponsor} key={idx} />
+              {grouped.silver.map((sponsor) => (
+                <SponsorCard sponsor={sponsor} key={sponsor.id} />
               ))}
             </div>
           </section>
@@ -73,8 +73,8 @@ export default async function SponsorsPage() {
           <section className="max-w-7xl mx-auto px-4 mt-16">
             <h2 className="text-xl font-bold mb-6 text-primary text-left">Bronze Sponsors</h2>
             <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
-              {grouped.bronze.map((sponsor, idx) => (
-                <SponsorCard sponsor={sponsor} key={idx} />
+              {grouped.bronze.map((sponsor) => (
+                <SponsorCard sponsor={sponsor} key={sponsor.id} />
               ))}
             </div>
           </section>
