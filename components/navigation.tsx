@@ -93,9 +93,6 @@ export default function Navigation() {
                 <Link href="/events" className="underline-animate text-text-main hover:text-primary px-3 py-2 rounded-none text-sm font-medium uppercase text-center" onClick={() => setIsMenuOpen(false)}>
                   EVENTS
                 </Link>
-                <Link href="/blogs" className="underline-animate text-text-main hover:text-primary px-3 py-2 rounded-none text-sm font-medium uppercase text-center" onClick={() => setIsMenuOpen(false)}>
-                  BLOG
-                </Link>
                 <Link href="/rockets" className="underline-animate text-text-main hover:text-primary px-3 py-2 rounded-none text-sm font-medium uppercase text-center" onClick={() => setIsMenuOpen(false)}>
                   ROCKETS
                 </Link>
