@@ -18,6 +18,7 @@ export type EventSummary = {
   id: number;
   title: string;
   slug: string;
+  image?: string | null;
   description?: string | null;
   date: string;
   eventTag?: string | null;
@@ -34,6 +35,7 @@ export type Exec = {
   role: string;
   bio: string;
   photo: string;
+  linkedinUrl?: string | null;
 };
 
 export type Feature = {
@@ -102,7 +104,7 @@ export const getEventsOverview = unstable_cache(
       supabase
         .from("Event")
         .select(
-          "id,title,slug,description,date,eventTag,signupUrl,isPast,location",
+          "id,title,slug,image,description,date,eventTag,signupUrl,isPast,location",
         )
         .eq("isPast", false)
         .gte("date", nowIso)
@@ -111,7 +113,7 @@ export const getEventsOverview = unstable_cache(
       supabase
         .from("Event")
         .select(
-          "id,title,slug,description,date,eventTag,signupUrl,isPast,location",
+          "id,title,slug,image,description,date,eventTag,signupUrl,isPast,location",
         )
         .or(pastFilter)
         .order("date", { ascending: false })

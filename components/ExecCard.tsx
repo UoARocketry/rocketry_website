@@ -6,6 +6,7 @@ type Exec = {
   role?: string;
   bio?: string;
   photo?: string;
+  linkedinUrl?: string | null;
 };
 
 type Props = {
@@ -14,7 +15,11 @@ type Props = {
   className?: string;
 };
 
-export default function ExecCard({ exec, centered = false, className = "" }: Props) {
+export default function ExecCard({
+  exec,
+  centered = false,
+  className = "",
+}: Props) {
   return (
     <div
       className={`group relative bg-card rounded-xl p-6 border border-border transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 ${
@@ -42,7 +47,32 @@ export default function ExecCard({ exec, centered = false, className = "" }: Pro
         <p className="text-primary text-sm font-medium mb-3">{exec.role}</p>
       )}
       {exec.bio && (
-        <p className="text-text-secondary text-sm leading-relaxed">{exec.bio}</p>
+        <p className="text-text-secondary text-sm leading-relaxed">
+          {exec.bio}
+        </p>
+      )}
+      {exec.linkedinUrl && (
+        <a
+          href={exec.linkedinUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`mt-4 inline-flex items-center text-primary text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200 ${centered ? "justify-center" : ""}`}
+        >
+          Visit Profile
+          <svg
+            className="w-4 h-4 ml-1"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+            />
+          </svg>
+        </a>
       )}
     </div>
   );

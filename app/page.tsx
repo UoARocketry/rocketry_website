@@ -18,6 +18,7 @@ type EventItem = {
   id: number;
   title: string;
   slug: string;
+  image?: string | null;
   description?: string | null;
   date: string;
   eventTag?: string | null;
@@ -196,7 +197,7 @@ export default async function HomePage() {
                   className="block"
                 >
                   <Card
-                    image={eventPlaceholder}
+                    image={event.image ?? eventPlaceholder}
                     title={event.title}
                     date={new Date(event.date).toLocaleDateString()}
                     tag={event.eventTag ?? "General"}

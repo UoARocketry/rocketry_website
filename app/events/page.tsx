@@ -59,10 +59,13 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl" />
         </div>
         <div className="relative z-10 max-w-7xl mx-auto">
-          <p className="text-primary text-sm font-medium uppercase tracking-wider mb-3">Stay Connected</p>
+          <p className="text-primary text-sm font-medium uppercase tracking-wider mb-3">
+            Stay Connected
+          </p>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Events</h1>
           <p className="text-lg text-text-secondary max-w-2xl mb-8">
-            Discover and join our upcoming and past events! From launches to workshops, our events are open to all members and enthusiasts.
+            Discover and join our upcoming and past events! From launches to
+            workshops, our events are open to all members and enthusiasts.
           </p>
           <EventsTagFilter selectedTag={selectedTag} allTags={allTags} />
         </div>
@@ -73,7 +76,9 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
         <div className="max-w-7xl mx-auto">
           <div className="mb-10">
-            <p className="text-primary text-sm font-medium uppercase tracking-wider mb-2">Coming Up</p>
+            <p className="text-primary text-sm font-medium uppercase tracking-wider mb-2">
+              Coming Up
+            </p>
             <h2 className="text-2xl md:text-3xl font-bold">Upcoming Events</h2>
           </div>
           {filteredUpcoming.length === 0 ? (
@@ -95,7 +100,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
                   className="block"
                 >
                   <Card
-                    image={placeholder}
+                    image={event.image ?? placeholder}
                     title={event.title}
                     date={new Date(event.date).toLocaleDateString()}
                     tag={event.eventTag ?? "General"}
@@ -114,11 +119,17 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
         <div className="max-w-7xl mx-auto">
           <div className="mb-10">
-            <p className="text-text-muted text-sm font-medium uppercase tracking-wider mb-2">Archive</p>
+            <p className="text-text-muted text-sm font-medium uppercase tracking-wider mb-2">
+              Archive
+            </p>
             <h2 className="text-2xl md:text-3xl font-bold">Past Events</h2>
           </div>
           {filteredPast.length === 0 ? (
-            <SectionFallback align="left" title="No past events" description="Past events will appear here." />
+            <SectionFallback
+              align="left"
+              title="No past events"
+              description="Past events will appear here."
+            />
           ) : (
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
               {filteredPast.map((event: EventLocal) => (
@@ -128,7 +139,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
                   className="block"
                 >
                   <Card
-                    image={placeholder}
+                    image={event.image ?? placeholder}
                     title={event.title}
                     date={new Date(event.date).toLocaleDateString()}
                     tag={event.eventTag ?? "General"}

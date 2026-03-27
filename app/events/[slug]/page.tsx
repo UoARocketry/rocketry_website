@@ -51,7 +51,7 @@ export default async function EventPage({ params }: EventPageProps) {
                 {/* Event Image */}
                 <div className="relative">
                   <img
-                    src={placeholder}
+                    src={event.image ?? placeholder}
                     alt={event.title}
                     className="w-full h-96 object-cover rounded-lg shadow-lg"
                   />
