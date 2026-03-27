@@ -5,6 +5,7 @@ import ExecCard from "../../components/ExecCard";
 import StatCard from "../../components/StatCard";
 import SectionFallback from "../../components/SectionFallback";
 import { getAboutPayload, type AboutPayload, type Exec } from "@/lib/site-data";
+import ImageWithLoader from "@/components/ImageWithLoader";
 
 export const revalidate = 300;
 
@@ -46,7 +47,7 @@ export default async function AboutPage() {
         <div className="max-w-7xl mx-auto">
           {teamImageUrl ? (
             <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-black/50">
-              <Image
+              <ImageWithLoader
                 src={teamImageUrl}
                 alt="UARC Team"
                 width={2160}
@@ -54,6 +55,7 @@ export default async function AboutPage() {
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 92vw, 1200px"
                 priority
                 className="w-full h-auto object-cover"
+                containerClassName="relative"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
             </div>
