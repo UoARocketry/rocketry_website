@@ -46,7 +46,7 @@ export default function FeatureCard({
 
       {/* Card image */}
       {image ? (
-        <div className="relative w-full h-44 overflow-hidden">
+        <div className="relative w-full h-42 overflow-hidden">
           <Image
             src={image}
             alt={imageAlt || (typeof title === "string" ? title : "")}
