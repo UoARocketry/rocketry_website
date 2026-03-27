@@ -8,6 +8,7 @@ import BurgerMenu from "./ui/burger-menu";
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [joinUrl, setJoinUrl] = useState("");
 
   const pathname = usePathname();
   const isHome = pathname === "/";
@@ -27,6 +28,23 @@ export default function Navigation() {
     return () => {
       window.removeEventListener("scroll", updateNavState);
     };
+  }, []);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await fetch("/api/site-settings");
+        if (response.ok) {
+          const settings = await response.json();
+          setJoinUrl(settings.memberJoinUrl);
+        }
+      } catch (error) {
+        console.error("Error fetching site settings:", error);
+        // Fall back to default URL
+      }
+    };
+
+    fetchSettings();
   }, []);
 
   const navLinks = [
@@ -85,7 +103,7 @@ export default function Navigation() {
               );
             })}
             <Link
-              href="https://docs.google.com/forms/d/e/1FAIpQLSfS7PS--UX-fQinUfuYzVLV3-rM92cW7uVFOqoEVczgYLb8Qg/viewform?usp=sf_link"
+              href={joinUrl}
               className="ml-4 bg-primary hover:bg-primary-dark px-5 py-2 rounded-lg text-sm font-semibold tracking-wide transition-all duration-200 hover:shadow-lg hover:shadow-primary/20"
               style={{ color: "#ffffff" }}
               target="_blank"
@@ -132,7 +150,7 @@ export default function Navigation() {
             })}
             <div className="pt-4 px-4">
               <Link
-                href="https://docs.google.com/forms/d/e/1FAIpQLSfS7PS--UX-fQinUfuYzVLV3-rM92cW7uVFOqoEVczgYLb8Qg/viewform?usp=sf_link"
+                href={joinUrl}
                 className="block w-full bg-primary hover:bg-primary-dark text-center px-5 py-3 rounded-lg text-sm font-semibold tracking-wide transition-all duration-200"
                 style={{ color: "#ffffff" }}
                 onClick={() => setIsMenuOpen(false)}

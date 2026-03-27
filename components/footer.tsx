@@ -2,8 +2,9 @@ import Link from "next/link";
 import LinkedInIcon from "./ui/linkedin-icon";
 import InstagramIcon from "./ui/instagram-icon";
 import DiscordIcon from "./ui/discord-icon";
+import { getSiteSettings } from "@/lib/site-data";
 
-export default function Footer() {
+export default async function Footer() {
   const navLinks = [
     { href: "/", label: "Home" },
     { href: "/about", label: "About" },
@@ -21,6 +22,14 @@ export default function Footer() {
       label: "Discord",
     },
   ];
+
+  let joinUrl = "";
+  try {
+    const settings = await getSiteSettings();
+    joinUrl = settings.memberJoinUrl;
+  } catch {
+    // Fall back to database value only
+  }
 
   return (
     <footer className="bg-surface border-t border-border">
@@ -96,7 +105,7 @@ export default function Footer() {
             {/* CTA */}
             <div className="mt-8">
               <Link
-                href="https://docs.google.com/forms/d/e/1FAIpQLSfS7PS--UX-fQinUfuYzVLV3-rM92cW7uVFOqoEVczgYLb8Qg/viewform?usp=sf_link"
+                href={joinUrl}
                 className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-primary/20"
                 style={{ color: "#ffffff" }}
                 target="_blank"

@@ -4,7 +4,12 @@ import ExecCard from "../../components/ExecCard";
 import StatCard from "../../components/StatCard";
 import SectionFallback from "../../components/SectionFallback";
 import ImageWithLoader from "../../components/ImageWithLoader";
-import { getAboutPayload, type AboutPayload, type Exec } from "@/lib/site-data";
+import {
+  getAboutPayload,
+  type AboutPayload,
+  type Exec,
+  getSiteSettings,
+} from "@/lib/site-data";
 
 export const revalidate = 300;
 
@@ -16,14 +21,20 @@ export default async function AboutPage() {
   let journey: AboutPayload["journey"] = [];
   let teamStructure: AboutPayload["teamStructure"] = [];
   let stats: AboutPayload["stats"] = [];
+  let joinUrl =
+    "https://docs.google.com/forms/d/e/1FAIpQLSfS7PS--UX-fQinUfuYzVLV3-rM92cW7uVFOqoEVczgYLb8Qg/viewform?usp=sf_link";
 
   try {
-    const payload = await getAboutPayload();
+    const [payload, settings] = await Promise.all([
+      getAboutPayload(),
+      getSiteSettings(),
+    ]);
     executives = payload.executives;
     whatWeDo = payload.whatWeDo;
     journey = payload.journey;
     teamStructure = payload.teamStructure;
     stats = payload.stats;
+    joinUrl = settings.memberJoinUrl;
     execsError = executives.length === 0;
   } catch (err) {
     console.error("Error loading about data:", err);
@@ -270,7 +281,7 @@ export default async function AboutPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                 <Link
-                  href="https://docs.google.com/forms/d/e/1FAIpQLSfS7PS--UX-fQinUfuYzVLV3-rM92cW7uVFOqoEVczgYLb8Qg/viewform?usp=sf_link"
+                  href={joinUrl}
                   className="bg-primary hover:bg-primary-dark px-6 py-3 rounded-lg font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-primary/20"
                   style={{ color: "#ffffff" }}
                   target="_blank"

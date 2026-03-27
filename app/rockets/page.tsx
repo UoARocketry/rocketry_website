@@ -1,15 +1,21 @@
 import Card from "../../components/ui/card";
 import SectionFallback from "../../components/SectionFallback";
 import Link from "next/link";
-import { getRocketSummaries, type RocketSummary } from "@/lib/site-data";
+import { getRocketSummaries, getSiteSettings, type RocketSummary } from "@/lib/site-data";
 
 type RocketItem = RocketSummary;
 
 export default async function RocketsPage() {
   let rockets: RocketItem[] = [];
+  let joinUrl = "";
 
   try {
-    rockets = await getRocketSummaries();
+    const [rocketsData, settings] = await Promise.all([
+      getRocketSummaries(),
+      getSiteSettings(),
+    ]);
+    rockets = rocketsData;
+    joinUrl = settings.memberJoinUrl;
   } catch (error) {
     console.error("Error fetching rockets:", error);
   }
@@ -84,7 +90,7 @@ export default async function RocketsPage() {
                 student-built rockets.
               </p>
               <Link
-                href="https://docs.google.com/forms/d/e/1FAIpQLSfS7PS--UX-fQinUfuYzVLV3-rM92cW7uVFOqoEVczgYLb8Qg/viewform?usp=sf_link"
+                href={joinUrl}
                 className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark px-6 py-3 rounded-lg font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-primary/20"
                 style={{ color: "#ffffff" }}
                 target="_blank"

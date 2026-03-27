@@ -3,7 +3,11 @@ import Link from "next/link";
 import Card from "../components/ui/card";
 import SectionFallback from "../components/SectionFallback";
 import QuickNavCard from "../components/QuickNavCard";
-import { getEventsOverview, getRocketSummaries } from "@/lib/site-data";
+import {
+  getEventsOverview,
+  getRocketSummaries,
+  getSiteSettings,
+} from "@/lib/site-data";
 
 type Rocket = {
   id: number;
@@ -27,15 +31,18 @@ type EventItem = {
 export default async function HomePage() {
   let featuredRockets: Rocket[] = [];
   let latestEvents: EventItem[] = [];
+  let joinUrl = "";
 
   try {
-    const [rockets, events] = await Promise.all([
+    const [rockets, events, settings] = await Promise.all([
       getRocketSummaries(),
       getEventsOverview(),
+      getSiteSettings(),
     ]);
 
     featuredRockets = rockets;
     latestEvents = events.upcoming;
+    joinUrl = settings.memberJoinUrl;
   } catch (err) {
     console.error("Failed to load homepage data", err);
   }
@@ -69,7 +76,7 @@ export default async function HomePage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link
-              href="https://docs.google.com/forms/d/e/1FAIpQLSfS7PS--UX-fQinUfuYzVLV3-rM92cW7uVFOqoEVczgYLb8Qg/viewform?usp=sf_link"
+              href={joinUrl}
               className="bg-primary hover:bg-primary-dark text-base px-8 py-3.5 rounded-lg font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-0.5"
               style={{ color: "#ffffff" }}
               target="_blank"

@@ -79,6 +79,10 @@ export type AboutPayload = {
   stats: Stat[];
 };
 
+export type SiteSettings = {
+  memberJoinUrl: string;
+};
+
 export const getRocketSummaries = unstable_cache(
   async (): Promise<RocketSummary[]> => {
     const { data, error } = await supabase
@@ -194,6 +198,25 @@ export const getSponsors = unstable_cache(
   },
   ["sponsors"],
   { revalidate: CONTENT_REVALIDATE_SECONDS, tags: ["sponsors"] },
+);
+
+export const getSiteSettings = unstable_cache(
+  async (): Promise<SiteSettings> => {
+    const { data, error } = await supabase
+      .from("SiteSettings")
+      .select("memberJoinUrl")
+      .limit(1)
+      .maybeSingle();
+
+    if (error) throw error;
+
+    return (data ?? {
+      memberJoinUrl:
+        "https://docs.google.com/forms/d/e/1FAIpQLSfS7PS--UX-fQinUfuYzVLV3-rM92cW7uVFOqoEVczgYLb8Qg/viewform?usp=sf_link",
+    }) as SiteSettings;
+  },
+  ["site-settings"],
+  { revalidate: CONTENT_REVALIDATE_SECONDS, tags: ["settings"] },
 );
 
 export async function getRocketBySlug(
