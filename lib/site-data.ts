@@ -81,6 +81,7 @@ export type AboutPayload = {
 
 export type SiteSettings = {
   memberJoinUrl: string;
+  execTeamImageUrl?: string | null;
 };
 
 export const getRocketSummaries = unstable_cache(
@@ -204,15 +205,15 @@ export const getSiteSettings = unstable_cache(
   async (): Promise<SiteSettings> => {
     const { data, error } = await supabase
       .from("SiteSettings")
-      .select("memberJoinUrl")
+      .select("memberJoinUrl,execTeamImageUrl")
       .limit(1)
       .maybeSingle();
 
     if (error) throw error;
 
     return (data ?? {
-      memberJoinUrl:
-        "https://docs.google.com/forms/d/e/1FAIpQLSfS7PS--UX-fQinUfuYzVLV3-rM92cW7uVFOqoEVczgYLb8Qg/viewform?usp=sf_link",
+      memberJoinUrl: "",
+      execTeamImageUrl: null,
     }) as SiteSettings;
   },
   ["site-settings"],

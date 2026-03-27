@@ -9,8 +9,8 @@ export async function GET() {
     console.error("Error fetching site settings:", error);
     return NextResponse.json(
       {
-        memberJoinUrl:
-          "https://docs.google.com/forms/d/e/1FAIpQLSfS7PS--UX-fQinUfuYzVLV3-rM92cW7uVFOqoEVczgYLb8Qg/viewform?usp=sf_link",
+        memberJoinUrl: "",
+        execTeamImageUrl: null,
       },
       { status: 200 },
     );

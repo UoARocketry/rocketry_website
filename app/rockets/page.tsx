@@ -1,7 +1,11 @@
 import Card from "../../components/ui/card";
 import SectionFallback from "../../components/SectionFallback";
 import Link from "next/link";
-import { getRocketSummaries, getSiteSettings, type RocketSummary } from "@/lib/site-data";
+import {
+  getRocketSummaries,
+  getSiteSettings,
+  type RocketSummary,
+} from "@/lib/site-data";
 
 type RocketItem = RocketSummary;
 

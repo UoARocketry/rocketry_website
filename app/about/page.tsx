@@ -21,8 +21,8 @@ export default async function AboutPage() {
   let journey: AboutPayload["journey"] = [];
   let teamStructure: AboutPayload["teamStructure"] = [];
   let stats: AboutPayload["stats"] = [];
-  let joinUrl =
-    "https://docs.google.com/forms/d/e/1FAIpQLSfS7PS--UX-fQinUfuYzVLV3-rM92cW7uVFOqoEVczgYLb8Qg/viewform?usp=sf_link";
+  let joinUrl = "";
+  let teamImageUrl: string | null = null;
 
   try {
     const [payload, settings] = await Promise.all([
@@ -35,19 +35,12 @@ export default async function AboutPage() {
     teamStructure = payload.teamStructure;
     stats = payload.stats;
     joinUrl = settings.memberJoinUrl;
+    teamImageUrl = settings.execTeamImageUrl ?? null;
     execsError = executives.length === 0;
   } catch (err) {
     console.error("Error loading about data:", err);
     execsError = true;
   }
-
-  const SUPABASE_STORAGE_BASE = process.env.NEXT_PUBLIC_SUPABASE_STORAGE_URL;
-  const TEAM_IMAGE_PATH = "images/execs/exec_team.jpg";
-  const encodePath = (p: string) =>
-    p.split("/").map(encodeURIComponent).join("/");
-  const teamImageUrl = SUPABASE_STORAGE_BASE
-    ? `${SUPABASE_STORAGE_BASE.replace(/\/$/, "")}/${encodePath(TEAM_IMAGE_PATH)}`
-    : null;
 
   return (
     <main className="min-h-screen bg-background text-text-main">
