@@ -40,7 +40,7 @@ export default function EventsTagFilter({
           <button
             key={tag}
             onClick={() => handleTagChange(tag)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer ${
               isActive
                 ? "bg-primary shadow-md shadow-primary/20"
                 : "bg-card border border-border text-text-secondary hover:text-text-main hover:border-primary/50"

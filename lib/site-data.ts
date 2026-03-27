@@ -37,7 +37,7 @@ export type Exec = {
 };
 
 export type Feature = {
-  icon?: string | null;
+  image?: string | null;
   title: string;
   body?: string | null;
   variant?: "background" | "surface" | null;

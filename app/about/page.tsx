@@ -1,11 +1,10 @@
 import Link from "next/link";
-import Image from "next/image";
 import FeatureCard from "../../components/FeatureCard";
 import ExecCard from "../../components/ExecCard";
 import StatCard from "../../components/StatCard";
 import SectionFallback from "../../components/SectionFallback";
+import ImageWithLoader from "../../components/ImageWithLoader";
 import { getAboutPayload, type AboutPayload, type Exec } from "@/lib/site-data";
-import ImageWithLoader from "@/components/ImageWithLoader";
 
 export const revalidate = 300;
 
@@ -86,9 +85,11 @@ export default async function AboutPage() {
               {whatWeDo.map((w, idx) => (
                 <FeatureCard
                   key={idx}
-                  icon={w.icon}
+                  image={w.image ?? undefined}
+                  imageAlt={w.title}
                   title={w.title}
                   centered={true}
+                  showImagePlaceholder={true}
                   variant={w.variant as "background" | "surface"}
                 >
                   {w.body}
@@ -120,8 +121,10 @@ export default async function AboutPage() {
               {journey.map((j, idx) => (
                 <FeatureCard
                   key={idx}
-                  icon={j.icon}
+                  image={j.image ?? undefined}
+                  imageAlt={j.title}
                   title={j.title}
+                  showImagePlaceholder={true}
                   variant={j.variant as "background" | "surface"}
                 >
                   {j.body}
