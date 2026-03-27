@@ -86,7 +86,8 @@ export default function Navigation() {
             })}
             <Link
               href="https://docs.google.com/forms/d/e/1FAIpQLSfS7PS--UX-fQinUfuYzVLV3-rM92cW7uVFOqoEVczgYLb8Qg/viewform?usp=sf_link"
-              className="ml-4 bg-primary hover:bg-primary-dark text-white px-5 py-2 rounded-lg text-sm font-semibold tracking-wide transition-all duration-200 hover:shadow-lg hover:shadow-primary/20"
+              className="ml-4 bg-primary hover:bg-primary-dark px-5 py-2 rounded-lg text-sm font-semibold tracking-wide transition-all duration-200 hover:shadow-lg hover:shadow-primary/20"
+              style={{ color: "#ffffff" }}
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -132,7 +133,8 @@ export default function Navigation() {
             <div className="pt-4 px-4">
               <Link
                 href="https://docs.google.com/forms/d/e/1FAIpQLSfS7PS--UX-fQinUfuYzVLV3-rM92cW7uVFOqoEVczgYLb8Qg/viewform?usp=sf_link"
-                className="block w-full bg-primary hover:bg-primary-dark text-white text-center px-5 py-3 rounded-lg text-sm font-semibold tracking-wide transition-all duration-200"
+                className="block w-full bg-primary hover:bg-primary-dark text-center px-5 py-3 rounded-lg text-sm font-semibold tracking-wide transition-all duration-200"
+                style={{ color: "#ffffff" }}
                 onClick={() => setIsMenuOpen(false)}
                 target="_blank"
                 rel="noopener noreferrer"

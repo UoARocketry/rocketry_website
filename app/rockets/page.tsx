@@ -22,10 +22,14 @@ export default async function RocketsPage() {
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl" />
         </div>
         <div className="relative z-10 max-w-7xl mx-auto">
-          <p className="text-primary text-sm font-medium uppercase tracking-wider mb-3">Our Fleet</p>
+          <p className="text-primary text-sm font-medium uppercase tracking-wider mb-3">
+            Our Fleet
+          </p>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Our Rockets</h1>
           <p className="text-lg text-text-secondary max-w-2xl">
-            Explore our rocket projects and engineering achievements. Each rocket represents countless hours of design, testing, and innovation by our team members.
+            Explore our rocket projects and engineering achievements. Each
+            rocket represents countless hours of design, testing, and innovation
+            by our team members.
           </p>
         </div>
       </section>
@@ -35,7 +39,7 @@ export default async function RocketsPage() {
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
         <div className="max-w-7xl mx-auto">
           {rockets.length === 0 ? (
-            <SectionFallback 
+            <SectionFallback
               title="No rockets yet"
               description="Our rocket projects will appear here soon. Stay tuned!"
             />
@@ -76,17 +80,29 @@ export default async function RocketsPage() {
                 Want to Build Rockets?
               </h2>
               <p className="text-text-secondary mb-8 max-w-md mx-auto">
-                Join our team and contribute to the next generation of student-built rockets.
+                Join our team and contribute to the next generation of
+                student-built rockets.
               </p>
               <Link
                 href="https://docs.google.com/forms/d/e/1FAIpQLSfS7PS--UX-fQinUfuYzVLV3-rM92cW7uVFOqoEVczgYLb8Qg/viewform?usp=sf_link"
-                className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-primary/20"
+                className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark px-6 py-3 rounded-lg font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-primary/20"
+                style={{ color: "#ffffff" }}
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 Join UARC
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 8l4 4m0 0l-4 4m4-4H3"
+                  />
                 </svg>
               </Link>
             </div>

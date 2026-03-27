@@ -35,16 +35,17 @@ export default function EventsTagFilter({
       {tags.map((tag) => {
         const isActive = selectedTag === tag;
         const label = tag === "all" ? "All Events" : tag;
-        
+
         return (
           <button
             key={tag}
             onClick={() => handleTagChange(tag)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
               isActive
-                ? "bg-primary text-white shadow-md shadow-primary/20"
+                ? "bg-primary shadow-md shadow-primary/20"
                 : "bg-card border border-border text-text-secondary hover:text-text-main hover:border-primary/50"
             }`}
+            style={isActive ? { color: "#ffffff" } : undefined}
           >
             {label}
           </button>

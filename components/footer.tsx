@@ -15,7 +15,11 @@ export default function Footer() {
   const socialLinks = [
     { href: "https://linkedin.com", icon: LinkedInIcon, label: "LinkedIn" },
     { href: "https://instagram.com", icon: InstagramIcon, label: "Instagram" },
-    { href: "https://discord.gg/8afab78eyf", icon: DiscordIcon, label: "Discord" },
+    {
+      href: "https://discord.gg/8afab78eyf",
+      icon: DiscordIcon,
+      label: "Discord",
+    },
   ];
 
   return (
@@ -24,15 +28,12 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12">
           {/* Logo and Description */}
           <div className="md:col-span-5">
-            <img
-              src="/UARC logo.png"
-              alt="UARC Logo"
-              className="h-10 mb-6"
-            />
+            <img src="/UARC logo.png" alt="UARC Logo" className="h-10 mb-6" />
             <p className="text-text-secondary text-sm leading-relaxed max-w-sm mb-6">
-              The University of Auckland Rocketry Club is a student-led organisation
-              dedicated to designing, building, and launching rockets. Join us in
-              exploring aerospace engineering and space exploration.
+              The University of Auckland Rocketry Club is a student-led
+              organisation dedicated to designing, building, and launching
+              rockets. Join us in exploring aerospace engineering and space
+              exploration.
             </p>
             <div className="flex gap-4">
               {socialLinks.map((social) => {
@@ -96,13 +97,24 @@ export default function Footer() {
             <div className="mt-8">
               <Link
                 href="https://docs.google.com/forms/d/e/1FAIpQLSfS7PS--UX-fQinUfuYzVLV3-rM92cW7uVFOqoEVczgYLb8Qg/viewform?usp=sf_link"
-                className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-primary/20"
+                className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-primary/20"
+                style={{ color: "#ffffff" }}
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 Join the Club
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 8l4 4m0 0l-4 4m4-4H3"
+                  />
                 </svg>
               </Link>
             </div>
@@ -112,7 +124,8 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="mt-16 pt-8 border-t border-border">
           <p className="text-text-muted text-sm text-center">
-            {new Date().getFullYear()} University of Auckland Rocketry Club. All rights reserved.
+            {new Date().getFullYear()} University of Auckland Rocketry Club. All
+            rights reserved.
           </p>
         </div>
       </div>

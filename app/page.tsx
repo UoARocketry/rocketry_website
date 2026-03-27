@@ -63,12 +63,14 @@ export default async function HomePage() {
             <span className="block text-primary">Rocketry Club</span>
           </h1>
           <p className="text-lg md:text-xl text-text-secondary mb-10 max-w-2xl mx-auto leading-relaxed text-pretty">
-            We give students the opportunity to design, build and fly rockets as we explore the exciting world of aerospace engineering together.
+            We give students the opportunity to design, build and fly rockets as
+            we explore the exciting world of aerospace engineering together.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link
               href="https://docs.google.com/forms/d/e/1FAIpQLSfS7PS--UX-fQinUfuYzVLV3-rM92cW7uVFOqoEVczgYLb8Qg/viewform?usp=sf_link"
-              className="bg-primary hover:bg-primary-dark text-white text-base px-8 py-3.5 rounded-lg font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-0.5"
+              className="bg-primary hover:bg-primary-dark text-base px-8 py-3.5 rounded-lg font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-0.5"
+              style={{ color: "#ffffff" }}
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -85,8 +87,18 @@ export default async function HomePage() {
 
         {/* Scroll indicator */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-          <svg className="w-6 h-6 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+          <svg
+            className="w-6 h-6 text-text-muted"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 14l-7 7m0 0l-7-7m7 7V3"
+            />
           </svg>
         </div>
       </section>
@@ -96,8 +108,12 @@ export default async function HomePage() {
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <p className="text-primary text-sm font-medium uppercase tracking-wider mb-3">Our Projects</p>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Featured Rockets</h2>
+            <p className="text-primary text-sm font-medium uppercase tracking-wider mb-3">
+              Our Projects
+            </p>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Featured Rockets
+            </h2>
             <p className="text-text-secondary max-w-xl mx-auto">
               Explore our latest rocket projects and engineering achievements.
             </p>
@@ -133,8 +149,18 @@ export default async function HomePage() {
               className="inline-flex items-center gap-2 text-primary hover:text-primary-light font-medium transition-colors duration-200"
             >
               View all rockets
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 8l4 4m0 0l-4 4m4-4H3"
+                />
               </svg>
             </Link>
           </div>
@@ -146,8 +172,12 @@ export default async function HomePage() {
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <p className="text-primary text-sm font-medium uppercase tracking-wider mb-3">Stay Updated</p>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Upcoming Events</h2>
+            <p className="text-primary text-sm font-medium uppercase tracking-wider mb-3">
+              Stay Updated
+            </p>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Upcoming Events
+            </h2>
             <p className="text-text-secondary max-w-xl mx-auto">
               Join our next events and be part of the excitement.
             </p>
@@ -183,8 +213,18 @@ export default async function HomePage() {
               className="inline-flex items-center gap-2 text-primary hover:text-primary-light font-medium transition-colors duration-200"
             >
               View all events
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 8l4 4m0 0l-4 4m4-4H3"
+                />
               </svg>
             </Link>
           </div>
@@ -195,18 +235,32 @@ export default async function HomePage() {
       <section className="py-24 px-4 bg-surface relative">
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
         <div className="max-w-4xl mx-auto text-center">
-          <p className="text-primary text-sm font-medium uppercase tracking-wider mb-3">Thank You</p>
+          <p className="text-primary text-sm font-medium uppercase tracking-wider mb-3">
+            Thank You
+          </p>
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Our Sponsors</h2>
           <p className="text-text-secondary max-w-xl mx-auto mb-10">
-            We are grateful for the generous support of our sponsors who make our rocketry projects possible.
+            We are grateful for the generous support of our sponsors who make
+            our rocketry projects possible.
           </p>
           <Link
             href="/sponsors"
-            className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-primary/20"
+            className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark px-6 py-3 rounded-lg font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-primary/20"
+            style={{ color: "#ffffff" }}
           >
             View Our Sponsors
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M17 8l4 4m0 0l-4 4m4-4H3"
+              />
             </svg>
           </Link>
         </div>
@@ -217,10 +271,15 @@ export default async function HomePage() {
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <p className="text-primary text-sm font-medium uppercase tracking-wider mb-3">Discover</p>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Explore More</h2>
+            <p className="text-primary text-sm font-medium uppercase tracking-wider mb-3">
+              Discover
+            </p>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Explore More
+            </h2>
             <p className="text-text-secondary max-w-xl mx-auto">
-              Discover everything the University of Auckland Rocketry Club has to offer.
+              Discover everything the University of Auckland Rocketry Club has
+              to offer.
             </p>
           </div>
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">

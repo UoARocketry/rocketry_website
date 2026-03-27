@@ -68,10 +68,15 @@ export default async function AboutPage() {
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <p className="text-primary text-sm font-medium uppercase tracking-wider mb-3">Our Activities</p>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">What Do We Do?</h2>
+            <p className="text-primary text-sm font-medium uppercase tracking-wider mb-3">
+              Our Activities
+            </p>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              What Do We Do?
+            </h2>
             <p className="text-text-secondary max-w-xl mx-auto">
-              We offer a variety of activities to help students learn, network, and grow in the field of rocketry.
+              We offer a variety of activities to help students learn, network,
+              and grow in the field of rocketry.
             </p>
           </div>
           {whatWeDo.length > 0 ? (
@@ -99,10 +104,13 @@ export default async function AboutPage() {
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <p className="text-primary text-sm font-medium uppercase tracking-wider mb-3">Our Story</p>
+            <p className="text-primary text-sm font-medium uppercase tracking-wider mb-3">
+              Our Story
+            </p>
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Our Journey</h2>
             <p className="text-text-secondary max-w-xl mx-auto">
-              From humble beginnings to launching rockets that reach new heights.
+              From humble beginnings to launching rockets that reach new
+              heights.
             </p>
           </div>
           {journey.length > 0 ? (
@@ -129,10 +137,15 @@ export default async function AboutPage() {
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <p className="text-primary text-sm font-medium uppercase tracking-wider mb-3">Meet The Team</p>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Our Executive Team</h2>
+            <p className="text-primary text-sm font-medium uppercase tracking-wider mb-3">
+              Meet The Team
+            </p>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Our Executive Team
+            </h2>
             <p className="text-text-secondary max-w-xl mx-auto">
-              Meet the dedicated leaders driving UARC forward with their passion for rocketry and aerospace engineering.
+              Meet the dedicated leaders driving UARC forward with their passion
+              for rocketry and aerospace engineering.
             </p>
           </div>
           {execsError ? (
@@ -155,8 +168,12 @@ export default async function AboutPage() {
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <p className="text-primary text-sm font-medium uppercase tracking-wider mb-3">By The Numbers</p>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Our Achievements</h2>
+            <p className="text-primary text-sm font-medium uppercase tracking-wider mb-3">
+              By The Numbers
+            </p>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Our Achievements
+            </h2>
             <p className="text-text-secondary max-w-xl mx-auto">
               Milestones that showcase our commitment to excellence in rocketry.
             </p>
@@ -184,8 +201,12 @@ export default async function AboutPage() {
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <p className="text-primary text-sm font-medium uppercase tracking-wider mb-3">How We Work</p>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Our Team Structure</h2>
+            <p className="text-primary text-sm font-medium uppercase tracking-wider mb-3">
+              How We Work
+            </p>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Our Team Structure
+            </h2>
             <p className="text-text-secondary max-w-xl mx-auto">
               Organised teams working together to achieve our rocketry goals.
             </p>
@@ -204,7 +225,11 @@ export default async function AboutPage() {
                       {t.bullets.map((b, i) => (
                         <li key={i} className="flex items-start gap-2">
                           <span className="text-primary mt-1">
-                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 8 8">
+                            <svg
+                              className="w-3 h-3"
+                              fill="currentColor"
+                              viewBox="0 0 8 8"
+                            >
                               <circle cx="4" cy="4" r="3" />
                             </svg>
                           </span>
@@ -229,18 +254,20 @@ export default async function AboutPage() {
           <div className="relative bg-card rounded-2xl p-10 text-center border border-border overflow-hidden">
             {/* Decorative gradient */}
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent" />
-            
+
             <div className="relative z-10">
               <h2 className="text-2xl md:text-3xl font-bold text-text-main mb-3">
                 Ready to Join?
               </h2>
               <p className="text-text-secondary mb-8 max-w-md mx-auto">
-                Whether you&apos;re an experienced engineer or just starting your journey in aerospace, there&apos;s a place for you in UARC.
+                Whether you&apos;re an experienced engineer or just starting
+                your journey in aerospace, there&apos;s a place for you in UARC.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                 <Link
                   href="https://docs.google.com/forms/d/e/1FAIpQLSfS7PS--UX-fQinUfuYzVLV3-rM92cW7uVFOqoEVczgYLb8Qg/viewform?usp=sf_link"
-                  className="bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-primary/20"
+                  className="bg-primary hover:bg-primary-dark px-6 py-3 rounded-lg font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-primary/20"
+                  style={{ color: "#ffffff" }}
                   target="_blank"
                   rel="noopener noreferrer"
                 >

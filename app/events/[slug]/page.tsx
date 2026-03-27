@@ -94,7 +94,8 @@ export default async function EventPage({ params }: EventPageProps) {
                         href={formUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="button bg-primary text-white px-6 py-3 font-bold hover:bg-[#a94425] transition-all duration-200"
+                        className="button bg-primary px-6 py-3 font-bold hover:bg-[#a94425] transition-all duration-200"
+                        style={{ color: "#ffffff" }}
                         aria-label={`Sign up for ${event.title}`}
                       >
                         Sign Up
