@@ -1,171 +1,136 @@
 import { unstable_cache } from "next/cache";
+import type {
+  Event as PayloadEvent,
+  Executive as PayloadExecutive,
+  JourneyItem as PayloadJourneyItem,
+  Rocket as PayloadRocket,
+  SiteSetting as PayloadSiteSettings,
+  Sponsor as PayloadSponsor,
+  Stat as PayloadStat,
+  TeamRole as PayloadTeamRole,
+  WhatWeDo as PayloadWhatWeDo,
+} from "@/payload-types";
 import { getPayloadClient } from "@/lib/payload";
+import type {
+  AboutPayload,
+  EventDetail,
+  EventSummary,
+  EventsOverview,
+  Exec,
+  ExecTeamPayload,
+  Feature,
+  RocketDetail,
+  RocketSummary,
+  SiteSettings,
+  Sponsor,
+  Stat,
+  TeamRole,
+} from "@/lib/site-data.types";
+
+export type {
+  AboutPayload,
+  EventDetail,
+  EventSummary,
+  EventsOverview,
+  Exec,
+  ExecTeamPayload,
+  Feature,
+  RocketDetail,
+  RocketSummary,
+  SiteSettings,
+  Sponsor,
+  Stat,
+  TeamRole,
+} from "@/lib/site-data.types";
 
 const CONTENT_REVALIDATE_SECONDS = 300;
 
-type PayloadDoc<T> = T & { id: number | string };
+function parseDateValue(value: string | null | undefined): Date | null {
+  if (!value) return null;
 
-type PayloadRocket = {
-  name: string;
-  slug: string;
-  image?: string | null;
-  description?: string | null;
-  launchedAt?: string | null;
-};
-
-type PayloadEvent = {
-  title: string;
-  slug: string;
-  image?: string | null;
-  description?: string | null;
-  date?: string | null;
-  eventTag?: string | null;
-  signupUrl?: string | null;
-  isPast?: boolean | null;
-  location?: string | null;
-};
-
-type PayloadExecutive = {
-  name: string;
-  role: string;
-  bio: string;
-  photo: string;
-  year: number;
-  order: number;
-  linkedinUrl?: string | null;
-};
-
-type PayloadFeature = {
-  title: string;
-  body?: string | null;
-  image?: string | null;
-  variant?: "background" | "surface" | null;
-  order: number;
-};
-
-type PayloadTeamRole = {
-  title: string;
-  body?: string | null;
-  bullets?: Array<{ value: string }> | null;
-  variant?: "background" | "surface" | null;
-  order: number;
-};
-
-type PayloadStat = {
-  value: string;
-  label: string;
-  order: number;
-};
-
-type PayloadSponsor = {
-  name: string;
-  logo: string;
-  url: string;
-  description?: string | null;
-  tier?: "GOLD" | "SILVER" | "BRONZE" | null;
-};
-
-type PayloadSiteSettings = {
-  memberJoinUrl?: string | null;
-  execTeamImageUrl?: string | null;
-};
-
-export type RocketSummary = {
-  id: number;
-  name: string;
-  slug: string;
-  image?: string | null;
-  description?: string | null;
-  launchedAt?: string | null;
-};
-
-export type RocketDetail = RocketSummary;
-
-export type EventSummary = {
-  id: number;
-  title: string;
-  slug: string;
-  image?: string | null;
-  description?: string | null;
-  date: string;
-  eventTag?: string | null;
-  signupUrl?: string | null;
-  isPast?: boolean;
-  location?: string | null;
-};
-
-export type EventDetail = EventSummary;
-
-export type Exec = {
-  id: number;
-  name: string;
-  role: string;
-  bio: string;
-  photo: string;
-  year: number;
-  linkedinUrl?: string | null;
-};
-
-export type Feature = {
-  image?: string | null;
-  title: string;
-  body?: string | null;
-  variant?: "background" | "surface" | null;
-};
-
-export type TeamRole = {
-  title: string;
-  body?: string | null;
-  bullets?: string[];
-  variant?: "background" | "surface" | null;
-};
-
-export type Stat = {
-  value: string;
-  label: string;
-};
-
-export type Sponsor = {
-  id: number;
-  name: string;
-  logo: string;
-  url: string;
-  description?: string | null;
-  tier?: string | null;
-};
-
-export type EventsOverview = {
-  upcoming: EventSummary[];
-  past: EventSummary[];
-};
-
-export type AboutPayload = {
-  executives: Exec[];
-  whatWeDo: Feature[];
-  journey: Feature[];
-  teamStructure: TeamRole[];
-  stats: Stat[];
-};
-
-export type ExecTeamPayload = {
-  selectedYear: number;
-  availableYears: number[];
-  executives: Exec[];
-};
-
-export type SiteSettings = {
-  memberJoinUrl: string;
-  execTeamImageUrl?: string | null;
-};
-
-function toNumberId(id: number | string): number {
-  const parsed = Number(id);
-  return Number.isFinite(parsed) ? parsed : 0;
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
-function mapRocket(doc: PayloadDoc<PayloadRocket>): RocketSummary {
+function normalizeEventDate(value: string | null | undefined): string {
+  return parseDateValue(value)?.toISOString() ?? "";
+}
+
+function partitionEventsByDate(events: EventSummary[]): EventsOverview {
+  const now = Date.now();
+
+  const withSortKey = events.map((event) => {
+    const parsedDate = parseDateValue(event.date);
+    const timestamp = parsedDate?.getTime() ?? Number.MIN_SAFE_INTEGER;
+
+    return { event, timestamp };
+  });
+
+  const upcoming = withSortKey
+    .filter(({ event, timestamp }) => !event.isPast && timestamp >= now)
+    .sort((a, b) => a.timestamp - b.timestamp)
+    .map(({ event }) => event);
+
+  const past = withSortKey
+    .filter(({ event, timestamp }) => event.isPast || timestamp < now)
+    .sort((a, b) => b.timestamp - a.timestamp)
+    .map(({ event }) => event);
+
+  return { upcoming, past };
+}
+
+function createCachedByNumberArg<T>(options: {
+  keyPrefix: string;
+  tags: (value: number) => string[];
+  load: (value: number) => Promise<T>;
+}) {
+  const cache = new Map<number, () => Promise<T>>();
+
+  return (value: number) => {
+    let loader = cache.get(value);
+
+    if (!loader) {
+      loader = unstable_cache(() => options.load(value), [
+        options.keyPrefix,
+        String(value),
+      ], {
+        revalidate: CONTENT_REVALIDATE_SECONDS,
+        tags: options.tags(value),
+      });
+
+      cache.set(value, loader);
+    }
+
+    return loader();
+  };
+}
+
+function createCachedByStringArg<T>(options: {
+  keyPrefix: string;
+  tags: (value: string) => string[];
+  load: (value: string) => Promise<T>;
+}) {
+  const cache = new Map<string, () => Promise<T>>();
+
+  return (value: string) => {
+    let loader = cache.get(value);
+
+    if (!loader) {
+      loader = unstable_cache(() => options.load(value), [options.keyPrefix, value], {
+        revalidate: CONTENT_REVALIDATE_SECONDS,
+        tags: options.tags(value),
+      });
+
+      cache.set(value, loader);
+    }
+
+    return loader();
+  };
+}
+
+function mapRocket(doc: PayloadRocket): RocketSummary {
   return {
-    id: toNumberId(doc.id),
+    id: doc.id,
     name: doc.name,
     slug: doc.slug,
     image: doc.image ?? null,
@@ -174,14 +139,14 @@ function mapRocket(doc: PayloadDoc<PayloadRocket>): RocketSummary {
   };
 }
 
-function mapEvent(doc: PayloadDoc<PayloadEvent>): EventSummary {
+function mapEvent(doc: PayloadEvent): EventSummary {
   return {
-    id: toNumberId(doc.id),
+    id: doc.id,
     title: doc.title,
     slug: doc.slug,
     image: doc.image ?? null,
     description: doc.description ?? null,
-    date: doc.date ?? "",
+    date: normalizeEventDate(doc.date),
     eventTag: doc.eventTag ?? null,
     signupUrl: doc.signupUrl ?? null,
     isPast: Boolean(doc.isPast),
@@ -189,9 +154,9 @@ function mapEvent(doc: PayloadDoc<PayloadEvent>): EventSummary {
   };
 }
 
-function mapExec(doc: PayloadDoc<PayloadExecutive>): Exec {
+function mapExec(doc: PayloadExecutive): Exec {
   return {
-    id: toNumberId(doc.id),
+    id: doc.id,
     name: doc.name,
     role: doc.role,
     bio: doc.bio,
@@ -201,7 +166,7 @@ function mapExec(doc: PayloadDoc<PayloadExecutive>): Exec {
   };
 }
 
-function mapFeature(doc: PayloadDoc<PayloadFeature>): Feature {
+function mapFeature(doc: PayloadWhatWeDo | PayloadJourneyItem): Feature {
   return {
     title: doc.title,
     body: doc.body ?? null,
@@ -210,7 +175,7 @@ function mapFeature(doc: PayloadDoc<PayloadFeature>): Feature {
   };
 }
 
-function mapTeamRole(doc: PayloadDoc<PayloadTeamRole>): TeamRole {
+function mapTeamRole(doc: PayloadTeamRole): TeamRole {
   return {
     title: doc.title,
     body: doc.body ?? null,
@@ -219,16 +184,16 @@ function mapTeamRole(doc: PayloadDoc<PayloadTeamRole>): TeamRole {
   };
 }
 
-function mapStat(doc: PayloadDoc<PayloadStat>): Stat {
+function mapStat(doc: PayloadStat): Stat {
   return {
     value: doc.value,
     label: doc.label,
   };
 }
 
-function mapSponsor(doc: PayloadDoc<PayloadSponsor>): Sponsor {
+function mapSponsor(doc: PayloadSponsor): Sponsor {
   return {
-    id: toNumberId(doc.id),
+    id: doc.id,
     name: doc.name,
     logo: doc.logo,
     url: doc.url,
@@ -236,6 +201,69 @@ function mapSponsor(doc: PayloadDoc<PayloadSponsor>): Sponsor {
     tier: doc.tier ?? null,
   };
 }
+
+const getExecTeamByYear = createCachedByNumberArg<Exec[]>({
+  keyPrefix: "exec-team",
+  tags: (year) => ["about", "exec", `exec-year:${year}`],
+  load: async (year) => {
+    const payload = await getPayloadClient();
+    const result = await payload.find({
+      collection: "executives",
+      draft: false,
+      pagination: false,
+      sort: "order",
+      where: {
+        year: {
+          equals: year,
+        },
+      },
+    });
+
+    return result.docs.map((doc) => mapExec(doc as PayloadExecutive));
+  },
+});
+
+const getRocketBySlugCached = createCachedByStringArg<RocketDetail | null>({
+  keyPrefix: "rocket-by-slug",
+  tags: (slug) => ["rockets", `rocket:${slug}`],
+  load: async (slug) => {
+    const payload = await getPayloadClient();
+    const result = await payload.find({
+      collection: "rockets",
+      draft: false,
+      limit: 1,
+      where: {
+        slug: {
+          equals: slug,
+        },
+      },
+    });
+
+    const doc = result.docs[0];
+    return doc ? mapRocket(doc as PayloadRocket) : null;
+  },
+});
+
+const getEventBySlugCached = createCachedByStringArg<EventDetail | null>({
+  keyPrefix: "event-by-slug",
+  tags: (slug) => ["events", `event:${slug}`],
+  load: async (slug) => {
+    const payload = await getPayloadClient();
+    const result = await payload.find({
+      collection: "events",
+      draft: false,
+      limit: 1,
+      where: {
+        slug: {
+          equals: slug,
+        },
+      },
+    });
+
+    const doc = result.docs[0];
+    return doc ? mapEvent(doc as PayloadEvent) : null;
+  },
+});
 
 export const getRocketSummaries = unstable_cache(
   async (): Promise<RocketSummary[]> => {
@@ -247,9 +275,7 @@ export const getRocketSummaries = unstable_cache(
       sort: "-launchedAt",
     });
 
-    return result.docs.map((doc) =>
-      mapRocket(doc as PayloadDoc<PayloadRocket>),
-    );
+    return result.docs.map((doc) => mapRocket(doc as PayloadRocket));
   },
   ["rocket-summaries"],
   { revalidate: CONTENT_REVALIDATE_SECONDS, tags: ["rockets"] },
@@ -265,9 +291,7 @@ export const getAllRockets = unstable_cache(
       sort: "-launchedAt",
     });
 
-    return result.docs.map((doc) =>
-      mapRocket(doc as PayloadDoc<PayloadRocket>),
-    );
+    return result.docs.map((doc) => mapRocket(doc as PayloadRocket));
   },
   ["all-rockets"],
   { revalidate: CONTENT_REVALIDATE_SECONDS, tags: ["rockets"] },
@@ -283,20 +307,9 @@ export const getEventsOverview = unstable_cache(
       sort: "-date",
     });
 
-    const docs = result.docs.map((doc) =>
-      mapEvent(doc as PayloadDoc<PayloadEvent>),
-    );
-    const now = new Date();
+    const docs = result.docs.map((doc) => mapEvent(doc as PayloadEvent));
 
-    const upcoming = docs
-      .filter((event) => !event.isPast && new Date(event.date) >= now)
-      .sort((a, b) => a.date.localeCompare(b.date));
-
-    const past = docs
-      .filter((event) => event.isPast || new Date(event.date) < now)
-      .sort((a, b) => b.date.localeCompare(a.date));
-
-    return { upcoming, past };
+    return partitionEventsByDate(docs);
   },
   ["events-overview"],
   { revalidate: CONTENT_REVALIDATE_SECONDS, tags: ["events"] },
@@ -343,17 +356,15 @@ export const getAboutPayload = unstable_cache(
     return {
       executives: execTeamPayload.executives,
       whatWeDo: whatWeDoResult.docs.map((doc) =>
-        mapFeature(doc as PayloadDoc<PayloadFeature>),
+        mapFeature(doc as PayloadWhatWeDo),
       ),
       journey: journeyResult.docs.map((doc) =>
-        mapFeature(doc as PayloadDoc<PayloadFeature>),
+        mapFeature(doc as PayloadJourneyItem),
       ),
       teamStructure: teamResult.docs.map((doc) =>
-        mapTeamRole(doc as PayloadDoc<PayloadTeamRole>),
+        mapTeamRole(doc as PayloadTeamRole),
       ),
-      stats: statsResult.docs.map((doc) =>
-        mapStat(doc as PayloadDoc<PayloadStat>),
-      ),
+      stats: statsResult.docs.map((doc) => mapStat(doc as PayloadStat)),
     };
   },
   ["about-payload"],
@@ -371,7 +382,7 @@ export const getExecYears = unstable_cache(
     });
 
     const years = result.docs
-      .map((doc) => (doc as PayloadDoc<PayloadExecutive>).year)
+      .map((doc) => (doc as PayloadExecutive).year)
       .filter((year) => Number.isFinite(year));
 
     return Array.from(new Set(years));
@@ -392,33 +403,7 @@ export async function getExecTeam(year?: number): Promise<Exec[]> {
   const targetYear =
     typeof year === "number" ? year : await getLatestExecYear();
 
-  const cachedLoader = unstable_cache(
-    async (): Promise<Exec[]> => {
-      const payload = await getPayloadClient();
-      const result = await payload.find({
-        collection: "executives",
-        draft: false,
-        pagination: false,
-        sort: "order",
-        where: {
-          year: {
-            equals: targetYear,
-          },
-        },
-      });
-
-      return result.docs.map((doc) =>
-        mapExec(doc as PayloadDoc<PayloadExecutive>),
-      );
-    },
-    ["exec-team", String(targetYear)],
-    {
-      revalidate: CONTENT_REVALIDATE_SECONDS,
-      tags: ["about", "exec", `exec-year:${targetYear}`],
-    },
-  );
-
-  return cachedLoader();
+  return getExecTeamByYear(targetYear);
 }
 
 export async function getExecTeamPayload(
@@ -450,9 +435,7 @@ export const getSponsors = unstable_cache(
       sort: "name",
     });
 
-    return result.docs.map((doc) =>
-      mapSponsor(doc as PayloadDoc<PayloadSponsor>),
-    );
+    return result.docs.map((doc) => mapSponsor(doc as PayloadSponsor));
   },
   ["sponsors"],
   { revalidate: CONTENT_REVALIDATE_SECONDS, tags: ["sponsors"] },
@@ -480,59 +463,11 @@ export const getSiteSettings = unstable_cache(
 export async function getRocketBySlug(
   slug: string,
 ): Promise<RocketDetail | null> {
-  const cachedLoader = unstable_cache(
-    async (): Promise<RocketDetail | null> => {
-      const payload = await getPayloadClient();
-      const result = await payload.find({
-        collection: "rockets",
-        draft: false,
-        limit: 1,
-        where: {
-          slug: {
-            equals: slug,
-          },
-        },
-      });
-
-      const doc = result.docs[0];
-      return doc ? mapRocket(doc as PayloadDoc<PayloadRocket>) : null;
-    },
-    ["rocket-by-slug", slug],
-    {
-      revalidate: CONTENT_REVALIDATE_SECONDS,
-      tags: ["rockets", `rocket:${slug}`],
-    },
-  );
-
-  return cachedLoader();
+  return getRocketBySlugCached(slug);
 }
 
 export async function getEventBySlug(
   slug: string,
 ): Promise<EventDetail | null> {
-  const cachedLoader = unstable_cache(
-    async (): Promise<EventDetail | null> => {
-      const payload = await getPayloadClient();
-      const result = await payload.find({
-        collection: "events",
-        draft: false,
-        limit: 1,
-        where: {
-          slug: {
-            equals: slug,
-          },
-        },
-      });
-
-      const doc = result.docs[0];
-      return doc ? mapEvent(doc as PayloadDoc<PayloadEvent>) : null;
-    },
-    ["event-by-slug", slug],
-    {
-      revalidate: CONTENT_REVALIDATE_SECONDS,
-      tags: ["events", `event:${slug}`],
-    },
-  );
-
-  return cachedLoader();
+  return getEventBySlugCached(slug);
 }
