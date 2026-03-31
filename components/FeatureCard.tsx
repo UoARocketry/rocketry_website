@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
 
-type Props = {
+type BaseProps = {
   image?: string;
   imageAlt?: string;
   title?: React.ReactNode;
@@ -11,36 +11,54 @@ type Props = {
   variant?: "surface" | "background";
   showImagePlaceholder?: boolean;
   className?: string;
-  as?: "div" | "a" | "button";
-  href?: string;
   ariaLabel?: string;
 };
 
-export default function FeatureCard({
-  image,
-  imageAlt = "",
-  title,
-  subtitle,
-  children,
-  centered = false,
-  variant = "surface",
-  showImagePlaceholder = false,
-  className = "",
-  as = "div",
-  href,
-  ariaLabel,
-}: Props) {
-  const bg = variant === "surface" ? "bg-surface" : "bg-card";
-  const Tag: React.ElementType = as;
+type DivProps = BaseProps & {
+  as?: "div";
+  href?: never;
+  onClick?: never;
+};
 
-  return (
-    <Tag
-      className={`group relative ${bg} rounded-xl border border-border transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 overflow-hidden ${
-        centered ? "text-center" : ""
-      } ${className}`.trim()}
-      href={href}
-      aria-label={ariaLabel}
-    >
+type AnchorProps = BaseProps & {
+  as: "a";
+  href: string;
+  target?: React.HTMLAttributeAnchorTarget;
+  rel?: string;
+};
+
+type ButtonProps = BaseProps & {
+  as: "button";
+  href?: never;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
+  buttonType?: "button" | "submit" | "reset";
+  disabled?: boolean;
+};
+
+type Props = DivProps | AnchorProps | ButtonProps;
+
+export default function FeatureCard(props: Props) {
+  const {
+    image,
+    imageAlt = "",
+    title,
+    subtitle,
+    children,
+    centered = false,
+    variant = "surface",
+    showImagePlaceholder = false,
+    className = "",
+    ariaLabel,
+  } = props;
+
+  const bg = variant === "surface" ? "bg-surface" : "bg-card";
+  const rootClassName =
+    `group relative ${bg} rounded-xl border border-border transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 overflow-hidden ${
+      centered ? "text-center" : ""
+    } ${className}`.trim();
+
+  const cardContent = (
+    <>
       {/* Subtle top accent line */}
       <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10" />
 
@@ -75,6 +93,40 @@ export default function FeatureCard({
           </div>
         )}
       </div>
-    </Tag>
+    </>
+  );
+
+  if (props.as === "a") {
+    return (
+      <a
+        className={rootClassName}
+        href={props.href}
+        target={props.target}
+        rel={props.rel}
+        aria-label={ariaLabel}
+      >
+        {cardContent}
+      </a>
+    );
+  }
+
+  if (props.as === "button") {
+    return (
+      <button
+        type={props.buttonType ?? "button"}
+        className={rootClassName}
+        onClick={props.onClick}
+        disabled={props.disabled}
+        aria-label={ariaLabel}
+      >
+        {cardContent}
+      </button>
+    );
+  }
+
+  return (
+    <div className={rootClassName} aria-label={ariaLabel}>
+      {cardContent}
+    </div>
   );
 }

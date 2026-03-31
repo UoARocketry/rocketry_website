@@ -44,6 +44,7 @@ export default function Navigation({ joinUrl }: NavigationProps) {
 
   return (
     <nav
+      id="site-navigation"
       className={`fixed w-full top-0 z-50 transition-all duration-300 ${
         isScrolled
           ? "bg-elevated/95 backdrop-blur-md border-b border-border shadow-lg"
@@ -94,8 +95,7 @@ export default function Navigation({ joinUrl }: NavigationProps) {
             {hasJoinUrl && (
               <Link
                 href={joinUrl}
-                className="ml-4 bg-primary hover:bg-primary-dark px-5 py-2 rounded-lg text-sm font-semibold tracking-wide transition-all duration-200 hover:shadow-lg hover:shadow-primary/20"
-                style={{ color: "#ffffff" }}
+                className="ml-4 bg-primary hover:bg-primary-dark px-5 py-2 rounded-lg text-sm font-semibold tracking-wide text-white transition-all duration-200 hover:shadow-lg hover:shadow-primary/20"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -107,8 +107,11 @@ export default function Navigation({ joinUrl }: NavigationProps) {
           {/* Burger menu button */}
           <button
             onClick={toggleMenu}
+            type="button"
             className="lg:hidden p-2 text-text-secondary hover:text-text-main transition-colors"
             aria-label="Toggle menu"
+            aria-expanded={isMenuOpen}
+            aria-controls="mobile-navigation"
           >
             <BurgerMenu isOpen={isMenuOpen} />
           </button>
@@ -116,6 +119,7 @@ export default function Navigation({ joinUrl }: NavigationProps) {
 
         {/* Mobile nav */}
         <div
+          id="mobile-navigation"
           className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${
             isMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
           }`}
@@ -143,8 +147,7 @@ export default function Navigation({ joinUrl }: NavigationProps) {
               <div className="pt-4 px-4">
                 <Link
                   href={joinUrl}
-                  className="block w-full bg-primary hover:bg-primary-dark text-center px-5 py-3 rounded-lg text-sm font-semibold tracking-wide transition-all duration-200"
-                  style={{ color: "#ffffff" }}
+                  className="block w-full bg-primary hover:bg-primary-dark text-white text-center px-5 py-3 rounded-lg text-sm font-semibold tracking-wide transition-all duration-200"
                   onClick={() => setIsMenuOpen(false)}
                   target="_blank"
                   rel="noopener noreferrer"

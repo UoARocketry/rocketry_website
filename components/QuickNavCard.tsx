@@ -7,7 +7,8 @@ import SponsorsQuickNavIcon from "./icons/sponsors-quick-nav-icon";
 
 type Props = {
   href: string;
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
+  iconKey?: "about" | "events" | "rockets" | "sponsors";
   title: string;
   description: string;
   className?: string;
@@ -23,21 +24,14 @@ const iconMap: Record<string, React.ReactNode> = {
 export default function QuickNavCard({
   href,
   icon,
+  iconKey,
   title,
   description,
   className = "",
 }: Props) {
-  // Determine which icon to use based on title
-  const titleLower = title.toLowerCase();
-  const svgIcon = titleLower.includes("about")
-    ? iconMap.about
-    : titleLower.includes("event")
-      ? iconMap.events
-      : titleLower.includes("rocket")
-        ? iconMap.rockets
-        : titleLower.includes("sponsor")
-          ? iconMap.sponsors
-          : null;
+  const hrefKey = href.replace(/^\/+/, "").split("/")[0]?.toLowerCase() ?? "";
+  const resolvedIcon =
+    iconMap[iconKey ?? hrefKey] ?? (React.isValidElement(icon) ? icon : null);
 
   return (
     <Link
@@ -49,7 +43,7 @@ export default function QuickNavCard({
 
       <div className="relative z-10">
         <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-primary/10 text-primary mb-4 transition-all duration-300 group-hover:bg-primary/20 group-hover:scale-110">
-          {svgIcon || icon}
+          {resolvedIcon}
         </div>
         <h3 className="text-base font-semibold text-text-main mb-2 group-hover:text-primary transition-colors duration-200">
           {title}

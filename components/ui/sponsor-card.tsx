@@ -1,13 +1,5 @@
 import Image from "next/image";
-
-interface Sponsor {
-  id: number;
-  name: string;
-  logo: string;
-  url: string;
-  description?: string | null;
-  tier?: string | null;
-}
+import type { Sponsor } from "@/lib/site-data";
 
 export default function SponsorCard({
   sponsor,
@@ -57,6 +49,8 @@ export default function SponsorCard({
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
+            aria-hidden="true"
+            focusable="false"
           >
             <path
               strokeLinecap="round"

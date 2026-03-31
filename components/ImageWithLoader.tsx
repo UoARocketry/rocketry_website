@@ -26,6 +26,17 @@ export default function ImageWithLoader({
   containerClassName = "relative",
 }: ImageWithLoaderProps) {
   const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+
+  const handleLoaded = () => {
+    setIsLoading(false);
+    setHasError(false);
+  };
+
+  const handleError = () => {
+    setHasError(true);
+    setIsLoading(false);
+  };
 
   return (
     <div className={containerClassName}>
@@ -43,6 +54,11 @@ export default function ImageWithLoader({
           </div>
         </div>
       )}
+      {hasError && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-surface text-text-muted text-sm">
+          Image unavailable
+        </div>
+      )}
       <Image
         src={src}
         alt={alt}
@@ -51,7 +67,8 @@ export default function ImageWithLoader({
         sizes={sizes}
         priority={priority}
         className={className}
-        onLoadingComplete={() => setIsLoading(false)}
+        onLoad={handleLoaded}
+        onError={handleError}
       />
     </div>
   );
