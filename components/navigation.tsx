@@ -3,15 +3,19 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import BurgerMenu from "./ui/burger-menu";
 
-export default function Navigation() {
+type NavigationProps = {
+  joinUrl: string;
+};
+
+export default function Navigation({ joinUrl }: NavigationProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [joinUrl, setJoinUrl] = useState("");
 
   const pathname = usePathname();
-  const isHome = pathname === "/";
+  const hasJoinUrl = Boolean(joinUrl.trim());
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -28,23 +32,6 @@ export default function Navigation() {
     return () => {
       window.removeEventListener("scroll", updateNavState);
     };
-  }, []);
-
-  useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const response = await fetch("/api/site-settings");
-        if (response.ok) {
-          const settings = await response.json();
-          setJoinUrl(settings.memberJoinUrl);
-        }
-      } catch (error) {
-        console.error("Error fetching site settings:", error);
-        // Fall back to default URL
-      }
-    };
-
-    fetchSettings();
   }, []);
 
   const navLinks = [
@@ -70,10 +57,12 @@ export default function Navigation() {
           }`}
         >
           {/* Logo */}
-          <Link href="/" className="flex-shrink-0 flex items-center group">
-            <img
+          <Link href="/" className="shrink-0 flex items-center group">
+            <Image
               src="/UARC logo.png"
               alt="UARC Logo"
+              width={240}
+              height={96}
               className={`w-auto object-contain transition-all duration-300 group-hover:opacity-80 ${
                 isScrolled ? "h-10" : "h-12"
               }`}
@@ -102,15 +91,17 @@ export default function Navigation() {
                 </Link>
               );
             })}
-            <Link
-              href={joinUrl}
-              className="ml-4 bg-primary hover:bg-primary-dark px-5 py-2 rounded-lg text-sm font-semibold tracking-wide transition-all duration-200 hover:shadow-lg hover:shadow-primary/20"
-              style={{ color: "#ffffff" }}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              JOIN US
-            </Link>
+            {hasJoinUrl && (
+              <Link
+                href={joinUrl}
+                className="ml-4 bg-primary hover:bg-primary-dark px-5 py-2 rounded-lg text-sm font-semibold tracking-wide transition-all duration-200 hover:shadow-lg hover:shadow-primary/20"
+                style={{ color: "#ffffff" }}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                JOIN US
+              </Link>
+            )}
           </div>
 
           {/* Burger menu button */}
@@ -148,18 +139,20 @@ export default function Navigation() {
                 </Link>
               );
             })}
-            <div className="pt-4 px-4">
-              <Link
-                href={joinUrl}
-                className="block w-full bg-primary hover:bg-primary-dark text-center px-5 py-3 rounded-lg text-sm font-semibold tracking-wide transition-all duration-200"
-                style={{ color: "#ffffff" }}
-                onClick={() => setIsMenuOpen(false)}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                JOIN US
-              </Link>
-            </div>
+            {hasJoinUrl && (
+              <div className="pt-4 px-4">
+                <Link
+                  href={joinUrl}
+                  className="block w-full bg-primary hover:bg-primary-dark text-center px-5 py-3 rounded-lg text-sm font-semibold tracking-wide transition-all duration-200"
+                  style={{ color: "#ffffff" }}
+                  onClick={() => setIsMenuOpen(false)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  JOIN US
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </div>

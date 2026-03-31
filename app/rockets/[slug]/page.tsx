@@ -1,5 +1,5 @@
 import Link from "next/link";
-// import { notFound } from "next/navigation";
+import Image from "next/image";
 import SectionFallback from "@/components/SectionFallback";
 import { getRocketBySlug } from "@/lib/site-data";
 
@@ -8,10 +8,8 @@ interface RocketPageProps {
 }
 
 export default async function RocketPage({ params }: RocketPageProps) {
-  // await the params promise to pull out slug
   const { slug } = await params;
   let rocket = null;
-  const rocketImageSrc = (image?: string | null) => image ?? "";
 
   try {
     rocket = await getRocketBySlug(slug);
@@ -44,9 +42,12 @@ export default async function RocketPage({ params }: RocketPageProps) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           {/* Rocket Image */}
           <div className="relative">
-            <img
-              src={rocketImageSrc(rocket.image)}
+            <Image
+              src={rocket.image ?? "/UARC logo.png"}
               alt={rocket.name}
+              width={1200}
+              height={900}
+              sizes="(max-width: 1024px) 100vw, 50vw"
               className="w-full h-96 object-cover rounded-lg shadow-lg"
             />
           </div>

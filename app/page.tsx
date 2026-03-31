@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import Card from "../components/ui/card";
 import SectionFallback from "../components/SectionFallback";
 import QuickNavCard from "../components/QuickNavCard";
@@ -7,30 +8,13 @@ import {
   getEventsOverview,
   getRocketSummaries,
   getSiteSettings,
+  type EventSummary,
+  type RocketSummary,
 } from "@/lib/site-data";
 
-type Rocket = {
-  id: number;
-  name: string;
-  slug: string;
-  image?: string | null;
-  description?: string | null;
-  launchedAt?: string | null;
-};
-
-type EventItem = {
-  id: number;
-  title: string;
-  slug: string;
-  image?: string | null;
-  description?: string | null;
-  date: string;
-  eventTag?: string | null;
-};
-
 export default async function HomePage() {
-  let featuredRockets: Rocket[] = [];
-  let latestEvents: EventItem[] = [];
+  let featuredRockets: RocketSummary[] = [];
+  let latestEvents: EventSummary[] = [];
   let joinUrl = "";
 
   try {
@@ -49,6 +33,7 @@ export default async function HomePage() {
 
   const eventPlaceholder =
     "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80";
+  const hasJoinUrl = Boolean(joinUrl.trim());
 
   return (
     <main className="min-h-screen bg-background text-text-main">
@@ -56,15 +41,18 @@ export default async function HomePage() {
       <section className="relative min-h-[90vh] flex flex-col items-center justify-center text-center px-4 bg-background overflow-hidden">
         {/* Background gradient effects */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-200 h-200 bg-primary/5 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-border to-transparent" />
         </div>
 
         <div className="relative z-10 max-w-4xl mx-auto">
-          <img
+          <Image
             src="/UARC logo.png"
             alt="UARC Logo"
+            width={360}
+            height={144}
             className="h-20 md:h-24 mb-8 mx-auto"
+            priority
           />
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 tracking-tight text-balance">
             University of Auckland
@@ -75,15 +63,17 @@ export default async function HomePage() {
             we explore the exciting world of aerospace engineering together.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link
-              href={joinUrl}
-              className="bg-primary hover:bg-primary-dark text-base px-8 py-3.5 rounded-lg font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-0.5"
-              style={{ color: "#ffffff" }}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Join The Club
-            </Link>
+            {hasJoinUrl && (
+              <Link
+                href={joinUrl}
+                className="bg-primary hover:bg-primary-dark text-base px-8 py-3.5 rounded-lg font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-0.5"
+                style={{ color: "#ffffff" }}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Join The Club
+              </Link>
+            )}
             <Link
               href="/rockets"
               className="bg-transparent border border-border hover:border-primary/50 text-text-main hover:text-primary text-base px-8 py-3.5 rounded-lg font-semibold transition-all duration-200 hover:bg-primary/5"
@@ -113,7 +103,7 @@ export default async function HomePage() {
 
       {/* Featured Rockets Section */}
       <section className="py-24 px-4 bg-surface relative">
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+        <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-border to-transparent" />
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <p className="text-primary text-sm font-medium uppercase tracking-wider mb-3">
@@ -177,7 +167,7 @@ export default async function HomePage() {
 
       {/* Latest Events Section */}
       <section className="py-24 px-4 bg-background relative">
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+        <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-border to-transparent" />
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <p className="text-primary text-sm font-medium uppercase tracking-wider mb-3">
@@ -241,7 +231,7 @@ export default async function HomePage() {
 
       {/* Sponsors Section */}
       <section className="py-24 px-4 bg-surface relative">
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+        <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-border to-transparent" />
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-primary text-sm font-medium uppercase tracking-wider mb-3">
             Thank You
@@ -276,7 +266,7 @@ export default async function HomePage() {
 
       {/* Quick Navigation Section */}
       <section className="py-24 px-4 bg-background relative">
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+        <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-border to-transparent" />
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <p className="text-primary text-sm font-medium uppercase tracking-wider mb-3">

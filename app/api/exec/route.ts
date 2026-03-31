@@ -5,8 +5,15 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const yearParam = searchParams.get("year");
-    const parsedYear = yearParam ? Number.parseInt(yearParam, 10) : undefined;
-    const year = Number.isFinite(parsedYear) ? parsedYear : undefined;
+
+    if (yearParam && !/^\d{4}$/.test(yearParam)) {
+      return NextResponse.json(
+        { error: "Invalid year query parameter. Expected YYYY format." },
+        { status: 400 },
+      );
+    }
+
+    const year = yearParam ? Number(yearParam) : undefined;
 
     const execPayload = await getExecTeamPayload(year);
 

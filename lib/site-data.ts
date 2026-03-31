@@ -2,6 +2,15 @@ import { unstable_cache } from "next/cache";
 import supabase from "@/lib/supabase";
 
 const CONTENT_REVALIDATE_SECONDS = 300;
+const ROCKET_COLUMNS = "id,name,slug,image,description,launchedAt";
+const EVENT_COLUMNS =
+  "id,title,slug,image,description,date,eventTag,signupUrl,isPast,location";
+const EXEC_COLUMNS = "id,name,role,bio,photo,year,linkedinUrl";
+const SPONSOR_COLUMNS = "id,name,logo,url,description,tier";
+const WHAT_WE_DO_COLUMNS = "title,body,image,variant";
+const JOURNEY_COLUMNS = "title,body,image,variant";
+const TEAM_ROLE_COLUMNS = "title,body,bullets,variant";
+const STAT_COLUMNS = "value,label";
 
 export type RocketSummary = {
   id: number;
@@ -95,7 +104,7 @@ export const getRocketSummaries = unstable_cache(
   async (): Promise<RocketSummary[]> => {
     const { data, error } = await supabase
       .from("Rocket")
-      .select("id,name,slug,image,description,launchedAt")
+      .select(ROCKET_COLUMNS)
       .order("launchedAt", { ascending: false })
       .limit(2);
 
@@ -115,18 +124,14 @@ export const getEventsOverview = unstable_cache(
     const [upcomingResult, pastResult] = await Promise.all([
       supabase
         .from("Event")
-        .select(
-          "id,title,slug,image,description,date,eventTag,signupUrl,isPast,location",
-        )
+        .select(EVENT_COLUMNS)
         .eq("isPast", false)
         .gte("date", nowIso)
         .order("date", { ascending: true })
         .limit(10),
       supabase
         .from("Event")
-        .select(
-          "id,title,slug,image,description,date,eventTag,signupUrl,isPast,location",
-        )
+        .select(EVENT_COLUMNS)
         .or(pastFilter)
         .order("date", { ascending: false })
         .limit(10),
@@ -154,10 +159,22 @@ export const getAboutPayload = unstable_cache(
       statsResult,
     ] = await Promise.all([
       getExecTeamPayload(),
-      supabase.from("WhatWeDo").select("*").order("id", { ascending: true }),
-      supabase.from("JourneyItem").select("*").order("id", { ascending: true }),
-      supabase.from("TeamRole").select("*").order("id", { ascending: true }),
-      supabase.from("Stat").select("*").order("id", { ascending: true }),
+      supabase
+        .from("WhatWeDo")
+        .select(WHAT_WE_DO_COLUMNS)
+        .order("id", { ascending: true }),
+      supabase
+        .from("JourneyItem")
+        .select(JOURNEY_COLUMNS)
+        .order("id", { ascending: true }),
+      supabase
+        .from("TeamRole")
+        .select(TEAM_ROLE_COLUMNS)
+        .order("id", { ascending: true }),
+      supabase
+        .from("Stat")
+        .select(STAT_COLUMNS)
+        .order("id", { ascending: true }),
     ]);
 
     if (whatWeDoResult.error) throw whatWeDoResult.error;
@@ -213,7 +230,7 @@ export async function getExecTeam(year?: number): Promise<Exec[]> {
     async (): Promise<Exec[]> => {
       const { data, error } = await supabase
         .from("Exec")
-        .select("*")
+        .select(EXEC_COLUMNS)
         .eq("year", targetYear)
         .order("order", { ascending: true });
 
@@ -254,7 +271,7 @@ export const getSponsors = unstable_cache(
   async (): Promise<Sponsor[]> => {
     const { data, error } = await supabase
       .from("Sponsor")
-      .select("*")
+      .select(SPONSOR_COLUMNS)
       .order("id", { ascending: true });
 
     if (error) throw error;
@@ -291,7 +308,7 @@ export async function getRocketBySlug(
     async (): Promise<RocketDetail | null> => {
       const { data, error } = await supabase
         .from("Rocket")
-        .select("*")
+        .select(ROCKET_COLUMNS)
         .eq("slug", slug)
         .maybeSingle();
 
@@ -316,7 +333,7 @@ export async function getEventBySlug(
     async (): Promise<EventDetail | null> => {
       const { data, error } = await supabase
         .from("Event")
-        .select("*")
+        .select(EVENT_COLUMNS)
         .eq("slug", slug)
         .maybeSingle();
 

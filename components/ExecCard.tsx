@@ -1,16 +1,18 @@
 import React from "react";
+import Image from "next/image";
+import type { Exec } from "@/lib/site-data";
 
-type Exec = {
-  id?: number;
-  name: string;
-  role?: string;
-  bio?: string;
-  photo?: string;
-  linkedinUrl?: string | null;
+type ExecCardModel = {
+  id?: Exec["id"];
+  name: Exec["name"];
+  role?: Exec["role"];
+  bio?: Exec["bio"];
+  photo?: Exec["photo"];
+  linkedinUrl?: Exec["linkedinUrl"];
 };
 
 type Props = {
-  exec: Exec;
+  exec: ExecCardModel;
   centered?: boolean;
   className?: string;
 };
@@ -20,6 +22,8 @@ export default function ExecCard({
   centered = false,
   className = "",
 }: Props) {
+  const photoSrc = exec.photo || "/UARC logo.png";
+
   return (
     <div
       className={`group relative bg-card rounded-xl p-6 border border-border transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 ${
@@ -29,12 +33,14 @@ export default function ExecCard({
       {/* Photo with hover effect */}
       <div className="relative mb-5 inline-block">
         <div className="relative w-28 h-28 mx-auto rounded-full overflow-hidden border-2 border-border group-hover:border-primary/50 transition-all duration-300">
-          <img
-            src={exec.photo || ""}
+          <Image
+            src={photoSrc}
             alt={exec.name}
+            fill
+            sizes="112px"
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="absolute inset-0 bg-linear-to-t from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         </div>
         {/* Decorative ring */}
         <div className="absolute inset-0 rounded-full border-2 border-primary/30 scale-110 opacity-0 group-hover:opacity-100 transition-all duration-300" />

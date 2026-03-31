@@ -14,7 +14,6 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
   const { tag } = await searchParams;
   const selectedTag = typeof tag === "string" ? tag : "all";
 
-  let events: EventLocal[] = [];
   let upcoming: EventLocal[] = [];
   let past: EventLocal[] = [];
 
@@ -22,14 +21,10 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
     const data = await getEventsOverview();
     upcoming = data.upcoming;
     past = data.past;
-    events = [...upcoming, ...past];
   } catch (error) {
     console.error("Error fetching events:", error);
-    const now = new Date();
-    upcoming = events.filter(
-      (e: EventLocal) => !e.isPast && new Date(e.date) >= now,
-    );
-    past = events.filter((e: EventLocal) => e.isPast || new Date(e.date) < now);
+    upcoming = [];
+    past = [];
   }
 
   const placeholder =
@@ -56,7 +51,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
       {/* Hero Section */}
       <section className="relative pt-32 pb-16 px-4 bg-background overflow-hidden">
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-150 h-150 bg-primary/5 rounded-full blur-3xl" />
         </div>
         <div className="relative z-10 max-w-7xl mx-auto">
           <p className="text-primary text-sm font-medium uppercase tracking-wider mb-3">
@@ -73,7 +68,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
 
       {/* Upcoming Events Section */}
       <section className="py-24 px-4 bg-surface relative">
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+        <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-border to-transparent" />
         <div className="max-w-7xl mx-auto">
           <div className="mb-10">
             <p className="text-primary text-sm font-medium uppercase tracking-wider mb-2">
@@ -116,7 +111,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
 
       {/* Past Events Section */}
       <section className="py-24 px-4 bg-background relative">
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+        <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-border to-transparent" />
         <div className="max-w-7xl mx-auto">
           <div className="mb-10">
             <p className="text-text-muted text-sm font-medium uppercase tracking-wider mb-2">

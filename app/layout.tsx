@@ -6,6 +6,7 @@ import Footer from "@/components/footer";
 import ScrollToTop from "@/components/ScrollToTop";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { getSiteSettings } from "@/lib/site-data";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,19 +32,28 @@ export const metadata: Metadata = {
   ],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  let joinUrl = "";
+
+  try {
+    const settings = await getSiteSettings();
+    joinUrl = settings.memberJoinUrl;
+  } catch (error) {
+    console.error("Failed to load site settings in layout:", error);
+  }
+
   return (
     <html lang="en">
       <body
         className={`dark ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Navigation />
+        <Navigation joinUrl={joinUrl} />
         <ScrollToTop />
-        <main className="relative pt-16 min-h-screen mt-16 mb-16">
+        <div className="relative pt-16 min-h-screen mt-16 mb-16">
           {children}
-        </main>
+        </div>
         <Footer />
         <Analytics />
         <SpeedInsights />

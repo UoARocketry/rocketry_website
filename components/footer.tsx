@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import LinkedInIcon from "./ui/linkedin-icon";
 import InstagramIcon from "./ui/instagram-icon";
 import DiscordIcon from "./ui/discord-icon";
@@ -31,13 +32,21 @@ export default async function Footer() {
     // Fall back to database value only
   }
 
+  const hasJoinUrl = Boolean(joinUrl.trim());
+
   return (
     <footer className="bg-surface border-t border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12">
           {/* Logo and Description */}
           <div className="md:col-span-5">
-            <img src="/UARC logo.png" alt="UARC Logo" className="h-10 mb-6" />
+            <Image
+              src="/UARC logo.png"
+              alt="UARC Logo"
+              width={180}
+              height={72}
+              className="h-10 w-auto mb-6"
+            />
             <p className="text-text-secondary text-sm leading-relaxed max-w-sm mb-6">
               The University of Auckland Rocketry Club is a student-led
               organisation dedicated to designing, building, and launching
@@ -103,30 +112,32 @@ export default async function Footer() {
             </div>
 
             {/* CTA */}
-            <div className="mt-8">
-              <Link
-                href={joinUrl}
-                className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-primary/20"
-                style={{ color: "#ffffff" }}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Join the Club
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+            {hasJoinUrl && (
+              <div className="mt-8">
+                <Link
+                  href={joinUrl}
+                  className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-primary/20"
+                  style={{ color: "#ffffff" }}
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 8l4 4m0 0l-4 4m4-4H3"
-                  />
-                </svg>
-              </Link>
-            </div>
+                  Join the Club
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17 8l4 4m0 0l-4 4m4-4H3"
+                    />
+                  </svg>
+                </Link>
+              </div>
+            )}
           </div>
         </div>
 
