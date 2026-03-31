@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getEventBySlug } from "@/lib/site-data";
+import { formatDateWithTime } from "@/lib/utils";
 
 interface EventPageProps {
   readonly params: Promise<{ slug: string }>;
@@ -17,17 +18,6 @@ export default async function EventPage({ params }: EventPageProps) {
   if (!event) {
     notFound();
   }
-
-  const formatDate = (date: string | Date) => {
-    return new Date(date).toLocaleDateString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
 
   return (
     <main className="min-h-screen max-w-7xl mx-auto pb-16">
@@ -67,7 +57,7 @@ export default async function EventPage({ params }: EventPageProps) {
               <div className="space-y-2 mb-4 text-sm sm:text-base">
                 <p className="text-text-secondary leading-relaxed">
                   <span className="text-primary font-semibold">Date:</span>{" "}
-                  {formatDate(event.date)}
+                  {formatDateWithTime(event.date)}
                 </p>
                 <p className="text-text-secondary leading-relaxed">
                   <span className="text-primary font-semibold">Location:</span>{" "}

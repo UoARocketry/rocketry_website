@@ -1,10 +1,16 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { ALL_EVENTS_TAG } from "@/lib/utils";
+
+interface EventTagOption {
+  readonly value: string;
+  readonly label: string;
+}
 
 interface EventsTagFilterProps {
   readonly selectedTag: string;
-  readonly allTags: string[];
+  readonly allTags: EventTagOption[];
 }
 
 export default function EventsTagFilter({
@@ -18,7 +24,7 @@ export default function EventsTagFilter({
   const handleTagChange = (value: string) => {
     const params = new URLSearchParams(searchParams.toString());
 
-    if (value === "all") {
+    if (value === ALL_EVENTS_TAG) {
       params.delete("tag");
     } else {
       params.set("tag", value);
@@ -28,18 +34,17 @@ export default function EventsTagFilter({
     router.push(query ? `${pathname}?${query}` : pathname);
   };
 
-  const tags = ["all", ...allTags];
+  const tags = [{ value: ALL_EVENTS_TAG, label: "All Events" }, ...allTags];
 
   return (
     <div className="flex flex-wrap gap-2 mt-6">
       {tags.map((tag) => {
-        const isActive = selectedTag === tag;
-        const label = tag === "all" ? "All Events" : tag;
+        const isActive = selectedTag === tag.value;
 
         return (
           <button
-            key={tag}
-            onClick={() => handleTagChange(tag)}
+            key={tag.value}
+            onClick={() => handleTagChange(tag.value)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer ${
               isActive
                 ? "bg-primary shadow-md shadow-primary/20"
@@ -47,7 +52,7 @@ export default function EventsTagFilter({
             }`}
             style={isActive ? { color: "#ffffff" } : undefined}
           >
-            {label}
+            {tag.label}
           </button>
         );
       })}

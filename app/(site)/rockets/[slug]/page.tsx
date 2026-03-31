@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getRocketBySlug } from "@/lib/site-data";
+import { formatDateLong, formatDateShort } from "@/lib/utils";
 
 interface RocketPageProps {
   readonly params: Promise<{ slug: string }>;
@@ -47,7 +48,7 @@ export default async function RocketPage({ params }: RocketPageProps) {
               </h1>
               {rocket.launchedAt && (
                 <p className="text-lg text-text-secondary mb-4">
-                  Launched: {new Date(rocket.launchedAt).toLocaleDateString()}
+                  Launched: {formatDateShort(rocket.launchedAt)}
                 </p>
               )}
             </div>
@@ -76,11 +77,7 @@ export default async function RocketPage({ params }: RocketPageProps) {
                   <div>
                     <p className="text-sm text-text-secondary">Launch Date</p>
                     <p className="font-semibold">
-                      {new Date(rocket.launchedAt).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
+                      {formatDateLong(rocket.launchedAt)}
                     </p>
                   </div>
                 )}

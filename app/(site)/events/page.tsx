@@ -3,6 +3,13 @@ import Card from "@/components/ui/card";
 import SectionFallback from "@/components/SectionFallback";
 import EventsTagFilter from "@/components/EventsTagFilter";
 import { getEventsOverview, type EventSummary } from "@/lib/site-data";
+import {
+  ALL_EVENTS_TAG,
+  formatDateShort,
+  formatEventTagLabel,
+  normalizeEventTag,
+  normalizeEventTagParam,
+} from "@/lib/utils";
 
 type EventLocal = EventSummary;
 
@@ -12,7 +19,7 @@ interface EventsPageProps {
 
 export default async function EventsPage({ searchParams }: EventsPageProps) {
   const { tag } = await searchParams;
-  const selectedTag = typeof tag === "string" ? tag : "all";
+  const selectedTag = normalizeEventTagParam(tag);
 
   let upcoming: EventLocal[] = [];
   let past: EventLocal[] = [];
@@ -30,17 +37,27 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
   const placeholder =
     "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80";
 
-  const allTags = Array.from(
-    new Set(
-      [...upcoming, ...past]
-        .map((event) => event.eventTag?.trim())
-        .filter((value): value is string => Boolean(value)),
-    ),
-  ).sort((a, b) => a.localeCompare(b));
+  const tagMap = new Map<string, string>();
+
+  for (const event of [...upcoming, ...past]) {
+    const label = formatEventTagLabel(event.eventTag);
+    const value = normalizeEventTag(event.eventTag);
+
+    if (!tagMap.has(value)) {
+      tagMap.set(value, label);
+    }
+  }
+
+  const allTags = Array.from(tagMap, ([value, label]) => ({
+    value,
+    label,
+  })).sort((a, b) =>
+    a.label.localeCompare(b.label, undefined, { sensitivity: "base" }),
+  );
 
   const filterByTag = (event: EventLocal) => {
-    if (selectedTag === "all") return true;
-    return (event.eventTag?.trim() || "General") === selectedTag;
+    if (selectedTag === ALL_EVENTS_TAG) return true;
+    return normalizeEventTag(event.eventTag) === selectedTag;
   };
 
   const filteredUpcoming = upcoming.filter(filterByTag);
@@ -81,7 +98,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
               align="left"
               title="No upcoming events"
               description={
-                selectedTag === "all"
+                selectedTag === ALL_EVENTS_TAG
                   ? "There are currently no future events scheduled. Check back soon."
                   : "No events match this filter. Try switching to All Tags."
               }
@@ -97,8 +114,8 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
                   <Card
                     image={event.image ?? placeholder}
                     title={event.title}
-                    date={new Date(event.date).toLocaleDateString()}
-                    tag={event.eventTag ?? "General"}
+                    date={formatDateShort(event.date)}
+                    tag={formatEventTagLabel(event.eventTag)}
                     description={event.description ?? ""}
                     vertical
                   />
@@ -136,8 +153,8 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
                   <Card
                     image={event.image ?? placeholder}
                     title={event.title}
-                    date={new Date(event.date).toLocaleDateString()}
-                    tag={event.eventTag ?? "General"}
+                    date={formatDateShort(event.date)}
+                    tag={formatEventTagLabel(event.eventTag)}
                     description={event.description ?? ""}
                     vertical
                   />

@@ -6,6 +6,7 @@ import {
   getSiteSettings,
   type RocketSummary,
 } from "@/lib/site-data";
+import { formatDateShort } from "@/lib/utils";
 
 type RocketItem = RocketSummary;
 
@@ -68,7 +69,7 @@ export default async function RocketsPage() {
                     title={rocket.name}
                     date={
                       rocket.launchedAt
-                        ? new Date(rocket.launchedAt).toLocaleDateString()
+                        ? formatDateShort(rocket.launchedAt)
                         : "TBA"
                     }
                     description={rocket.description ?? ""}
