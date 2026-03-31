@@ -27,8 +27,8 @@ export default async function HomePage() {
     featuredRockets = rockets;
     latestEvents = events.upcoming;
     joinUrl = settings.memberJoinUrl;
-  } catch (err) {
-    console.error("Failed to load homepage data", err);
+  } catch (error) {
+    console.error("[app/home] Failed to load homepage data:", error);
   }
 
   const eventPlaceholder =

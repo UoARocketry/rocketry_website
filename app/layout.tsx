@@ -41,7 +41,7 @@ export default async function RootLayout({
     const settings = await getSiteSettings();
     joinUrl = settings.memberJoinUrl;
   } catch (error) {
-    console.error("Failed to load site settings in layout:", error);
+    console.error("[app/layout] Failed to load site settings:", error);
   }
 
   return (

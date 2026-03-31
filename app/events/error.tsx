@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import SectionFallback from "../../components/SectionFallback";
 
 type ErrorProps = {
@@ -8,7 +8,9 @@ type ErrorProps = {
 };
 
 export default function EventsError({ error }: ErrorProps) {
-  console.error("Error rendering /events page:", error);
+  useEffect(() => {
+    console.error("[error-boundary/events] Render error:", error);
+  }, [error]);
 
   return (
     <main className="min-h-screen max-w-7xl mx-auto pb-16">

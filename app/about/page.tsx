@@ -44,8 +44,8 @@ export default async function AboutPage() {
     stats = payload.stats;
     joinUrl = settings.memberJoinUrl;
     teamImageUrl = settings.execTeamImageUrl ?? null;
-  } catch (err) {
-    console.error("Error loading about data:", err);
+  } catch (error) {
+    console.error("[app/about] Failed to load about data:", error);
     execsError = true;
   }
 

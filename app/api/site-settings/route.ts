@@ -1,18 +1,18 @@
-import { getSiteSettings } from "@/lib/site-data";
-import { NextResponse } from "next/server";
+import { jsonSuccess } from "@/lib/api-response";
+import { getSiteSettings, type SiteSettings } from "@/lib/site-data";
 
 export async function GET() {
   try {
     const settings = await getSiteSettings();
-    return NextResponse.json(settings);
+    return jsonSuccess<SiteSettings>(settings);
   } catch (error) {
-    console.error("Error fetching site settings:", error);
-    return NextResponse.json(
-      {
-        memberJoinUrl: "",
-        execTeamImageUrl: null,
-      },
-      { status: 200 },
+    console.error(
+      "[api/site-settings] Failed to fetch site settings, returning defaults:",
+      error,
     );
+    return jsonSuccess<SiteSettings>({
+      memberJoinUrl: "",
+      execTeamImageUrl: null,
+    });
   }
 }

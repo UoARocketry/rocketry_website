@@ -1,18 +1,12 @@
-import { getRocketSummaries } from "@/lib/site-data";
+import { jsonError, jsonSuccess } from "@/lib/api-response";
+import { getRocketSummaries, type RocketSummary } from "@/lib/site-data";
 
 export async function GET() {
   try {
     const rockets = await getRocketSummaries();
-
-    return new Response(JSON.stringify(rockets ?? []), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
-  } catch (err) {
-    console.error("Database error in /api/rockets:", err);
-    return new Response(JSON.stringify({ error: "Failed to fetch rockets" }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return jsonSuccess<RocketSummary[]>(rockets ?? []);
+  } catch (error) {
+    console.error("[api/rockets] Failed to fetch rockets:", error);
+    return jsonError("Failed to fetch rockets", 500);
   }
 }

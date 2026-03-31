@@ -21,7 +21,7 @@ export default async function RocketsPage() {
     rockets = rocketsData;
     joinUrl = settings.memberJoinUrl;
   } catch (error) {
-    console.error("Error fetching rockets:", error);
+    console.error("[app/rockets] Failed to load rockets data:", error);
   }
 
   return (

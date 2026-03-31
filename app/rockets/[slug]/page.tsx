@@ -14,7 +14,7 @@ export default async function RocketPage({ params }: RocketPageProps) {
   try {
     rocket = await getRocketBySlug(slug);
   } catch (error) {
-    console.error("Failed to load rocket:", error);
+    console.error("[app/rockets/[slug]] Failed to load rocket:", error);
   }
 
   if (!rocket) {

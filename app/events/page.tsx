@@ -22,7 +22,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
     upcoming = data.upcoming;
     past = data.past;
   } catch (error) {
-    console.error("Error fetching events:", error);
+    console.error("[app/events] Failed to load events data:", error);
     upcoming = [];
     past = [];
   }

@@ -1,6 +1,13 @@
+import { jsonSuccess } from "@/lib/api-response";
+
+type HealthcheckResponse = {
+  ok: true;
+  now: string;
+};
+
 export async function GET() {
-  return new Response(JSON.stringify({ ok: true, now: new Date().toISOString() }), {
-    status: 200,
-    headers: { "Content-Type": "application/json" },
+  return jsonSuccess<HealthcheckResponse>({
+    ok: true,
+    now: new Date().toISOString(),
   });
 }

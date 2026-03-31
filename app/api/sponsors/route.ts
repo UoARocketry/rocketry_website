@@ -1,15 +1,12 @@
-import { NextResponse } from "next/server";
-import { getSponsors } from "@/lib/site-data";
+import { jsonError, jsonSuccess } from "@/lib/api-response";
+import { getSponsors, type Sponsor } from "@/lib/site-data";
 
 export async function GET() {
   try {
     const sponsors = await getSponsors();
-    return NextResponse.json(sponsors ?? []);
+    return jsonSuccess<Sponsor[]>(sponsors ?? []);
   } catch (error) {
-    console.error("Error fetching sponsors:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch sponsors" },
-      { status: 500 },
-    );
+    console.error("[api/sponsors] Failed to fetch sponsors:", error);
+    return jsonError("Failed to fetch sponsors", 500);
   }
 }

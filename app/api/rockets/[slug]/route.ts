@@ -1,29 +1,26 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getRocketBySlug } from "@/lib/site-data";
+import { jsonError, jsonSuccess } from "@/lib/api-response";
+import { getRocketBySlug, type RocketDetail } from "@/lib/site-data";
 
 export async function GET(
-  request: NextRequest,
+  _request: Request,
   { params }: { params: Promise<{ slug: string }> },
 ) {
   const { slug } = await params;
 
   if (!slug || typeof slug !== "string") {
-    return NextResponse.json({ error: "Missing slug" }, { status: 400 });
+    return jsonError("Invalid slug parameter", 400);
   }
 
   try {
     const rocket = await getRocketBySlug(slug);
 
     if (!rocket) {
-      return NextResponse.json({ error: "Rocket not found" }, { status: 404 });
+      return jsonError("Rocket not found", 404);
     }
 
-    return NextResponse.json(rocket);
+    return jsonSuccess<RocketDetail>(rocket);
   } catch (error) {
-    console.error("Error fetching rocket by slug:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 },
-    );
+    console.error("[api/rockets/[slug]] Failed to fetch rocket:", error);
+    return jsonError("Failed to fetch rocket", 500);
   }
 }
