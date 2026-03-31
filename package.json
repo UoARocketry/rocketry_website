@@ -12,16 +12,12 @@
     "payload:generate:types": "payload generate:types",
     "payload:generate:importmap": "payload generate:importmap",
     "payload:migrate": "payload migrate",
-    "db:grant": "npx tsx scripts/grant-db.ts",
-    "seed": "npx tsx scripts/seed.ts",
-    "seed:payload": "payload run scripts/payload-bootstrap.mjs",
     "update-deps-latest": "npx npm-check-updates -u && npm install"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "^3.80.0",
     "@payloadcms/next": "^3.80.0",
     "@radix-ui/react-slot": "^1.2.4",
-    "@supabase/supabase-js": "^2.101.0",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "class-variance-authority": "^0.7.1",
