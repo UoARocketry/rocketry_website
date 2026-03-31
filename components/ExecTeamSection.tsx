@@ -166,7 +166,7 @@ export default function ExecTeamSection({
           type="button"
           onClick={() => previousYear && loadYear(previousYear)}
           disabled={!previousYear || isLoading}
-          className="inline-flex items-center rounded-lg border border-border px-4 py-2 text-sm font-medium text-text-main transition-colors hover:border-primary/50 hover:text-primary disabled:cursor-not-allowed disabled:opacity-50"
+          className="cursor-pointer inline-flex items-center rounded-lg border border-border px-4 py-2 text-sm font-medium text-text-main transition-colors hover:border-primary/50 hover:text-primary disabled:cursor-not-allowed disabled:opacity-50"
         >
           <span aria-hidden="true" className="mr-2">
             &larr;
@@ -182,7 +182,7 @@ export default function ExecTeamSection({
           type="button"
           onClick={() => nextYear && loadYear(nextYear)}
           disabled={!nextYear || isLoading}
-          className="inline-flex items-center rounded-lg border border-border px-4 py-2 text-sm font-medium text-text-main transition-colors hover:border-primary/50 hover:text-primary disabled:cursor-not-allowed disabled:opacity-50"
+          className="cursor-pointer inline-flex items-center rounded-lg border border-border px-4 py-2 text-sm font-medium text-text-main transition-colors hover:border-primary/50 hover:text-primary disabled:cursor-not-allowed disabled:opacity-50"
         >
           Next Year
           <span aria-hidden="true" className="ml-2">

@@ -96,6 +96,7 @@ export default function Navigation({ joinUrl }: NavigationProps) {
               <Link
                 href={joinUrl}
                 className="ml-4 bg-primary hover:bg-primary-dark px-5 py-2 rounded-lg text-sm font-semibold tracking-wide text-white transition-all duration-200 hover:shadow-lg hover:shadow-primary/20"
+                style={{ color: "#ffffff" }}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -108,7 +109,7 @@ export default function Navigation({ joinUrl }: NavigationProps) {
           <button
             onClick={toggleMenu}
             type="button"
-            className="lg:hidden p-2 text-text-secondary hover:text-text-main transition-colors"
+            className="cursor-pointer lg:hidden p-2 text-text-secondary hover:text-text-main transition-colors"
             aria-label="Toggle menu"
             aria-expanded={isMenuOpen}
             aria-controls="mobile-navigation"
@@ -120,11 +121,13 @@ export default function Navigation({ joinUrl }: NavigationProps) {
         {/* Mobile nav */}
         <div
           id="mobile-navigation"
-          className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-            isMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+          className={`lg:hidden -mx-4 sm:-mx-6 overflow-hidden transition-all duration-300 ease-in-out ${
+            isMenuOpen
+              ? "max-h-96 opacity-100 bg-elevated/95 backdrop-blur-md border-t border-border"
+              : "max-h-0 opacity-0"
           }`}
         >
-          <div className="py-4 space-y-1 border-t border-border">
+          <div className="py-4 space-y-1">
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
               return (
@@ -148,6 +151,7 @@ export default function Navigation({ joinUrl }: NavigationProps) {
                 <Link
                   href={joinUrl}
                   className="block w-full bg-primary hover:bg-primary-dark text-white text-center px-5 py-3 rounded-lg text-sm font-semibold tracking-wide transition-all duration-200"
+                  style={{ color: "#ffffff" }}
                   onClick={() => setIsMenuOpen(false)}
                   target="_blank"
                   rel="noopener noreferrer"
