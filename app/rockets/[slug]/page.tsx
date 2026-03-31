@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import SectionFallback from "@/components/SectionFallback";
+import { notFound } from "next/navigation";
 import { getRocketBySlug } from "@/lib/site-data";
 
 interface RocketPageProps {
@@ -9,23 +9,10 @@ interface RocketPageProps {
 
 export default async function RocketPage({ params }: RocketPageProps) {
   const { slug } = await params;
-  let rocket = null;
-
-  try {
-    rocket = await getRocketBySlug(slug);
-  } catch (error) {
-    console.error("[app/rockets/[slug]] Failed to load rocket:", error);
-  }
+  const rocket = await getRocketBySlug(slug);
 
   if (!rocket) {
-    return (
-      <main className="min-h-screen max-w-7xl mx-auto pb-16">
-        <section className="max-w-7xl mx-auto pt-16 pb-8 px-4">
-          <h1 className="text-5xl font-extrabold mb-4 text-primary">Rocket</h1>
-          <SectionFallback align="left" />
-        </section>
-      </main>
-    );
+    notFound();
   }
 
   return (

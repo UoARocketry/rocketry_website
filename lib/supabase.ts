@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import type { Database } from "@/lib/database.types";
 
 if (typeof window !== "undefined") {
   throw new Error("lib/supabase.ts must only be imported on the server.");
@@ -19,10 +20,10 @@ if (missingEnv.length > 0) {
   );
 }
 
-const supabaseUrl = SUPABASE_URL as string;
-const supabaseKey = SUPABASE_KEY as string;
+const supabaseUrl = SUPABASE_URL!;
+const supabaseKey = SUPABASE_KEY!;
 
-const supabase = createClient(supabaseUrl, supabaseKey, {
+const supabase = createClient<Database>(supabaseUrl, supabaseKey, {
   auth: { persistSession: false },
   global: { headers: { "x-client-info": "rocketry_website" } },
 });

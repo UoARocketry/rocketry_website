@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import SectionFallback from "@/components/SectionFallback";
+import { notFound } from "next/navigation";
 import { getEventBySlug } from "@/lib/site-data";
 
 interface EventPageProps {
@@ -15,22 +15,7 @@ export default async function EventPage({ params }: EventPageProps) {
   const event = await getEventBySlug(slug);
 
   if (!event) {
-    return (
-      <main className="min-h-screen max-w-7xl mx-auto pb-16">
-        <section className="max-w-7xl mx-auto pt-16 pb-8 px-4">
-          <div className="mb-6">
-            <Link
-              href="/events"
-              className="inline-flex items-center text-primary hover:text-primary/80 transition-colors"
-            >
-              ← Back to all Events
-            </Link>
-          </div>
-          <h1 className="text-5xl font-extrabold mb-4 text-primary">Event</h1>
-          <SectionFallback align="left" />
-        </section>
-      </main>
-    );
+    notFound();
   }
 
   const formatDate = (date: string | Date) => {

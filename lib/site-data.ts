@@ -1,5 +1,6 @@
 import { unstable_cache } from "next/cache";
 import supabase from "@/lib/supabase";
+import type { Database } from "@/lib/database.types";
 
 const CONTENT_REVALIDATE_SECONDS = 300;
 const ROCKET_COLUMNS = "id,name,slug,image,description,launchedAt";
@@ -11,6 +12,16 @@ const WHAT_WE_DO_COLUMNS = "title,body,image,variant";
 const JOURNEY_COLUMNS = "title,body,image,variant";
 const TEAM_ROLE_COLUMNS = "title,body,bullets,variant";
 const STAT_COLUMNS = "value,label";
+
+type EventRow = Database["public"]["Tables"]["Event"]["Row"];
+type RocketRow = Database["public"]["Tables"]["Rocket"]["Row"];
+type ExecRow = Database["public"]["Tables"]["Exec"]["Row"];
+type SponsorRow = Database["public"]["Tables"]["Sponsor"]["Row"];
+type WhatWeDoRow = Database["public"]["Tables"]["WhatWeDo"]["Row"];
+type JourneyItemRow = Database["public"]["Tables"]["JourneyItem"]["Row"];
+type TeamRoleRow = Database["public"]["Tables"]["TeamRole"]["Row"];
+type StatRow = Database["public"]["Tables"]["Stat"]["Row"];
+type SiteSettingsRow = Database["public"]["Tables"]["SiteSettings"]["Row"];
 
 export type RocketSummary = {
   id: number;
@@ -100,6 +111,80 @@ export type SiteSettings = {
   execTeamImageUrl?: string | null;
 };
 
+function mapRocket(row: RocketRow): RocketSummary {
+  return {
+    id: row.id,
+    name: row.name,
+    slug: row.slug,
+    image: row.image,
+    description: row.description,
+    launchedAt: row.launchedAt,
+  };
+}
+
+function mapEvent(row: EventRow): EventSummary {
+  return {
+    id: row.id,
+    title: row.title,
+    slug: row.slug,
+    image: row.image,
+    description: row.description,
+    date: row.date,
+    eventTag: row.eventTag,
+    signupUrl: row.signupUrl,
+    isPast: row.isPast,
+    location: row.location,
+  };
+}
+
+function mapExec(row: ExecRow): Exec {
+  return {
+    id: row.id,
+    name: row.name,
+    role: row.role,
+    bio: row.bio,
+    photo: row.photo,
+    year: row.year,
+    linkedinUrl: row.linkedinUrl,
+  };
+}
+
+function mapFeature(row: WhatWeDoRow | JourneyItemRow): Feature {
+  return {
+    title: row.title,
+    body: row.body,
+    image: row.image,
+    variant: row.variant,
+  };
+}
+
+function mapTeamRole(row: TeamRoleRow): TeamRole {
+  return {
+    title: row.title,
+    body: row.body,
+    bullets: row.bullets ?? undefined,
+    variant: row.variant,
+  };
+}
+
+function mapStat(row: StatRow): Stat {
+  return {
+    value: row.value,
+    label: row.label,
+  };
+}
+
+function mapSponsor(row: SponsorRow): Sponsor {
+  return {
+    id: row.id,
+    name: row.name,
+    logo: row.logo,
+    url: row.url,
+    description: row.description,
+    tier: row.tier,
+  };
+}
+
 export const getRocketSummaries = unstable_cache(
   async (): Promise<RocketSummary[]> => {
     const { data, error } = await supabase
@@ -110,7 +195,7 @@ export const getRocketSummaries = unstable_cache(
 
     if (error) throw error;
 
-    return (data ?? []) as RocketSummary[];
+    return (data ?? []).map(mapRocket);
   },
   ["rocket-summaries"],
   { revalidate: CONTENT_REVALIDATE_SECONDS, tags: ["rockets"] },
@@ -141,8 +226,8 @@ export const getEventsOverview = unstable_cache(
     if (pastResult.error) throw pastResult.error;
 
     return {
-      upcoming: (upcomingResult.data ?? []) as EventSummary[],
-      past: (pastResult.data ?? []) as EventSummary[],
+      upcoming: (upcomingResult.data ?? []).map(mapEvent),
+      past: (pastResult.data ?? []).map(mapEvent),
     };
   },
   ["events-overview"],
@@ -184,10 +269,10 @@ export const getAboutPayload = unstable_cache(
 
     return {
       executives: execTeamPayload.executives,
-      whatWeDo: (whatWeDoResult.data ?? []) as Feature[],
-      journey: (journeyResult.data ?? []) as Feature[],
-      teamStructure: (teamResult.data ?? []) as TeamRole[],
-      stats: (statsResult.data ?? []) as Stat[],
+      whatWeDo: (whatWeDoResult.data ?? []).map(mapFeature),
+      journey: (journeyResult.data ?? []).map(mapFeature),
+      teamStructure: (teamResult.data ?? []).map(mapTeamRole),
+      stats: (statsResult.data ?? []).map(mapStat),
     };
   },
   ["about-payload"],
@@ -198,14 +283,15 @@ export const getExecYears = unstable_cache(
   async (): Promise<number[]> => {
     const { data, error } = await supabase
       .from("Exec")
-      .select("year")
+      .select(EXEC_COLUMNS)
       .not("year", "is", null)
       .order("year", { ascending: false });
 
     if (error) throw error;
 
     const years = (data ?? [])
-      .map((item) => Number(item.year))
+      .map(mapExec)
+      .map((exec) => exec.year)
       .filter((year) => Number.isFinite(year));
 
     return Array.from(new Set(years));
@@ -236,7 +322,7 @@ export async function getExecTeam(year?: number): Promise<Exec[]> {
 
       if (error) throw error;
 
-      return (data ?? []) as Exec[];
+      return (data ?? []).map(mapExec);
     },
     ["exec-team", String(targetYear)],
     {
@@ -276,7 +362,7 @@ export const getSponsors = unstable_cache(
 
     if (error) throw error;
 
-    return (data ?? []) as Sponsor[];
+    return (data ?? []).map(mapSponsor);
   },
   ["sponsors"],
   { revalidate: CONTENT_REVALIDATE_SECONDS, tags: ["sponsors"] },
@@ -292,10 +378,18 @@ export const getSiteSettings = unstable_cache(
 
     if (error) throw error;
 
-    return (data ?? {
+    const settings: Pick<
+      SiteSettingsRow,
+      "memberJoinUrl" | "execTeamImageUrl"
+    > = data ?? {
       memberJoinUrl: "",
       execTeamImageUrl: null,
-    }) as SiteSettings;
+    };
+
+    return {
+      memberJoinUrl: settings.memberJoinUrl ?? "",
+      execTeamImageUrl: settings.execTeamImageUrl ?? null,
+    };
   },
   ["site-settings"],
   { revalidate: CONTENT_REVALIDATE_SECONDS, tags: ["settings"] },
@@ -314,7 +408,7 @@ export async function getRocketBySlug(
 
       if (error) throw error;
 
-      return (data ?? null) as RocketDetail | null;
+      return data ? mapRocket(data) : null;
     },
     ["rocket-by-slug", slug],
     {
@@ -339,7 +433,7 @@ export async function getEventBySlug(
 
       if (error) throw error;
 
-      return (data ?? null) as EventDetail | null;
+      return data ? mapEvent(data) : null;
     },
     ["event-by-slug", slug],
     {

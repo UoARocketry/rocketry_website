@@ -1,61 +1,19 @@
 import React from "react";
 import SponsorCard from "@/components/ui/sponsor-card";
 import { getSponsors, type Sponsor } from "@/lib/site-data";
+import { buildSponsorTierSections } from "@/lib/sponsor-utils";
 
 export default async function SponsorsPage() {
   let sponsors: Sponsor[] = [];
   try {
     sponsors = await getSponsors();
-  } catch (e) {
-    console.warn("Could not load sponsors:", (e as Error).message);
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Unknown sponsors load failure";
+    console.warn("[app/sponsors] Could not load sponsors:", message);
   }
 
-  // group by sponsor.tier
-  const grouped: Record<string, Sponsor[]> = {
-    gold: [],
-    silver: [],
-    bronze: [],
-  };
-
-  if (sponsors && sponsors.length > 0) {
-    sponsors.forEach((s) => {
-      const raw = (s.tier ?? "BRONZE").toString();
-      const tierKey = raw.trim().toLowerCase();
-      if (tierKey === "gold" || tierKey === "silver" || tierKey === "bronze") {
-        grouped[tierKey].push(s);
-      } else if (tierKey === "g" || tierKey === "s" || tierKey === "b") {
-        const map: Record<string, string> = {
-          g: "gold",
-          s: "silver",
-          b: "bronze",
-        };
-        grouped[map[tierKey]].push(s);
-      } else {
-        grouped.bronze.push(s);
-      }
-    });
-  }
-
-  const tierSections = [
-    {
-      key: "gold",
-      title: "Gold Sponsors",
-      description: "Our premier partners making major contributions",
-      sponsors: grouped.gold,
-    },
-    {
-      key: "silver",
-      title: "Silver Sponsors",
-      description: "Valued supporters of our rocketry endeavors",
-      sponsors: grouped.silver,
-    },
-    {
-      key: "bronze",
-      title: "Bronze Sponsors",
-      description: "Appreciated contributors to our mission",
-      sponsors: grouped.bronze,
-    },
-  ].filter((section) => section.sponsors.length > 0);
+  const tierSections = buildSponsorTierSections(sponsors);
 
   return (
     <main className="min-h-screen bg-background text-text-main">

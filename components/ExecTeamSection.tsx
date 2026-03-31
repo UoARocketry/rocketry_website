@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import ExecCard from "./ExecCard";
 import SectionFallback from "./SectionFallback";
 import type { Exec } from "@/lib/site-data";
@@ -18,12 +18,41 @@ type Props = {
   initialLoadError: boolean;
 };
 
+function isExec(value: unknown): value is Exec {
+  if (!value || typeof value !== "object") return false;
+
+  const candidate = value as Partial<Exec>;
+  return (
+    typeof candidate.id === "number" &&
+    typeof candidate.name === "string" &&
+    typeof candidate.role === "string" &&
+    typeof candidate.bio === "string" &&
+    typeof candidate.photo === "string" &&
+    typeof candidate.year === "number"
+  );
+}
+
+function isExecApiPayload(value: unknown): value is ExecApiPayload {
+  if (!value || typeof value !== "object") return false;
+
+  const payload = value as Partial<ExecApiPayload>;
+  return (
+    typeof payload.selectedYear === "number" &&
+    Array.isArray(payload.availableYears) &&
+    payload.availableYears.every((year) => typeof year === "number") &&
+    Array.isArray(payload.executives) &&
+    payload.executives.every(isExec)
+  );
+}
+
 export default function ExecTeamSection({
   initialYear,
   initialYears,
   initialExecutives,
   initialLoadError,
 }: Props) {
+  const inFlightController = useRef<AbortController | null>(null);
+
   const [data, setData] = useState<ExecApiPayload>({
     selectedYear: initialYear,
     availableYears: initialYears,
@@ -45,26 +74,50 @@ export default function ExecTeamSection({
       ? (data.availableYears[currentYearIndex - 1] ?? null)
       : null;
 
+  useEffect(() => {
+    return () => {
+      inFlightController.current?.abort();
+    };
+  }, []);
+
   async function loadYear(year: number) {
+    inFlightController.current?.abort();
+
+    const controller = new AbortController();
+    inFlightController.current = controller;
+
     setIsLoading(true);
     setHasError(false);
 
     try {
       const response = await fetch(`/api/exec?year=${year}`, {
         cache: "no-store",
+        signal: controller.signal,
       });
 
       if (!response.ok) {
         throw new Error("Failed to fetch exec team payload");
       }
 
-      const payload = (await response.json()) as ExecApiPayload;
+      const payloadJson: unknown = await response.json();
+
+      if (!isExecApiPayload(payloadJson)) {
+        throw new Error("Invalid exec team payload format");
+      }
+
+      const payload = payloadJson;
       setData(payload);
     } catch (error) {
+      if (error instanceof Error && error.name === "AbortError") {
+        return;
+      }
+
       console.error("Error loading executive team:", error);
       setHasError(true);
     } finally {
-      setIsLoading(false);
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+      }
     }
   }
 
