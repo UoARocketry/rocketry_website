@@ -35,6 +35,7 @@ export type Exec = {
   role: string;
   bio: string;
   photo: string;
+  year: number;
   linkedinUrl?: string | null;
 };
 
@@ -77,6 +78,12 @@ export type AboutPayload = {
   journey: Feature[];
   teamStructure: TeamRole[];
   stats: Stat[];
+};
+
+export type ExecTeamPayload = {
+  selectedYear: number;
+  availableYears: number[];
+  executives: Exec[];
 };
 
 export type SiteSettings = {
@@ -140,27 +147,26 @@ export const getEventsOverview = unstable_cache(
 export const getAboutPayload = unstable_cache(
   async (): Promise<AboutPayload> => {
     const [
-      executivesResult,
+      execTeamPayload,
       whatWeDoResult,
       journeyResult,
       teamResult,
       statsResult,
     ] = await Promise.all([
-      supabase.from("Exec").select("*").order("order", { ascending: true }),
+      getExecTeamPayload(),
       supabase.from("WhatWeDo").select("*").order("id", { ascending: true }),
       supabase.from("JourneyItem").select("*").order("id", { ascending: true }),
       supabase.from("TeamRole").select("*").order("id", { ascending: true }),
       supabase.from("Stat").select("*").order("id", { ascending: true }),
     ]);
 
-    if (executivesResult.error) throw executivesResult.error;
     if (whatWeDoResult.error) throw whatWeDoResult.error;
     if (journeyResult.error) throw journeyResult.error;
     if (teamResult.error) throw teamResult.error;
     if (statsResult.error) throw statsResult.error;
 
     return {
-      executives: (executivesResult.data ?? []) as Exec[],
+      executives: execTeamPayload.executives,
       whatWeDo: (whatWeDoResult.data ?? []) as Feature[],
       journey: (journeyResult.data ?? []) as Feature[],
       teamStructure: (teamResult.data ?? []) as TeamRole[],
@@ -171,20 +177,78 @@ export const getAboutPayload = unstable_cache(
   { revalidate: CONTENT_REVALIDATE_SECONDS, tags: ["about"] },
 );
 
-export const getExecTeam = unstable_cache(
-  async (): Promise<Exec[]> => {
+export const getExecYears = unstable_cache(
+  async (): Promise<number[]> => {
     const { data, error } = await supabase
       .from("Exec")
-      .select("*")
-      .order("order", { ascending: true });
+      .select("year")
+      .not("year", "is", null)
+      .order("year", { ascending: false });
 
     if (error) throw error;
 
-    return (data ?? []) as Exec[];
+    const years = (data ?? [])
+      .map((item) => Number(item.year))
+      .filter((year) => Number.isFinite(year));
+
+    return Array.from(new Set(years));
   },
-  ["exec-team"],
-  { revalidate: CONTENT_REVALIDATE_SECONDS, tags: ["about", "exec"] },
+  ["exec-years"],
+  {
+    revalidate: CONTENT_REVALIDATE_SECONDS,
+    tags: ["about", "exec", "exec-years"],
+  },
 );
+
+async function getLatestExecYear(): Promise<number> {
+  const years = await getExecYears();
+  return years[0] ?? new Date().getFullYear();
+}
+
+export async function getExecTeam(year?: number): Promise<Exec[]> {
+  const targetYear =
+    typeof year === "number" ? year : await getLatestExecYear();
+
+  const cachedLoader = unstable_cache(
+    async (): Promise<Exec[]> => {
+      const { data, error } = await supabase
+        .from("Exec")
+        .select("*")
+        .eq("year", targetYear)
+        .order("order", { ascending: true });
+
+      if (error) throw error;
+
+      return (data ?? []) as Exec[];
+    },
+    ["exec-team", String(targetYear)],
+    {
+      revalidate: CONTENT_REVALIDATE_SECONDS,
+      tags: ["about", "exec", `exec-year:${targetYear}`],
+    },
+  );
+
+  return cachedLoader();
+}
+
+export async function getExecTeamPayload(
+  requestedYear?: number,
+): Promise<ExecTeamPayload> {
+  const availableYears = await getExecYears();
+  const fallbackYear = availableYears[0] ?? new Date().getFullYear();
+  const selectedYear =
+    typeof requestedYear === "number" && availableYears.includes(requestedYear)
+      ? requestedYear
+      : fallbackYear;
+
+  const executives = await getExecTeam(selectedYear);
+
+  return {
+    selectedYear,
+    availableYears,
+    executives,
+  };
+}
 
 export const getSponsors = unstable_cache(
   async (): Promise<Sponsor[]> => {

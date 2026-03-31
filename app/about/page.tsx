@@ -1,11 +1,12 @@
 import Link from "next/link";
 import FeatureCard from "../../components/FeatureCard";
-import ExecCard from "../../components/ExecCard";
 import StatCard from "../../components/StatCard";
 import SectionFallback from "../../components/SectionFallback";
 import ImageWithLoader from "../../components/ImageWithLoader";
+import ExecTeamSection from "../../components/ExecTeamSection";
 import {
   getAboutPayload,
+  getExecTeamPayload,
   type AboutPayload,
   type Exec,
   getSiteSettings,
@@ -15,6 +16,8 @@ export const revalidate = 300;
 
 export default async function AboutPage() {
   let executives: Exec[] = [];
+  let selectedExecYear = new Date().getFullYear();
+  let execYears: number[] = [];
   let execsError = false;
 
   let whatWeDo: AboutPayload["whatWeDo"] = [];
@@ -25,18 +28,22 @@ export default async function AboutPage() {
   let teamImageUrl: string | null = null;
 
   try {
-    const [payload, settings] = await Promise.all([
+    const [payload, settings, execTeamPayload] = await Promise.all([
       getAboutPayload(),
       getSiteSettings(),
+      getExecTeamPayload(),
     ]);
-    executives = payload.executives;
+    executives = execTeamPayload.executives.length
+      ? execTeamPayload.executives
+      : payload.executives;
+    selectedExecYear = execTeamPayload.selectedYear;
+    execYears = execTeamPayload.availableYears;
     whatWeDo = payload.whatWeDo;
     journey = payload.journey;
     teamStructure = payload.teamStructure;
     stats = payload.stats;
     joinUrl = settings.memberJoinUrl;
     teamImageUrl = settings.execTeamImageUrl ?? null;
-    execsError = executives.length === 0;
   } catch (err) {
     console.error("Error loading about data:", err);
     execsError = true;
@@ -157,18 +164,12 @@ export default async function AboutPage() {
               for rocketry and aerospace engineering.
             </p>
           </div>
-          {execsError ? (
-            <SectionFallback
-              title="Unable to load executive team"
-              description="We are having trouble fetching the executive team. Please try again later."
-            />
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {executives.map((exec: Exec) => (
-                <ExecCard key={exec.id} exec={exec} centered={true} />
-              ))}
-            </div>
-          )}
+          <ExecTeamSection
+            initialYear={selectedExecYear}
+            initialYears={execYears}
+            initialExecutives={executives}
+            initialLoadError={execsError}
+          />
         </div>
       </section>
 
