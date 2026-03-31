@@ -21,7 +21,17 @@ export function getNumberField(doc: unknown, field: string): number | null {
 
   const candidate = doc as Record<string, unknown>;
   const value = candidate[field];
-  return typeof value === "number" && Number.isFinite(value) ? value : null;
+
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+
+  if (typeof value === "string" && value.trim().length > 0) {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+
+  return null;
 }
 
 export function revalidateTags(tags: Array<string | null | undefined>): void {
@@ -38,4 +48,9 @@ export function revalidatePaths(paths: Array<string | null | undefined>): void {
       revalidatePath(path);
     }
   }
+}
+
+export function revalidateAboutContent(): void {
+  revalidateTags(["about"]);
+  revalidatePaths(["/about"]);
 }

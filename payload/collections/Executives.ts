@@ -5,6 +5,7 @@ import {
   revalidatePaths,
   revalidateTags,
 } from "../hooks/revalidation.ts";
+import { validateOptionalUrl } from "../fields/validators.ts";
 
 export const Executives: CollectionConfig = {
   slug: "executives",
@@ -23,7 +24,7 @@ export const Executives: CollectionConfig = {
   },
   hooks: {
     afterChange: [
-      async ({ doc, previousDoc }) => {
+      ({ doc, previousDoc }) => {
         const year = getNumberField(doc, "year");
         const previousYear = getNumberField(previousDoc, "year");
 
@@ -41,7 +42,7 @@ export const Executives: CollectionConfig = {
       },
     ],
     afterDelete: [
-      async ({ doc }) => {
+      ({ doc }) => {
         const year = getNumberField(doc, "year");
 
         revalidateTags([
@@ -62,6 +63,11 @@ export const Executives: CollectionConfig = {
     { name: "photo", type: "text", required: true },
     { name: "year", type: "number", required: true, index: true },
     { name: "order", type: "number", required: true, defaultValue: 1 },
-    { name: "linkedinUrl", type: "text", required: false },
+    {
+      name: "linkedinUrl",
+      type: "text",
+      required: false,
+      validate: (value: unknown) => validateOptionalUrl(value, "LinkedIn URL"),
+    },
   ],
 };

@@ -23,7 +23,7 @@ export const Rockets: CollectionConfig = {
   },
   hooks: {
     afterChange: [
-      async ({ doc, previousDoc }) => {
+      ({ doc, previousDoc }) => {
         const currentSlug = getStringField(doc, "slug");
         const previousSlug = getStringField(previousDoc, "slug");
 
@@ -46,7 +46,7 @@ export const Rockets: CollectionConfig = {
       },
     ],
     afterDelete: [
-      async ({ doc }) => {
+      ({ doc }) => {
         const deletedSlug = getStringField(doc, "slug");
 
         revalidateTags([

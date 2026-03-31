@@ -5,6 +5,7 @@ import {
   revalidatePaths,
   revalidateTags,
 } from "../hooks/revalidation.ts";
+import { validateOptionalUrl } from "../fields/validators.ts";
 
 export const Events: CollectionConfig = {
   slug: "events",
@@ -23,7 +24,7 @@ export const Events: CollectionConfig = {
   },
   hooks: {
     afterChange: [
-      async ({ doc, previousDoc }) => {
+      ({ doc, previousDoc }) => {
         const currentSlug = getStringField(doc, "slug");
         const previousSlug = getStringField(previousDoc, "slug");
 
@@ -46,7 +47,7 @@ export const Events: CollectionConfig = {
       },
     ],
     afterDelete: [
-      async ({ doc }) => {
+      ({ doc }) => {
         const deletedSlug = getStringField(doc, "slug");
 
         revalidateTags(["events", deletedSlug ? `event:${deletedSlug}` : null]);
@@ -61,11 +62,22 @@ export const Events: CollectionConfig = {
   fields: [
     { name: "title", type: "text", required: true },
     { name: "slug", type: "text", required: true, unique: true, index: true },
-    { name: "image", type: "text", required: false },
+    {
+      name: "image",
+      type: "text",
+      required: false,
+      validate: (value: unknown) =>
+        validateOptionalUrl(value, "Event image URL"),
+    },
     { name: "description", type: "textarea", required: true },
     { name: "date", type: "date", required: true },
     { name: "eventTag", type: "text", required: false },
-    { name: "signupUrl", type: "text", required: false },
+    {
+      name: "signupUrl",
+      type: "text",
+      required: false,
+      validate: (value: unknown) => validateOptionalUrl(value, "Signup URL"),
+    },
     { name: "isPast", type: "checkbox", required: true, defaultValue: false },
     { name: "location", type: "text", required: false },
   ],

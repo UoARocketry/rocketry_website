@@ -1,6 +1,7 @@
 import type { CollectionConfig } from "payload";
 import { isLoggedIn, isPublicRead } from "../access/policies.ts";
-import { revalidatePaths, revalidateTags } from "../hooks/revalidation.ts";
+import { BACKGROUND_SURFACE_OPTIONS } from "../fields/options.ts";
+import { revalidateAboutContent } from "../hooks/revalidation.ts";
 
 export const JourneyItems: CollectionConfig = {
   slug: "journey-items",
@@ -19,15 +20,13 @@ export const JourneyItems: CollectionConfig = {
   },
   hooks: {
     afterChange: [
-      async () => {
-        revalidateTags(["about"]);
-        revalidatePaths(["/about"]);
+      () => {
+        revalidateAboutContent();
       },
     ],
     afterDelete: [
-      async () => {
-        revalidateTags(["about"]);
-        revalidatePaths(["/about"]);
+      () => {
+        revalidateAboutContent();
       },
     ],
   },
@@ -39,10 +38,7 @@ export const JourneyItems: CollectionConfig = {
       name: "variant",
       type: "select",
       required: false,
-      options: [
-        { label: "Background", value: "background" },
-        { label: "Surface", value: "surface" },
-      ],
+      options: BACKGROUND_SURFACE_OPTIONS,
     },
     { name: "order", type: "number", required: true, defaultValue: 1 },
   ],

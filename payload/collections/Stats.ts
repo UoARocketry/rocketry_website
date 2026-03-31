@@ -1,6 +1,6 @@
 import type { CollectionConfig } from "payload";
 import { isLoggedIn, isPublicRead } from "../access/policies.ts";
-import { revalidatePaths, revalidateTags } from "../hooks/revalidation.ts";
+import { revalidateAboutContent } from "../hooks/revalidation.ts";
 
 export const Stats: CollectionConfig = {
   slug: "stats",
@@ -19,15 +19,13 @@ export const Stats: CollectionConfig = {
   },
   hooks: {
     afterChange: [
-      async () => {
-        revalidateTags(["about"]);
-        revalidatePaths(["/about"]);
+      () => {
+        revalidateAboutContent();
       },
     ],
     afterDelete: [
-      async () => {
-        revalidateTags(["about"]);
-        revalidatePaths(["/about"]);
+      () => {
+        revalidateAboutContent();
       },
     ],
   },

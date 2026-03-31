@@ -2,6 +2,7 @@ import type { GlobalConfig } from "payload";
 import { revalidatePath } from "next/cache";
 import { isLoggedIn, isPublicRead } from "../access/policies.ts";
 import { revalidatePaths, revalidateTags } from "../hooks/revalidation.ts";
+import { validateOptionalUrl } from "../fields/validators.ts";
 
 export const SiteSettings: GlobalConfig = {
   slug: "site-settings",
@@ -12,10 +13,10 @@ export const SiteSettings: GlobalConfig = {
   },
   hooks: {
     afterChange: [
-      async () => {
+      () => {
         revalidateTags(["settings"]);
         revalidatePath("/", "layout");
-        revalidatePaths(["/", "/about", "/events", "/rockets", "/sponsors"]);
+        revalidatePaths(["/about", "/events", "/rockets", "/sponsors"]);
       },
     ],
   },
@@ -27,11 +28,15 @@ export const SiteSettings: GlobalConfig = {
       name: "memberJoinUrl",
       type: "text",
       required: false,
+      validate: (value: unknown) =>
+        validateOptionalUrl(value, "Member join URL"),
     },
     {
       name: "execTeamImageUrl",
       type: "text",
       required: false,
+      validate: (value: unknown) =>
+        validateOptionalUrl(value, "Executive team image URL"),
     },
   ],
 };
