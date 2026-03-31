@@ -1,27 +1,74 @@
 import { unstable_cache } from "next/cache";
-import supabase from "@/lib/supabase";
-import type { Database } from "@/lib/database.types";
+import { getPayloadClient } from "@/lib/payload";
 
 const CONTENT_REVALIDATE_SECONDS = 300;
-const ROCKET_COLUMNS = "id,name,slug,image,description,launchedAt";
-const EVENT_COLUMNS =
-  "id,title,slug,image,description,date,eventTag,signupUrl,isPast,location";
-const EXEC_COLUMNS = "id,name,role,bio,photo,year,linkedinUrl";
-const SPONSOR_COLUMNS = "id,name,logo,url,description,tier";
-const WHAT_WE_DO_COLUMNS = "title,body,image,variant";
-const JOURNEY_COLUMNS = "title,body,image,variant";
-const TEAM_ROLE_COLUMNS = "title,body,bullets,variant";
-const STAT_COLUMNS = "value,label";
 
-type EventRow = Database["public"]["Tables"]["Event"]["Row"];
-type RocketRow = Database["public"]["Tables"]["Rocket"]["Row"];
-type ExecRow = Database["public"]["Tables"]["Exec"]["Row"];
-type SponsorRow = Database["public"]["Tables"]["Sponsor"]["Row"];
-type WhatWeDoRow = Database["public"]["Tables"]["WhatWeDo"]["Row"];
-type JourneyItemRow = Database["public"]["Tables"]["JourneyItem"]["Row"];
-type TeamRoleRow = Database["public"]["Tables"]["TeamRole"]["Row"];
-type StatRow = Database["public"]["Tables"]["Stat"]["Row"];
-type SiteSettingsRow = Database["public"]["Tables"]["SiteSettings"]["Row"];
+type PayloadDoc<T> = T & { id: number | string };
+
+type PayloadRocket = {
+  name: string;
+  slug: string;
+  image?: string | null;
+  description?: string | null;
+  launchedAt?: string | null;
+};
+
+type PayloadEvent = {
+  title: string;
+  slug: string;
+  image?: string | null;
+  description?: string | null;
+  date?: string | null;
+  eventTag?: string | null;
+  signupUrl?: string | null;
+  isPast?: boolean | null;
+  location?: string | null;
+};
+
+type PayloadExecutive = {
+  name: string;
+  role: string;
+  bio: string;
+  photo: string;
+  year: number;
+  order: number;
+  linkedinUrl?: string | null;
+};
+
+type PayloadFeature = {
+  title: string;
+  body?: string | null;
+  image?: string | null;
+  variant?: "background" | "surface" | null;
+  order: number;
+};
+
+type PayloadTeamRole = {
+  title: string;
+  body?: string | null;
+  bullets?: Array<{ value: string }> | null;
+  variant?: "background" | "surface" | null;
+  order: number;
+};
+
+type PayloadStat = {
+  value: string;
+  label: string;
+  order: number;
+};
+
+type PayloadSponsor = {
+  name: string;
+  logo: string;
+  url: string;
+  description?: string | null;
+  tier?: "GOLD" | "SILVER" | "BRONZE" | null;
+};
+
+type PayloadSiteSettings = {
+  memberJoinUrl?: string | null;
+  execTeamImageUrl?: string | null;
+};
 
 export type RocketSummary = {
   id: number;
@@ -111,124 +158,145 @@ export type SiteSettings = {
   execTeamImageUrl?: string | null;
 };
 
-function mapRocket(row: RocketRow): RocketSummary {
+function toNumberId(id: number | string): number {
+  const parsed = Number(id);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function mapRocket(doc: PayloadDoc<PayloadRocket>): RocketSummary {
   return {
-    id: row.id,
-    name: row.name,
-    slug: row.slug,
-    image: row.image,
-    description: row.description,
-    launchedAt: row.launchedAt,
+    id: toNumberId(doc.id),
+    name: doc.name,
+    slug: doc.slug,
+    image: doc.image ?? null,
+    description: doc.description ?? null,
+    launchedAt: doc.launchedAt ?? null,
   };
 }
 
-function mapEvent(row: EventRow): EventSummary {
+function mapEvent(doc: PayloadDoc<PayloadEvent>): EventSummary {
   return {
-    id: row.id,
-    title: row.title,
-    slug: row.slug,
-    image: row.image,
-    description: row.description,
-    date: row.date,
-    eventTag: row.eventTag,
-    signupUrl: row.signupUrl,
-    isPast: row.isPast,
-    location: row.location,
+    id: toNumberId(doc.id),
+    title: doc.title,
+    slug: doc.slug,
+    image: doc.image ?? null,
+    description: doc.description ?? null,
+    date: doc.date ?? "",
+    eventTag: doc.eventTag ?? null,
+    signupUrl: doc.signupUrl ?? null,
+    isPast: Boolean(doc.isPast),
+    location: doc.location ?? null,
   };
 }
 
-function mapExec(row: ExecRow): Exec {
+function mapExec(doc: PayloadDoc<PayloadExecutive>): Exec {
   return {
-    id: row.id,
-    name: row.name,
-    role: row.role,
-    bio: row.bio,
-    photo: row.photo,
-    year: row.year,
-    linkedinUrl: row.linkedinUrl,
+    id: toNumberId(doc.id),
+    name: doc.name,
+    role: doc.role,
+    bio: doc.bio,
+    photo: doc.photo,
+    year: doc.year,
+    linkedinUrl: doc.linkedinUrl ?? null,
   };
 }
 
-function mapFeature(row: WhatWeDoRow | JourneyItemRow): Feature {
+function mapFeature(doc: PayloadDoc<PayloadFeature>): Feature {
   return {
-    title: row.title,
-    body: row.body,
-    image: row.image,
-    variant: row.variant,
+    title: doc.title,
+    body: doc.body ?? null,
+    image: doc.image ?? null,
+    variant: doc.variant ?? null,
   };
 }
 
-function mapTeamRole(row: TeamRoleRow): TeamRole {
+function mapTeamRole(doc: PayloadDoc<PayloadTeamRole>): TeamRole {
   return {
-    title: row.title,
-    body: row.body,
-    bullets: row.bullets ?? undefined,
-    variant: row.variant,
+    title: doc.title,
+    body: doc.body ?? null,
+    bullets: (doc.bullets ?? []).map((bullet) => bullet.value),
+    variant: doc.variant ?? null,
   };
 }
 
-function mapStat(row: StatRow): Stat {
+function mapStat(doc: PayloadDoc<PayloadStat>): Stat {
   return {
-    value: row.value,
-    label: row.label,
+    value: doc.value,
+    label: doc.label,
   };
 }
 
-function mapSponsor(row: SponsorRow): Sponsor {
+function mapSponsor(doc: PayloadDoc<PayloadSponsor>): Sponsor {
   return {
-    id: row.id,
-    name: row.name,
-    logo: row.logo,
-    url: row.url,
-    description: row.description,
-    tier: row.tier,
+    id: toNumberId(doc.id),
+    name: doc.name,
+    logo: doc.logo,
+    url: doc.url,
+    description: doc.description ?? null,
+    tier: doc.tier ?? null,
   };
 }
 
 export const getRocketSummaries = unstable_cache(
   async (): Promise<RocketSummary[]> => {
-    const { data, error } = await supabase
-      .from("Rocket")
-      .select(ROCKET_COLUMNS)
-      .order("launchedAt", { ascending: false })
-      .limit(2);
+    const payload = await getPayloadClient();
+    const result = await payload.find({
+      collection: "rockets",
+      draft: false,
+      limit: 2,
+      sort: "-launchedAt",
+    });
 
-    if (error) throw error;
-
-    return (data ?? []).map(mapRocket);
+    return result.docs.map((doc) =>
+      mapRocket(doc as PayloadDoc<PayloadRocket>),
+    );
   },
   ["rocket-summaries"],
   { revalidate: CONTENT_REVALIDATE_SECONDS, tags: ["rockets"] },
 );
 
+export const getAllRockets = unstable_cache(
+  async (): Promise<RocketSummary[]> => {
+    const payload = await getPayloadClient();
+    const result = await payload.find({
+      collection: "rockets",
+      draft: false,
+      pagination: false,
+      sort: "-launchedAt",
+    });
+
+    return result.docs.map((doc) =>
+      mapRocket(doc as PayloadDoc<PayloadRocket>),
+    );
+  },
+  ["all-rockets"],
+  { revalidate: CONTENT_REVALIDATE_SECONDS, tags: ["rockets"] },
+);
+
 export const getEventsOverview = unstable_cache(
   async (): Promise<EventsOverview> => {
-    const nowIso = new Date().toISOString();
-    const pastFilter = `isPast.eq.true,date.lt.${nowIso}`;
+    const payload = await getPayloadClient();
+    const result = await payload.find({
+      collection: "events",
+      draft: false,
+      pagination: false,
+      sort: "-date",
+    });
 
-    const [upcomingResult, pastResult] = await Promise.all([
-      supabase
-        .from("Event")
-        .select(EVENT_COLUMNS)
-        .eq("isPast", false)
-        .gte("date", nowIso)
-        .order("date", { ascending: true })
-        .limit(10),
-      supabase
-        .from("Event")
-        .select(EVENT_COLUMNS)
-        .or(pastFilter)
-        .order("date", { ascending: false })
-        .limit(10),
-    ]);
+    const docs = result.docs.map((doc) =>
+      mapEvent(doc as PayloadDoc<PayloadEvent>),
+    );
+    const now = new Date();
 
-    if (upcomingResult.error) throw upcomingResult.error;
-    if (pastResult.error) throw pastResult.error;
+    const upcoming = docs
+      .filter((event) => !event.isPast && new Date(event.date) >= now)
+      .sort((a, b) => a.date.localeCompare(b.date));
 
-    return {
-      upcoming: (upcomingResult.data ?? []).map(mapEvent),
-      past: (pastResult.data ?? []).map(mapEvent),
-    };
+    const past = docs
+      .filter((event) => event.isPast || new Date(event.date) < now)
+      .sort((a, b) => b.date.localeCompare(a.date));
+
+    return { upcoming, past };
   },
   ["events-overview"],
   { revalidate: CONTENT_REVALIDATE_SECONDS, tags: ["events"] },
@@ -236,6 +304,8 @@ export const getEventsOverview = unstable_cache(
 
 export const getAboutPayload = unstable_cache(
   async (): Promise<AboutPayload> => {
+    const payload = await getPayloadClient();
+
     const [
       execTeamPayload,
       whatWeDoResult,
@@ -244,35 +314,46 @@ export const getAboutPayload = unstable_cache(
       statsResult,
     ] = await Promise.all([
       getExecTeamPayload(),
-      supabase
-        .from("WhatWeDo")
-        .select(WHAT_WE_DO_COLUMNS)
-        .order("id", { ascending: true }),
-      supabase
-        .from("JourneyItem")
-        .select(JOURNEY_COLUMNS)
-        .order("id", { ascending: true }),
-      supabase
-        .from("TeamRole")
-        .select(TEAM_ROLE_COLUMNS)
-        .order("id", { ascending: true }),
-      supabase
-        .from("Stat")
-        .select(STAT_COLUMNS)
-        .order("id", { ascending: true }),
+      payload.find({
+        collection: "what-we-do",
+        draft: false,
+        limit: 100,
+        sort: "order",
+      }),
+      payload.find({
+        collection: "journey-items",
+        draft: false,
+        limit: 100,
+        sort: "order",
+      }),
+      payload.find({
+        collection: "team-roles",
+        draft: false,
+        limit: 100,
+        sort: "order",
+      }),
+      payload.find({
+        collection: "stats",
+        draft: false,
+        limit: 100,
+        sort: "order",
+      }),
     ]);
-
-    if (whatWeDoResult.error) throw whatWeDoResult.error;
-    if (journeyResult.error) throw journeyResult.error;
-    if (teamResult.error) throw teamResult.error;
-    if (statsResult.error) throw statsResult.error;
 
     return {
       executives: execTeamPayload.executives,
-      whatWeDo: (whatWeDoResult.data ?? []).map(mapFeature),
-      journey: (journeyResult.data ?? []).map(mapFeature),
-      teamStructure: (teamResult.data ?? []).map(mapTeamRole),
-      stats: (statsResult.data ?? []).map(mapStat),
+      whatWeDo: whatWeDoResult.docs.map((doc) =>
+        mapFeature(doc as PayloadDoc<PayloadFeature>),
+      ),
+      journey: journeyResult.docs.map((doc) =>
+        mapFeature(doc as PayloadDoc<PayloadFeature>),
+      ),
+      teamStructure: teamResult.docs.map((doc) =>
+        mapTeamRole(doc as PayloadDoc<PayloadTeamRole>),
+      ),
+      stats: statsResult.docs.map((doc) =>
+        mapStat(doc as PayloadDoc<PayloadStat>),
+      ),
     };
   },
   ["about-payload"],
@@ -281,17 +362,16 @@ export const getAboutPayload = unstable_cache(
 
 export const getExecYears = unstable_cache(
   async (): Promise<number[]> => {
-    const { data, error } = await supabase
-      .from("Exec")
-      .select(EXEC_COLUMNS)
-      .not("year", "is", null)
-      .order("year", { ascending: false });
+    const payload = await getPayloadClient();
+    const result = await payload.find({
+      collection: "executives",
+      draft: false,
+      pagination: false,
+      sort: "-year",
+    });
 
-    if (error) throw error;
-
-    const years = (data ?? [])
-      .map(mapExec)
-      .map((exec) => exec.year)
+    const years = result.docs
+      .map((doc) => (doc as PayloadDoc<PayloadExecutive>).year)
       .filter((year) => Number.isFinite(year));
 
     return Array.from(new Set(years));
@@ -314,15 +394,22 @@ export async function getExecTeam(year?: number): Promise<Exec[]> {
 
   const cachedLoader = unstable_cache(
     async (): Promise<Exec[]> => {
-      const { data, error } = await supabase
-        .from("Exec")
-        .select(EXEC_COLUMNS)
-        .eq("year", targetYear)
-        .order("order", { ascending: true });
+      const payload = await getPayloadClient();
+      const result = await payload.find({
+        collection: "executives",
+        draft: false,
+        pagination: false,
+        sort: "order",
+        where: {
+          year: {
+            equals: targetYear,
+          },
+        },
+      });
 
-      if (error) throw error;
-
-      return (data ?? []).map(mapExec);
+      return result.docs.map((doc) =>
+        mapExec(doc as PayloadDoc<PayloadExecutive>),
+      );
     },
     ["exec-team", String(targetYear)],
     {
@@ -355,14 +442,17 @@ export async function getExecTeamPayload(
 
 export const getSponsors = unstable_cache(
   async (): Promise<Sponsor[]> => {
-    const { data, error } = await supabase
-      .from("Sponsor")
-      .select(SPONSOR_COLUMNS)
-      .order("id", { ascending: true });
+    const payload = await getPayloadClient();
+    const result = await payload.find({
+      collection: "sponsors",
+      draft: false,
+      pagination: false,
+      sort: "name",
+    });
 
-    if (error) throw error;
-
-    return (data ?? []).map(mapSponsor);
+    return result.docs.map((doc) =>
+      mapSponsor(doc as PayloadDoc<PayloadSponsor>),
+    );
   },
   ["sponsors"],
   { revalidate: CONTENT_REVALIDATE_SECONDS, tags: ["sponsors"] },
@@ -370,25 +460,17 @@ export const getSponsors = unstable_cache(
 
 export const getSiteSettings = unstable_cache(
   async (): Promise<SiteSettings> => {
-    const { data, error } = await supabase
-      .from("SiteSettings")
-      .select("memberJoinUrl,execTeamImageUrl")
-      .limit(1)
-      .maybeSingle();
+    const payload = await getPayloadClient();
+    const settings = await payload.findGlobal({
+      slug: "site-settings",
+      draft: false,
+    });
 
-    if (error) throw error;
-
-    const settings: Pick<
-      SiteSettingsRow,
-      "memberJoinUrl" | "execTeamImageUrl"
-    > = data ?? {
-      memberJoinUrl: "",
-      execTeamImageUrl: null,
-    };
+    const doc = settings as PayloadSiteSettings;
 
     return {
-      memberJoinUrl: settings.memberJoinUrl ?? "",
-      execTeamImageUrl: settings.execTeamImageUrl ?? null,
+      memberJoinUrl: doc.memberJoinUrl ?? "",
+      execTeamImageUrl: doc.execTeamImageUrl ?? null,
     };
   },
   ["site-settings"],
@@ -400,15 +482,20 @@ export async function getRocketBySlug(
 ): Promise<RocketDetail | null> {
   const cachedLoader = unstable_cache(
     async (): Promise<RocketDetail | null> => {
-      const { data, error } = await supabase
-        .from("Rocket")
-        .select(ROCKET_COLUMNS)
-        .eq("slug", slug)
-        .maybeSingle();
+      const payload = await getPayloadClient();
+      const result = await payload.find({
+        collection: "rockets",
+        draft: false,
+        limit: 1,
+        where: {
+          slug: {
+            equals: slug,
+          },
+        },
+      });
 
-      if (error) throw error;
-
-      return data ? mapRocket(data) : null;
+      const doc = result.docs[0];
+      return doc ? mapRocket(doc as PayloadDoc<PayloadRocket>) : null;
     },
     ["rocket-by-slug", slug],
     {
@@ -425,15 +512,20 @@ export async function getEventBySlug(
 ): Promise<EventDetail | null> {
   const cachedLoader = unstable_cache(
     async (): Promise<EventDetail | null> => {
-      const { data, error } = await supabase
-        .from("Event")
-        .select(EVENT_COLUMNS)
-        .eq("slug", slug)
-        .maybeSingle();
+      const payload = await getPayloadClient();
+      const result = await payload.find({
+        collection: "events",
+        draft: false,
+        limit: 1,
+        where: {
+          slug: {
+            equals: slug,
+          },
+        },
+      });
 
-      if (error) throw error;
-
-      return data ? mapEvent(data) : null;
+      const doc = result.docs[0];
+      return doc ? mapEvent(doc as PayloadDoc<PayloadEvent>) : null;
     },
     ["event-by-slug", slug],
     {

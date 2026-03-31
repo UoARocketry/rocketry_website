@@ -1,9 +1,11 @@
 import "dotenv/config";
+import { Client } from "pg";
 import supabase from "../lib/supabase";
 
 type Row = Record<string, unknown>;
 type MaybeError = { message: string } | null;
 type ExistingRow = { id: number } | null;
+type EventCleanupRow = { id: number | null; slug: string | null };
 
 type DynamicTableClient = {
   from: (table: string) => {
@@ -23,6 +25,311 @@ type DynamicTableClient = {
 };
 
 const db = supabase as unknown as DynamicTableClient;
+
+function isEventCleanupRow(value: unknown): value is EventCleanupRow {
+  if (typeof value !== "object" || value === null) return false;
+
+  const candidate = value as { id?: unknown; slug?: unknown };
+  const idValid = typeof candidate.id === "number" || candidate.id === null;
+  const slugValid =
+    typeof candidate.slug === "string" || candidate.slug === null;
+
+  return idValid && slugValid;
+}
+
+const directUrl = process.env.DIRECT_URL;
+const storageBase = process.env.NEXT_PUBLIC_SUPABASE_STORAGE_URL;
+
+function encodePath(path: string): string {
+  return path
+    .split("/")
+    .map((segment) => encodeURIComponent(segment))
+    .join("/");
+}
+
+function buildStorageImageUrl(path: string): string {
+  if (!storageBase) {
+    throw new Error(
+      "NEXT_PUBLIC_SUPABASE_STORAGE_URL is missing in environment",
+    );
+  }
+
+  return `${storageBase.replace(/\/$/, "")}/${encodePath(path)}`;
+}
+
+async function syncAboutImageColumns() {
+  if (!directUrl) {
+    throw new Error("DIRECT_URL is missing in environment");
+  }
+
+  const sql = `
+alter table public."WhatWeDo"
+  add column if not exists "image" text;
+
+alter table public."JourneyItem"
+  add column if not exists "image" text;
+
+alter table public."WhatWeDo"
+  drop column if exists "icon";
+
+alter table public."JourneyItem"
+  drop column if exists "icon";
+`;
+
+  const client = new Client({
+    connectionString: directUrl,
+    ssl: { rejectUnauthorized: false },
+  });
+
+  await client.connect();
+
+  try {
+    await client.query(sql);
+  } finally {
+    await client.end();
+  }
+}
+
+async function syncEventAndExecColumns() {
+  if (!directUrl) {
+    throw new Error("DIRECT_URL is missing in environment");
+  }
+
+  const sql = `
+alter table public."Event"
+  add column if not exists "image" text;
+
+alter table public."Exec"
+  add column if not exists "linkedinUrl" text;
+
+alter table public."Exec"
+  add column if not exists "year" integer;
+
+update public."Exec"
+set "year" = extract(year from now())::int
+where "year" is null;
+
+alter table public."Exec"
+  alter column "year" set default extract(year from now())::int;
+
+alter table public."Exec"
+  alter column "year" set not null;
+
+create index if not exists "Exec_year_idx"
+  on public."Exec" ("year");
+`;
+
+  const client = new Client({
+    connectionString: directUrl,
+    ssl: { rejectUnauthorized: false },
+  });
+
+  await client.connect();
+
+  try {
+    await client.query(sql);
+  } finally {
+    await client.end();
+  }
+}
+
+type AboutTable = "WhatWeDo" | "JourneyItem";
+
+async function upsertAboutByTitle(
+  table: AboutTable,
+  item: {
+    title: string;
+    body: string;
+    variant: "background" | "surface";
+    image: string;
+  },
+) {
+  if (!directUrl) {
+    throw new Error("DIRECT_URL is missing in environment");
+  }
+
+  const client = new Client({
+    connectionString: directUrl,
+    ssl: { rejectUnauthorized: false },
+  });
+
+  await client.connect();
+
+  try {
+    const updateResult = await client.query(
+      `
+update public."${table}"
+set "body" = $1,
+    "variant" = $2,
+    "image" = $3
+where "title" = $4
+`,
+      [item.body, item.variant, item.image, item.title],
+    );
+
+    if (updateResult.rowCount && updateResult.rowCount > 0) {
+      return "updated";
+    }
+
+    await client.query(
+      `
+insert into public."${table}" ("title", "body", "variant", "image")
+values ($1, $2, $3, $4)
+`,
+      [item.title, item.body, item.variant, item.image],
+    );
+
+    return "created";
+  } finally {
+    await client.end();
+  }
+}
+
+async function upsertExecByName(item: {
+  name: string;
+  role: string;
+  bio: string;
+  photo: string;
+  order: number;
+  year: number;
+  linkedinUrl: string;
+}) {
+  if (!directUrl) {
+    throw new Error("DIRECT_URL is missing in environment");
+  }
+
+  const client = new Client({
+    connectionString: directUrl,
+    ssl: { rejectUnauthorized: false },
+  });
+
+  await client.connect();
+
+  try {
+    const updateResult = await client.query(
+      `
+update public."Exec"
+set "role" = $1,
+    "bio" = $2,
+    "photo" = $3,
+    "order" = $4,
+    "linkedinUrl" = $5,
+    "year" = $6
+where "name" = $7
+`,
+      [
+        item.role,
+        item.bio,
+        item.photo,
+        item.order,
+        item.linkedinUrl,
+        item.year,
+        item.name,
+      ],
+    );
+
+    if (updateResult.rowCount && updateResult.rowCount > 0) {
+      return "updated";
+    }
+
+    await client.query(
+      `
+insert into public."Exec" ("name", "role", "bio", "photo", "order", "linkedinUrl", "year")
+values ($1, $2, $3, $4, $5, $6, $7)
+`,
+      [
+        item.name,
+        item.role,
+        item.bio,
+        item.photo,
+        item.order,
+        item.linkedinUrl,
+        item.year,
+      ],
+    );
+
+    return "created";
+  } finally {
+    await client.end();
+  }
+}
+
+async function upsertEventBySlug(item: {
+  title: string;
+  slug: string;
+  image: string;
+  description: string;
+  date: string;
+  location: string;
+  eventTag: string;
+  isPast: boolean;
+  signupUrl: string | null;
+}) {
+  if (!directUrl) {
+    throw new Error("DIRECT_URL is missing in environment");
+  }
+
+  const client = new Client({
+    connectionString: directUrl,
+    ssl: { rejectUnauthorized: false },
+  });
+
+  await client.connect();
+
+  try {
+    const updateResult = await client.query(
+      `
+update public."Event"
+set "title" = $1,
+    "image" = $2,
+    "description" = $3,
+    "date" = $4,
+    "location" = $5,
+    "eventTag" = $6,
+    "isPast" = $7,
+    "signupUrl" = $8
+where "slug" = $9
+`,
+      [
+        item.title,
+        item.image,
+        item.description,
+        item.date,
+        item.location,
+        item.eventTag,
+        item.isPast,
+        item.signupUrl,
+        item.slug,
+      ],
+    );
+
+    if (updateResult.rowCount && updateResult.rowCount > 0) {
+      return "updated";
+    }
+
+    await client.query(
+      `
+insert into public."Event" ("title", "slug", "image", "description", "date", "location", "eventTag", "isPast", "signupUrl")
+values ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+`,
+      [
+        item.title,
+        item.slug,
+        item.image,
+        item.description,
+        item.date,
+        item.location,
+        item.eventTag,
+        item.isPast,
+        item.signupUrl,
+      ],
+    );
+
+    return "created";
+  } finally {
+    await client.end();
+  }
+}
 
 function slugify(value: string): string {
   return value
@@ -77,7 +384,7 @@ async function upsertByUnique(table: string, uniqueKey: string, item: Row) {
   return "created";
 }
 
-function generateExecData(count: number) {
+function generateExecData(year: number, count: number, nameOffset: number) {
   const firstNames = [
     "Avery",
     "Jordan",
@@ -91,6 +398,14 @@ function generateExecData(count: number) {
     "Jamie",
     "Rowan",
     "Parker",
+    "Logan",
+    "Dakota",
+    "Elliot",
+    "Reese",
+    "Finley",
+    "Sage",
+    "Emerson",
+    "Sawyer",
   ];
   const lastNames = [
     "Nguyen",
@@ -105,6 +420,14 @@ function generateExecData(count: number) {
     "Lee",
     "Martin",
     "Davis",
+    "Brown",
+    "Clark",
+    "Walker",
+    "Wright",
+    "Hall",
+    "Allen",
+    "Young",
+    "Scott",
   ];
   const roles = [
     "President",
@@ -129,7 +452,8 @@ function generateExecData(count: number) {
   ];
 
   return Array.from({ length: count }, (_, i) => {
-    const name = `${pick(firstNames, i)} ${pick(lastNames, i * 3 + 1)}`;
+    const nameIndex = nameOffset + i;
+    const name = `${firstNames[nameIndex]} ${lastNames[nameIndex]}`;
     const role = pick(roles, i);
     const focus = pick(focusAreas, i * 2 + 1);
 
@@ -139,6 +463,8 @@ function generateExecData(count: number) {
       bio: `${name} leads ${focus} and helps the team execute reliable missions from concept to launch day.`,
       photo: `https://picsum.photos/seed/exec-${slugify(name)}/320/320`,
       order: i + 1,
+      year,
+      linkedinUrl: `https://www.linkedin.com/in/${slugify(name)}`,
     };
   });
 }
@@ -391,30 +717,89 @@ function generateEventData() {
       isPast: false,
       signupUrl: "https://forms.gle/1nGVSzsKXdXCBYLk9",
     },
-  ];
+  ].map((event) => ({
+    ...event,
+    image: buildStorageImageUrl(`images/events/${event.slug}.jpg`),
+  }));
+}
+
+async function syncSiteSettingsTable() {
+  if (!directUrl) {
+    throw new Error("DIRECT_URL is missing in environment");
+  }
+
+  const defaultExecTeamImageUrl = buildStorageImageUrl(
+    "images/execs/exec_team.jpg",
+  );
+
+  const sql = `
+create table if not exists public."SiteSettings" (
+  id int primary key default 1,
+  "memberJoinUrl" text,
+  "execTeamImageUrl" text,
+  updated_at timestamp default now()
+);
+
+alter table public."SiteSettings"
+  add column if not exists "execTeamImageUrl" text;
+
+insert into public."SiteSettings" (id, "execTeamImageUrl")
+values (1, '${defaultExecTeamImageUrl}')
+on conflict (id) do update set "execTeamImageUrl" = coalesce(public."SiteSettings"."execTeamImageUrl", excluded."execTeamImageUrl");
+`;
+
+  const client = new Client({
+    connectionString: directUrl,
+    ssl: { rejectUnauthorized: false },
+  });
+
+  await client.connect();
+
+  try {
+    await client.query(sql);
+  } finally {
+    await client.end();
+  }
 }
 
 async function main() {
   console.log("📝 Starting Supabase seed with dynamic mock data...");
 
   try {
+    console.log("🛠️ Syncing SiteSettings table...");
+    await syncSiteSettingsTable();
+    console.log("✅ SiteSettings table sync complete.");
+
+    console.log("🛠️ Syncing WhatWeDo/JourneyItem columns (icon -> image)...");
+    await syncAboutImageColumns();
+    console.log("✅ About section schema sync complete.");
+
+    console.log("🛠️ Syncing Event/Exec columns (image + linkedinUrl)...");
+    await syncEventAndExecColumns();
+    console.log("✅ Event and Exec schema sync complete.");
+
     console.log("📚 Seeding About page content (fixed copy)...");
 
-    const whatWeDo = [
+    const whatWeDo: Array<{
+      image: string;
+      title: string;
+      body: string;
+      variant: "background" | "surface";
+    }> = [
       {
-        icon: "🔧",
+        image: buildStorageImageUrl("images/cards/design-build.jpg"),
         title: "Workshops",
         body: "Hands-on workshops covering rocket design, propulsion systems, and manufacturing techniques. Learn practical skills from experienced members.",
         variant: "background",
       },
       {
-        icon: "🏭",
+        image: buildStorageImageUrl("images/cards/launch-compete.jpg"),
         title: "Industry Events",
         body: "Connect with professionals in the aerospace industry through guest lectures, site visits, and networking events with leading companies.",
         variant: "background",
       },
       {
-        icon: "🎉",
+        image: buildStorageImageUrl("images/cards/learn-grow.jpg"),
         title: "Social Events",
         body: "Build friendships and team spirit through social gatherings, team building activities, and celebrations of our achievements.",
         variant: "background",
@@ -422,27 +807,32 @@ async function main() {
     ];
 
     for (const item of whatWeDo) {
-      const action = await upsertByUnique("WhatWeDo", "title", item);
+      const action = await upsertAboutByTitle("WhatWeDo", item);
       console.log(
         `${action === "created" ? "✅" : "🔁"} ${action} WhatWeDo: ${item.title}`,
       );
     }
 
-    const journey = [
+    const journey: Array<{
+      image: string;
+      title: string;
+      body: string;
+      variant: "background" | "surface";
+    }> = [
       {
-        icon: "🚀",
+        image: buildStorageImageUrl("images/cards/founded.jpg"),
         title: "2024 - Foundation",
         body: "UARC was established by Laura with a vision to bring rocketry to the University of Auckland.",
         variant: "surface",
       },
       {
-        icon: "🏆",
+        image: buildStorageImageUrl("images/cards/first-launch.jpg"),
         title: "2025 - First Launch",
         body: "Successfully launched our first rocket, marking a major milestone in our club's history and proving our engineering capabilities.",
         variant: "surface",
       },
       {
-        icon: "🌟",
+        image: buildStorageImageUrl("images/cards/growing.jpg"),
         title: "2 - Years Active",
         body: "Continuing to push boundaries with advanced rocket designs, expanded team, and growing influence in the aerospace community.",
         variant: "surface",
@@ -450,7 +840,7 @@ async function main() {
     ];
 
     for (const item of journey) {
-      const action = await upsertByUnique("JourneyItem", "title", item);
+      const action = await upsertAboutByTitle("JourneyItem", item);
       console.log(
         `${action === "created" ? "✅" : "🔁"} ${action} JourneyItem: ${item.title}`,
       );
@@ -531,12 +921,15 @@ async function main() {
 
     console.log("🧪 Generating dynamic mock data for all other entities...");
 
-    const execItems = generateExecData(9);
-    for (const item of execItems) {
-      const action = await upsertByUnique("Exec", "name", item);
-      console.log(
-        `${action === "created" ? "✅" : "🔁"} ${action} Exec: ${item.name}`,
-      );
+    const execSeedYears = [2026, 2025];
+    for (const [yearIndex, year] of execSeedYears.entries()) {
+      const execItems = generateExecData(year, 9, yearIndex * 9);
+      for (const item of execItems) {
+        const action = await upsertExecByName(item);
+        console.log(
+          `${action === "created" ? "✅" : "🔁"} ${action} Exec: ${item.name} (${item.year})`,
+        );
+      }
     }
 
     const sponsorItems = generateSponsorData(12);
@@ -557,7 +950,7 @@ async function main() {
 
     const eventItems = generateEventData();
     for (const item of eventItems) {
-      const action = await upsertByUnique("Event", "slug", item);
+      const action = await upsertEventBySlug(item);
       console.log(
         `${action === "created" ? "✅" : "🔁"} ${action} Event: ${item.title}`,
       );
@@ -566,7 +959,7 @@ async function main() {
     const keepSlugs = new Set(eventItems.map((event) => event.slug));
     const { data: existingEvents, error: existingEventsError } = await supabase
       .from("Event")
-      .select("id,slug");
+      .select("*");
 
     if (existingEventsError) {
       throw new Error(
@@ -574,8 +967,15 @@ async function main() {
       );
     }
 
-    const staleEventIds = (existingEvents ?? [])
-      .filter((event) => !keepSlugs.has(event.slug))
+    const existingEventRows: unknown[] = Array.isArray(existingEvents)
+      ? existingEvents
+      : [];
+
+    const staleEventIds = existingEventRows
+      .filter(isEventCleanupRow)
+      .filter(
+        (event) => typeof event.slug === "string" && !keepSlugs.has(event.slug),
+      )
       .map((event) => event.id)
       .filter((id): id is number => typeof id === "number");
 

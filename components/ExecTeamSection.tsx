@@ -5,10 +5,16 @@ import ExecCard from "./ExecCard";
 import SectionFallback from "./SectionFallback";
 import type { Exec } from "@/lib/site-data";
 
-type ExecApiPayload = {
-  selectedYear: number;
-  availableYears: number[];
-  executives: Exec[];
+type ExecApiResponse = {
+  docs: Array<{
+    id: number | string;
+    name: string;
+    role: string;
+    bio: string;
+    photo: string;
+    year: number;
+    linkedinUrl?: string | null;
+  }>;
 };
 
 type Props = {
@@ -18,12 +24,12 @@ type Props = {
   initialLoadError: boolean;
 };
 
-function isExec(value: unknown): value is Exec {
+function isExecDoc(value: unknown): value is ExecApiResponse["docs"][number] {
   if (!value || typeof value !== "object") return false;
 
-  const candidate = value as Partial<Exec>;
+  const candidate = value as Partial<ExecApiResponse["docs"][number]>;
   return (
-    typeof candidate.id === "number" &&
+    (typeof candidate.id === "number" || typeof candidate.id === "string") &&
     typeof candidate.name === "string" &&
     typeof candidate.role === "string" &&
     typeof candidate.bio === "string" &&
@@ -32,17 +38,11 @@ function isExec(value: unknown): value is Exec {
   );
 }
 
-function isExecApiPayload(value: unknown): value is ExecApiPayload {
+function isExecApiResponse(value: unknown): value is ExecApiResponse {
   if (!value || typeof value !== "object") return false;
 
-  const payload = value as Partial<ExecApiPayload>;
-  return (
-    typeof payload.selectedYear === "number" &&
-    Array.isArray(payload.availableYears) &&
-    payload.availableYears.every((year) => typeof year === "number") &&
-    Array.isArray(payload.executives) &&
-    payload.executives.every(isExec)
-  );
+  const payload = value as Partial<ExecApiResponse>;
+  return Array.isArray(payload.docs) && payload.docs.every(isExecDoc);
 }
 
 export default function ExecTeamSection({
@@ -53,7 +53,11 @@ export default function ExecTeamSection({
 }: Props) {
   const inFlightController = useRef<AbortController | null>(null);
 
-  const [data, setData] = useState<ExecApiPayload>({
+  const [data, setData] = useState<{
+    selectedYear: number;
+    availableYears: number[];
+    executives: Exec[];
+  }>({
     selectedYear: initialYear,
     availableYears: initialYears,
     executives: initialExecutives,
@@ -90,10 +94,13 @@ export default function ExecTeamSection({
     setHasError(false);
 
     try {
-      const response = await fetch(`/api/exec?year=${year}`, {
-        cache: "no-store",
-        signal: controller.signal,
-      });
+      const response = await fetch(
+        `/api/executives?where[year][equals]=${year}&sort=order&limit=200&depth=0`,
+        {
+          cache: "no-store",
+          signal: controller.signal,
+        },
+      );
 
       if (!response.ok) {
         throw new Error("Failed to fetch exec team payload");
@@ -101,12 +108,25 @@ export default function ExecTeamSection({
 
       const payloadJson: unknown = await response.json();
 
-      if (!isExecApiPayload(payloadJson)) {
+      if (!isExecApiResponse(payloadJson)) {
         throw new Error("Invalid exec team payload format");
       }
 
-      const payload = payloadJson;
-      setData(payload);
+      const executives = payloadJson.docs.map((exec) => ({
+        id: typeof exec.id === "number" ? exec.id : Number(exec.id),
+        name: exec.name,
+        role: exec.role,
+        bio: exec.bio,
+        photo: exec.photo,
+        year: exec.year,
+        linkedinUrl: exec.linkedinUrl ?? null,
+      }));
+
+      setData((current) => ({
+        ...current,
+        selectedYear: year,
+        executives,
+      }));
     } catch (error) {
       if (error instanceof Error && error.name === "AbortError") {
         return;

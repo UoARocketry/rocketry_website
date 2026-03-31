@@ -1,99 +1,109 @@
 # University of Auckland Rocketry Club Website
 
-A full-stack website for the University of Auckland Rocketry Club, built with Next.js, TypeScript, Tailwind CSS, and Supabase.
+Official website for the University of Auckland Rocketry Club, built with Next.js App Router, TypeScript, Tailwind CSS, and Supabase.
 
-## Features
+## Overview
 
-### Pages
+This project is a content-driven site with server-rendered pages backed by Supabase. It includes:
 
-- **Home**: Club overview, blog/events preview, exec team showcase, sponsors section
-- **About**: Detailed information about what the club does, mission, and activities
-- **Events**: Display of upcoming and past events with individual event details
-- **Rockets**: Showcase of all rockets built by the club with images and descriptions
-- **Blogs**: Organized blog sections (recent, projects, other) with article previews
-- **Exec Team**: Executive team profiles with photos and detailed information
-- **Sign Up**: Membership application form for new members
-- **Sponsors**: Sponsorship opportunities and current sponsors
+- Home landing page with featured rockets and upcoming events
+- About page with team information and exec-year browsing
+- Events list and event detail pages
+- Rockets list and rocket detail pages
+- Sponsors page
+- API routes for site content
 
-### Tech Stack
+## Tech Stack
 
-- **Frontend**: Next.js 15 with React 19 and TypeScript
-- **Styling**: Tailwind CSS with custom UI components
-- **Database**: Supabase (PostgreSQL)
-- **Authentication**: NextAuth.js
-- **Deployment**: Vercel-ready
+- Next.js 16 (App Router)
+- React 19
+- TypeScript
+- Tailwind CSS 4
+- Supabase (PostgreSQL)
 
 ## Project Structure
 
 ```
-rocketry_website/
-├── app/                    # App directory
-│   ├── about/             # About page
-│   ├── events/            # Events page
-│   ├── rockets/           # Rockets page
-│   ├── blogs/             # Blogs page
-│   ├── exec/              # Executive team page
-│   ├── signup/            # Sign up page
-│   ├── sponsors/          # Sponsors page
-│   ├── api/               # API routes
-│   ├── globals.css        # Global styles
-│   ├── layout.tsx         # Root layout
-│   └── page.tsx           # Home page
-├── components/            # Reusable components
-│   ├── ui/               # UI components
-│   └── navigation.tsx    # Navigation component
-├── lib/                  # Utility functions
-│   ├── supabase.ts       # Supabase client
-│   └── utils.ts          # Utility functions
-└── public/               # Static assets
+app/
+	page.tsx
+	layout.tsx
+	about/
+	events/
+	rockets/
+	sponsors/
+	api/
+components/
+	ui/
+lib/
+	site-data.ts
+	supabase.ts
+scripts/
+public/
 ```
 
-## Database Schema
+## Data Model (High Level)
 
-The project includes database models for:
+- `Event`
+- `Rocket`
+- `Exec` (includes `year` for historical team browsing)
+- `Sponsor`
+- `WhatWeDo`
+- `JourneyItem`
+- `TeamRole`
+- `Stat`
+- `SiteSettings`
 
-- **Events**: Club events with dates, locations, and categories
-- **Rockets**: Rocket projects with specifications and launch data
-- **Exec**: Executive team members with roles and bios
-- **BlogPosts**: Blog articles with categories and content
-- **Sponsors**: Sponsor information and logos
+## Local Development
 
-## Development
+### Prerequisites
 
-### Available Scripts
+- Node.js (latest LTS or latest current)
+- npm
+- Supabase project credentials in environment variables
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
+### Commands
 
-### Adding New Pages
+- `npm run dev` - start development server
+- `npm run build` - create production build
+- `npm run start` - run production build locally
+- `npm run lint` - run ESLint
+- `npm run db:grant` - apply DB grants
+- `npm run seed` - run seed + schema sync script
 
-1. Create a new directory in `app/` with the page name
-2. Add a `page.tsx` file with the component
-3. Update the navigation in `components/navigation.tsx`
+## Environment Variables
 
-### Styling
+Required server variables are validated in `lib/supabase.ts`:
 
-The project uses Tailwind CSS with custom UI components. All components are in `components/ui/` and follow a consistent design system.
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `SUPABASE_URL` or `NEXT_PUBLIC_SUPABASE_URL`
 
-### Database Changes
+For scripts and media URLs, you may also need:
 
-1. Update SQL schema directly in Supabase
-2. Apply grants if needed: `npm run db:grant`
-3. Seed mock data: `npm run seed`
+- `DIRECT_URL`
+- `NEXT_PUBLIC_SUPABASE_STORAGE_URL`
 
-### Need to do
+## Notes
 
-- Implement CMS system
-- Implement conditional rendering for when there are failed API calls or there is nothing in the DB
+- Data-fetching is centralized in `lib/site-data.ts` with Next cache revalidation.
+- API routes are in `app/api/**/route.ts`.
+- Images use `next/image` where appropriate with host allowlists in `next.config.ts`.
 
-## License
+## Regression Checklist
 
-This project is licensed under the MIT License.
+Run these checks before merging significant UI/data changes:
+
+1. `npm run lint`
+2. `npm run build`
+3. Manual smoke test:
+   - Home page loads featured rockets and upcoming events
+   - About page loads and exec year switching works
+   - Events and Rockets detail pages render images and content correctly
+   - Sponsors page renders external logos without `next/image` host errors
+4. API spot checks:
+   - `/api/exec?year=2026` returns data
+   - `/api/exec?year=abcd` returns `400`
+   - `/api/test` returns `{ ok: true, now: ... }`
 
 ## Contact
 
-For questions about the website or the University of Auckland Rocketry Club:
-
-- Email: uoarocketryclub@auckland.ac.nz
+- uoarocketryclub@auckland.ac.nz

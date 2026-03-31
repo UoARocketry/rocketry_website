@@ -1,4 +1,10 @@
 import type { NextConfig } from "next";
+import { withPayload } from "@payloadcms/next/withPayload";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const filename = fileURLToPath(import.meta.url);
+const dirname = path.dirname(filename);
 
 function getSupabaseHostname(): string | null {
   const storageUrl = process.env.NEXT_PUBLIC_SUPABASE_STORAGE_URL;
@@ -56,6 +62,9 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  turbopack: {
+    root: path.resolve(dirname),
+  },
 };
 
-export default nextConfig;
+export default withPayload(nextConfig, { devBundleServerPackages: false });
