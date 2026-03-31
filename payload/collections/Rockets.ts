@@ -5,6 +5,7 @@ import {
   revalidatePaths,
   revalidateTags,
 } from "../hooks/revalidation.ts";
+import { createMediaRelationUrlSyncHook } from "../hooks/media-url-sync.ts";
 
 export const Rockets: CollectionConfig = {
   slug: "rockets",
@@ -22,6 +23,12 @@ export const Rockets: CollectionConfig = {
     delete: isLoggedIn,
   },
   hooks: {
+    beforeChange: [
+      createMediaRelationUrlSyncHook({
+        relationField: "imageMedia",
+        urlField: "image",
+      }),
+    ],
     afterChange: [
       ({ doc, previousDoc }) => {
         const currentSlug = getStringField(doc, "slug");
@@ -65,6 +72,16 @@ export const Rockets: CollectionConfig = {
   fields: [
     { name: "name", type: "text", required: true },
     { name: "slug", type: "text", required: true, unique: true, index: true },
+    {
+      name: "imageMedia",
+      type: "upload",
+      relationTo: "media" as never,
+      required: false,
+      admin: {
+        description:
+          "Upload or select an image. This auto-fills the Rocket image URL.",
+      },
+    },
     { name: "image", type: "text", required: false },
     { name: "description", type: "textarea", required: false },
     { name: "launchedAt", type: "date", required: false },

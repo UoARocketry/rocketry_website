@@ -5,6 +5,7 @@ import {
   revalidatePaths,
   revalidateTags,
 } from "../hooks/revalidation.ts";
+import { createMediaRelationUrlSyncHook } from "../hooks/media-url-sync.ts";
 import { validateOptionalUrl } from "../fields/validators.ts";
 
 export const Executives: CollectionConfig = {
@@ -23,6 +24,12 @@ export const Executives: CollectionConfig = {
     delete: isLoggedIn,
   },
   hooks: {
+    beforeChange: [
+      createMediaRelationUrlSyncHook({
+        relationField: "photoMedia",
+        urlField: "photo",
+      }),
+    ],
     afterChange: [
       ({ doc, previousDoc }) => {
         const year = getNumberField(doc, "year");
@@ -60,6 +67,16 @@ export const Executives: CollectionConfig = {
     { name: "name", type: "text", required: true },
     { name: "role", type: "text", required: true },
     { name: "bio", type: "textarea", required: true },
+    {
+      name: "photoMedia",
+      type: "upload",
+      relationTo: "media" as never,
+      required: false,
+      admin: {
+        description:
+          "Upload or select a headshot. This auto-fills the Photo URL.",
+      },
+    },
     { name: "photo", type: "text", required: true },
     { name: "year", type: "number", required: true, index: true },
     { name: "order", type: "number", required: true, defaultValue: 1 },

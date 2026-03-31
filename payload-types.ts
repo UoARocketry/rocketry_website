@@ -68,6 +68,7 @@ export interface Config {
   blocks: {};
   collections: {
     users: User;
+    media: Media;
     events: Event;
     rockets: Rocket;
     executives: Executive;
@@ -84,6 +85,7 @@ export interface Config {
   collectionsJoins: {};
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
+    media: MediaSelect<false> | MediaSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
     rockets: RocketsSelect<false> | RocketsSelect<true>;
     executives: ExecutivesSelect<false> | ExecutivesSelect<true>;
@@ -163,12 +165,36 @@ export interface User {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media".
+ */
+export interface Media {
+  id: number;
+  alt?: string | null;
+  prefix?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "events".
  */
 export interface Event {
   id: number;
   title: string;
   slug: string;
+  /**
+   * Upload or select an image. This auto-fills the Event image URL.
+   */
+  imageMedia?: (number | null) | Media;
   image?: string | null;
   description: string;
   date: string;
@@ -188,6 +214,10 @@ export interface Rocket {
   id: number;
   name: string;
   slug: string;
+  /**
+   * Upload or select an image. This auto-fills the Rocket image URL.
+   */
+  imageMedia?: (number | null) | Media;
   image?: string | null;
   description?: string | null;
   launchedAt?: string | null;
@@ -204,6 +234,10 @@ export interface Executive {
   name: string;
   role: string;
   bio: string;
+  /**
+   * Upload or select a headshot. This auto-fills the Photo URL.
+   */
+  photoMedia?: (number | null) | Media;
   photo: string;
   year: number;
   order: number;
@@ -219,6 +253,10 @@ export interface Executive {
 export interface Sponsor {
   id: number;
   name: string;
+  /**
+   * Upload or select a logo. This auto-fills the Logo URL field.
+   */
+  logoMedia?: (number | null) | Media;
   logo: string;
   url: string;
   description?: string | null;
@@ -235,6 +273,10 @@ export interface WhatWeDo {
   id: number;
   title: string;
   body?: string | null;
+  /**
+   * Upload or select an image. This auto-fills the image URL field.
+   */
+  imageMedia?: (number | null) | Media;
   image?: string | null;
   variant?: ('background' | 'surface') | null;
   order: number;
@@ -250,6 +292,10 @@ export interface JourneyItem {
   id: number;
   title: string;
   body?: string | null;
+  /**
+   * Upload or select an image. This auto-fills the image URL field.
+   */
+  imageMedia?: (number | null) | Media;
   image?: string | null;
   variant?: ('background' | 'surface') | null;
   order: number;
@@ -317,6 +363,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'users';
         value: number | User;
+      } | null)
+    | ({
+        relationTo: 'media';
+        value: number | Media;
       } | null)
     | ({
         relationTo: 'events';
@@ -417,11 +467,31 @@ export interface UsersSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media_select".
+ */
+export interface MediaSelect<T extends boolean = true> {
+  alt?: T;
+  prefix?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "events_select".
  */
 export interface EventsSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
+  imageMedia?: T;
   image?: T;
   description?: T;
   date?: T;
@@ -440,6 +510,7 @@ export interface EventsSelect<T extends boolean = true> {
 export interface RocketsSelect<T extends boolean = true> {
   name?: T;
   slug?: T;
+  imageMedia?: T;
   image?: T;
   description?: T;
   launchedAt?: T;
@@ -455,6 +526,7 @@ export interface ExecutivesSelect<T extends boolean = true> {
   name?: T;
   role?: T;
   bio?: T;
+  photoMedia?: T;
   photo?: T;
   year?: T;
   order?: T;
@@ -469,6 +541,7 @@ export interface ExecutivesSelect<T extends boolean = true> {
  */
 export interface SponsorsSelect<T extends boolean = true> {
   name?: T;
+  logoMedia?: T;
   logo?: T;
   url?: T;
   description?: T;
@@ -484,6 +557,7 @@ export interface SponsorsSelect<T extends boolean = true> {
 export interface WhatWeDoSelect<T extends boolean = true> {
   title?: T;
   body?: T;
+  imageMedia?: T;
   image?: T;
   variant?: T;
   order?: T;
@@ -498,6 +572,7 @@ export interface WhatWeDoSelect<T extends boolean = true> {
 export interface JourneyItemsSelect<T extends boolean = true> {
   title?: T;
   body?: T;
+  imageMedia?: T;
   image?: T;
   variant?: T;
   order?: T;
@@ -583,6 +658,10 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 export interface SiteSetting {
   id: number;
   memberJoinUrl?: string | null;
+  /**
+   * Upload or select an executive team image. This auto-fills the URL field.
+   */
+  execTeamImageMedia?: (number | null) | Media;
   execTeamImageUrl?: string | null;
   _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
@@ -594,6 +673,7 @@ export interface SiteSetting {
  */
 export interface SiteSettingsSelect<T extends boolean = true> {
   memberJoinUrl?: T;
+  execTeamImageMedia?: T;
   execTeamImageUrl?: T;
   _status?: T;
   updatedAt?: T;

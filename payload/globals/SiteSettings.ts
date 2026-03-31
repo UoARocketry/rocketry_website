@@ -1,6 +1,7 @@
 import type { GlobalConfig } from "payload";
-import { revalidatePath } from "next/cache";
+import { revalidatePath } from "next/cache.js";
 import { isLoggedIn, isPublicRead } from "../access/policies.ts";
+import { createMediaRelationUrlSyncHook } from "../hooks/media-url-sync.ts";
 import { revalidatePaths, revalidateTags } from "../hooks/revalidation.ts";
 import { validateOptionalUrl } from "../fields/validators.ts";
 
@@ -12,6 +13,12 @@ export const SiteSettings: GlobalConfig = {
     update: isLoggedIn,
   },
   hooks: {
+    beforeChange: [
+      createMediaRelationUrlSyncHook({
+        relationField: "execTeamImageMedia",
+        urlField: "execTeamImageUrl",
+      }),
+    ],
     afterChange: [
       () => {
         revalidateTags(["settings"]);
@@ -30,6 +37,16 @@ export const SiteSettings: GlobalConfig = {
       required: false,
       validate: (value: unknown) =>
         validateOptionalUrl(value, "Member join URL"),
+    },
+    {
+      name: "execTeamImageMedia",
+      type: "upload",
+      relationTo: "media" as never,
+      required: false,
+      admin: {
+        description:
+          "Upload or select an executive team image. This auto-fills the URL field.",
+      },
     },
     {
       name: "execTeamImageUrl",

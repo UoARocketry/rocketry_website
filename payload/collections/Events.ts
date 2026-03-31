@@ -5,6 +5,7 @@ import {
   revalidatePaths,
   revalidateTags,
 } from "../hooks/revalidation.ts";
+import { createMediaRelationUrlSyncHook } from "../hooks/media-url-sync.ts";
 import { validateOptionalUrl } from "../fields/validators.ts";
 
 export const Events: CollectionConfig = {
@@ -23,6 +24,12 @@ export const Events: CollectionConfig = {
     delete: isLoggedIn,
   },
   hooks: {
+    beforeChange: [
+      createMediaRelationUrlSyncHook({
+        relationField: "imageMedia",
+        urlField: "image",
+      }),
+    ],
     afterChange: [
       ({ doc, previousDoc }) => {
         const currentSlug = getStringField(doc, "slug");
@@ -62,6 +69,16 @@ export const Events: CollectionConfig = {
   fields: [
     { name: "title", type: "text", required: true },
     { name: "slug", type: "text", required: true, unique: true, index: true },
+    {
+      name: "imageMedia",
+      type: "upload",
+      relationTo: "media" as never,
+      required: false,
+      admin: {
+        description:
+          "Upload or select an image. This auto-fills the Event image URL.",
+      },
+    },
     {
       name: "image",
       type: "text",
