@@ -1,133 +1,167 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import BurgerMenu from "./ui/burger-menu";
 
-export default function Navigation() {
+type NavigationProps = {
+  joinUrl: string;
+};
+
+export default function Navigation({ joinUrl }: NavigationProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  const pathname = usePathname();
+  const hasJoinUrl = Boolean(joinUrl.trim());
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
+  useEffect(() => {
+    const updateNavState = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+
+    updateNavState();
+    window.addEventListener("scroll", updateNavState, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", updateNavState);
+    };
+  }, []);
+
+  const navLinks = [
+    { href: "/", label: "HOME" },
+    { href: "/about", label: "ABOUT" },
+    { href: "/events", label: "EVENTS" },
+    { href: "/rockets", label: "ROCKETS" },
+    { href: "/sponsors", label: "SPONSORS" },
+  ];
+
   return (
-    <nav className="!bg-surface shadow-md border-b border-surface fixed w-full top-0 z-50" style={{ backgroundColor: '#232323'}}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div className="flex justify-between items-center h-20">
+    <nav
+      id="site-navigation"
+      className={`fixed w-full top-0 z-50 transition-all duration-300 ${
+        isScrolled
+          ? "bg-elevated/95 backdrop-blur-md border-b border-border shadow-lg"
+          : "bg-transparent border-b border-transparent"
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div
+          className={`flex justify-between items-center transition-all duration-300 ${
+            isScrolled ? "h-16" : "h-20"
+          }`}
+        >
           {/* Logo */}
-          <div className="flex-shrink-0 flex items-center">
-            <Link href="/">
-              <img
-                src="/UARC logo.png"
-                alt="UARC Logo"
-                className="h-14 w-auto object-contain drop-shadow-lg"
-                style={{ filter: 'drop-shadow(0 10px 8px rgba(0,0,0,0.5))' }}
-              />
-            </Link>
-          </div>
+          <Link href="/" className="shrink-0 flex items-center group">
+            <Image
+              src="/UARC logo.png"
+              alt="UARC Logo"
+              width={240}
+              height={96}
+              className={`w-auto object-contain transition-all duration-300 group-hover:opacity-80 ${
+                isScrolled ? "h-10" : "h-12"
+              }`}
+            />
+          </Link>
 
           {/* Desktop nav */}
-          <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-8">
+          <div className="hidden lg:flex items-center gap-1">
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  aria-current={isActive ? "page" : undefined}
+                  className={`relative px-4 py-2 text-sm font-medium tracking-wide transition-colors duration-200 ${
+                    isActive
+                      ? "text-primary"
+                      : "text-text-secondary hover:text-text-main"
+                  }`}
+                >
+                  {link.label}
+                  {isActive && (
+                    <span className="absolute bottom-0 left-4 right-4 h-0.5 bg-primary rounded-full" />
+                  )}
+                </Link>
+              );
+            })}
+            {hasJoinUrl && (
               <Link
-                href="/about"
-                className="underline-animate text-text-main hover:text-primary px-4 py-2 rounded-none text-sm font-medium transition-colors uppercase">
-                ABOUT
-              </Link>
-              <Link
-                href="/events"
-                className="underline-animate text-text-main hover:text-primary px-4 py-2 rounded-none text-sm font-medium transition-colors uppercase">
-                EVENTS
-              </Link>
-              <Link
-                href="/rockets"
-                className="underline-animate text-text-main hover:text-primary px-4 py-2 rounded-none text-sm font-medium transition-colors uppercase">
-                ROCKETS
-              </Link>
-              <Link
-                href="/sponsors"
-                className="underline-animate text-text-main hover:text-primary px-4 py-2 rounded-none text-sm font-medium transition-colors uppercase">
-                SPONSORS
-              </Link>
-              <Link
-                href="https://docs.google.com/forms/d/e/1FAIpQLSfS7PS--UX-fQinUfuYzVLV3-rM92cW7uVFOqoEVczgYLb8Qg/viewform?usp=sf_link"
-                className="text-white px-6 py-2 rounded-lg text-base font-bold uppercase text-center"
-                style={{ 
-                  boxShadow: '0 4px 12px 0 rgba(0,0,0,0.25)',
-                  background: '#ea580c',
-                  color: '#ffffff',
-                  transition: 'all 0.2s ease-in-out',
-                  transform: 'scale(1)'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'scale(1.02)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'scale(1)';
-                }}
+                href={joinUrl}
+                className="ml-4 bg-primary hover:bg-primary-dark px-5 py-2 rounded-lg text-sm font-semibold tracking-wide text-white transition-all duration-200 hover:shadow-lg hover:shadow-primary/20"
+                style={{ color: "#ffffff" }}
                 target="_blank"
-                rel="noopener noreferrer">
-                SIGN UP
+                rel="noopener noreferrer"
+              >
+                JOIN US
               </Link>
-            </div>
+            )}
           </div>
 
           {/* Burger menu button */}
-          <div className="md:hidden">
-            <button onClick={toggleMenu} className="text-text-main hover:text-primary cursor-pointer focus:outline-none focus:text-primary">
-              <BurgerMenu isOpen={isMenuOpen} />
-            </button>
-          </div>
+          <button
+            onClick={toggleMenu}
+            type="button"
+            className="cursor-pointer lg:hidden p-2 text-text-secondary hover:text-text-main transition-colors"
+            aria-label="Toggle menu"
+            aria-expanded={isMenuOpen}
+            aria-controls="mobile-navigation"
+          >
+            <BurgerMenu isOpen={isMenuOpen} />
+          </button>
         </div>
 
-        {/* Burger nav */}
-        {isMenuOpen && (
-          <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-4 sm:px-3 bg-surface border-t border-surface">
-              {/* Links row - centered */}
-              <div className="flex flex-wrap justify-center items-center gap-4">
-                <Link href="/about" className="underline-animate text-text-main hover:text-primary px-3 py-2 rounded-none text-sm font-medium uppercase text-center" onClick={() => setIsMenuOpen(false)}>
-                  ABOUT
+        {/* Mobile nav */}
+        <div
+          id="mobile-navigation"
+          className={`lg:hidden -mx-4 sm:-mx-6 overflow-hidden transition-all duration-300 ease-in-out ${
+            isMenuOpen
+              ? "max-h-96 opacity-100 bg-elevated/95 backdrop-blur-md border-t border-border"
+              : "max-h-0 opacity-0"
+          }`}
+        >
+          <div className="py-4 space-y-1">
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  aria-current={isActive ? "page" : undefined}
+                  className={`block px-4 py-3 text-sm font-medium tracking-wide transition-colors duration-200 rounded-lg ${
+                    isActive
+                      ? "text-primary bg-primary/10"
+                      : "text-text-secondary hover:text-text-main hover:bg-elevated"
+                  }`}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {link.label}
                 </Link>
-                <Link href="/events" className="underline-animate text-text-main hover:text-primary px-3 py-2 rounded-none text-sm font-medium uppercase text-center" onClick={() => setIsMenuOpen(false)}>
-                  EVENTS
-                </Link>
-                <Link href="/rockets" className="underline-animate text-text-main hover:text-primary px-3 py-2 rounded-none text-sm font-medium uppercase text-center" onClick={() => setIsMenuOpen(false)}>
-                  ROCKETS
-                </Link>
-                <Link href="/sponsors" className="underline-animate text-text-main hover:text-primary px-3 py-2 rounded-none text-sm font-medium uppercase text-center" onClick={() => setIsMenuOpen(false)}>
-                  SPONSORS
-                </Link>
-              </div>
-              
-              {/* Button - centered below links */}
-              <div className="flex justify-center w-full">
-                <Link 
-                  href="https://docs.google.com/forms/d/e/1FAIpQLSfS7PS--UX-fQinUfuYzVLV3-rM92cW7uVFOqoEVczgYLb8Qg/viewform?usp=sf_link" 
-                  className="bg-primary hover:bg-[#a94425] text-white px-6 py-3 rounded-lg text-base font-bold uppercase text-center w-full" 
-                  style={{ 
-                    boxShadow: '0 4px 12px 0 rgba(0,0,0,0.25)',
-                    background: '#ea580c',
-                    color: '#ffffff',
-                    transition: 'all 0.2s ease-in-out',
-                    transform: 'scale(1)'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'scale(1.02)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'scale(1)';
-                  }}
+              );
+            })}
+            {hasJoinUrl && (
+              <div className="pt-4 px-4">
+                <Link
+                  href={joinUrl}
+                  className="block w-full bg-primary hover:bg-primary-dark text-white text-center px-5 py-3 rounded-lg text-sm font-semibold tracking-wide transition-all duration-200"
+                  style={{ color: "#ffffff" }}
                   onClick={() => setIsMenuOpen(false)}
                   target="_blank"
-                  rel="noopener noreferrer">
-                  SIGN UP
+                  rel="noopener noreferrer"
+                >
+                  JOIN US
                 </Link>
               </div>
-            </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </nav>
   );

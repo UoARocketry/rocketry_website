@@ -1,83 +1,176 @@
 @import "tailwindcss";
 
-body {
-  background: #181818;
-  color: #fff;
-  font-family: var(--font-geist-sans), sans-serif;
+@theme inline {
+  /* Background colors for alternating sections - more contrast */
+  --color-background: #0a0a0a;
+  --color-surface: #141414;
+  --color-elevated: #1a1a1a;
+  
+  /* Text colors */
+  --color-text-main: #ffffff;
+  --color-text-secondary: #888888;
+  --color-text-muted: #555555;
+  
+  /* Brand colors - refined orange palette */
+  --color-primary: #C25632;
+  --color-primary-light: #d96a47;
+  --color-primary-dark: #a94425;
+  --color-primary-glow: rgba(194, 86, 50, 0.15);
+  
+  /* Accent colors */
+  --color-accent: #E0E0E0;
+  --color-accent-muted: #666666;
+  
+  /* Card/component backgrounds */
+  --color-card: #111111;
+  --color-card-hover: #1a1a1a;
+  
+  /* Border colors */
+  --color-border: #222222;
+  --color-border-hover: #333333;
+  --color-border-active: #C25632;
 }
 
+/* Base body styling */
+body {
+  background: var(--color-background);
+  color: var(--color-text-main);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography - cleaner, more modern */
 h1 {
-  background: linear-gradient(135deg, #C25632 0%, #E0E0E0 50%, #C25632 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-  font-weight: 900;
-  text-shadow: 0 2px 4px rgba(194, 86, 50, 0.3);
-  position: relative;
+  color: #ffffff;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
 }
 
 h2 {
-  background: linear-gradient(90deg, #C25632, #E0E0E0);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-  font-weight: 800;
-  position: relative;
+  color: #ffffff;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
 }
 
 h3, h4, h5, h6 {
-  color: #C25632;
-  font-weight: 700;
+  color: #ffffff;
+  font-weight: 600;
 }
 
+/* Links with smooth transitions */
 a {
-  color: #C25632;
-  transition: color 0.2s;
+  color: var(--color-primary);
+  transition: color 0.2s ease;
 }
 a:hover, a:focus {
-  color: #E0E0E0;
+  color: var(--color-primary-light);
 }
 
+/* Primary button styling */
 .button, .btn {
-  background: #C25632;
+  background: var(--color-primary);
   color: #fff;
-  border-radius: 0.5rem;
-  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
   font-weight: 600;
-  transition: background 0.2s;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .button:hover, .btn:hover {
-  background: #a94425;
+  background: var(--color-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px var(--color-primary-glow);
 }
 
+/* Secondary/outline button */
+.button-secondary {
+  background: transparent;
+  color: var(--color-text-main);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.button-secondary:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-primary-glow);
+}
+
+/* Card base styling */
 .card, .section {
-  background: #232323;
-  border-radius: 1rem;
-  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.12);
+  background: var(--color-card);
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
   padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+.card:hover, .section:hover {
+  border-color: var(--color-border-hover);
 }
 
-/* Underline animation for links */
+/* Underline animation for links - refined */
 .underline-animate {
   position: relative;
   display: inline-block;
-  overflow: hidden;
 }
 .underline-animate::after {
   content: "";
   position: absolute;
   left: 0;
-  bottom: 0;
+  bottom: -2px;
   width: 100%;
   height: 2px;
-  background: #C25632;
+  background: var(--color-primary);
   transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.3s ease;
+  transform-origin: right;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .underline-animate:hover::after,
 .underline-animate:focus::after {
   transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* Section transitions - subtle gradient fade */
+.section-fade-bottom {
+  position: relative;
+}
+.section-fade-bottom::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-border), transparent);
+}
+
+/* Glow effect for interactive elements */
+.glow-hover {
+  transition: box-shadow 0.3s ease;
+}
+.glow-hover:hover {
+  box-shadow: 0 0 20px var(--color-primary-glow), 0 0 40px var(--color-primary-glow);
+}
+
+/* Focus ring styling */
+*:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Selection styling */
+::selection {
+  background: var(--color-primary);
+  color: white;
 }

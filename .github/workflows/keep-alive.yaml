@@ -1,0 +1,19 @@
+name: Keep Supabase Awake
+
+on:
+  schedule:
+    # Runs at 12:00 UTC every Monday and Thursday
+    - cron: "0 12 * * 1,4"
+  workflow_dispatch: # Allows you to manually click a "Run workflow" button in GitHub
+
+jobs:
+  ping-supabase:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase REST API
+        run: |
+          curl --silent --show-error --fail-with-body \
+          --retry 3 --retry-delay 5 --connect-timeout 10 \
+          "${{ secrets.SUPABASE_URL }}/rest/v1/payload_migrations?select=id&limit=1" \
+          -H "apikey: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+          -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}"
