@@ -12,8 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      DIRECT_URL: ${{ secrets.DIRECT_URL }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL || vars.DATABASE_URL }}
+      DIRECT_URL: ${{ secrets.DIRECT_URL || vars.DIRECT_URL }}
 
     steps:
       - name: Checkout
@@ -30,6 +30,26 @@ jobs:
 
       - name: Lint
         run: npm run lint
+
+      - name: Validate DB environment
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ -n "${DIRECT_URL:-}" || -n "${DATABASE_URL:-}" ]]; then
+            echo "Database build env is configured."
+            exit 0
+          fi
+
+          echo "::error::Missing DATABASE_URL/DIRECT_URL in workflow context."
+
+          if [[ "${{ github.event_name }}" == "pull_request" && "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.repository }}" ]]; then
+            echo "::error::This run is from a fork PR; repository secrets are not exposed to pull_request workflows."
+          else
+            echo "::error::Add DATABASE_URL or DIRECT_URL as repository secrets (or vars), or configure the job environment that contains them."
+          fi
+
+          exit 1
 
       - name: Build
         run: npm run build
