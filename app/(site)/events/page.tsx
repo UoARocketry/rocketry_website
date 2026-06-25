@@ -10,6 +10,7 @@ import {
   normalizeEventTag,
   normalizeEventTagParam,
 } from "@/lib/utils";
+import { PLACEHOLDER_IMAGE } from "@/lib/constants";
 
 type EventLocal = EventSummary;
 
@@ -33,9 +34,6 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
     upcoming = [];
     past = [];
   }
-
-  const placeholder =
-    "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80";
 
   const tagMap = new Map<string, string>();
 
@@ -112,7 +110,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
                   className="block"
                 >
                   <Card
-                    image={event.image ?? placeholder}
+                    image={event.image ?? PLACEHOLDER_IMAGE}
                     title={event.title}
                     date={formatDateShort(event.date)}
                     tag={formatEventTagLabel(event.eventTag)}
@@ -151,7 +149,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
                   className="block"
                 >
                   <Card
-                    image={event.image ?? placeholder}
+                    image={event.image ?? PLACEHOLDER_IMAGE}
                     title={event.title}
                     date={formatDateShort(event.date)}
                     tag={formatEventTagLabel(event.eventTag)}

@@ -11,6 +11,7 @@ import {
   type EventSummary,
   type RocketSummary,
 } from "@/lib/site-data";
+import { PLACEHOLDER_IMAGE } from "@/lib/constants";
 
 export default async function HomePage() {
   let featuredRockets: RocketSummary[] = [];
@@ -31,8 +32,6 @@ export default async function HomePage() {
     console.error("[app/home] Failed to load homepage data:", error);
   }
 
-  const eventPlaceholder =
-    "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80";
   const hasJoinUrl = Boolean(joinUrl.trim());
 
   return (
@@ -127,7 +126,7 @@ export default async function HomePage() {
                   className="block"
                 >
                   <Card
-                    image={rocket.image ?? ""}
+                    image={rocket.image ?? PLACEHOLDER_IMAGE}
                     title={rocket.name}
                     date={
                       rocket.launchedAt
@@ -194,7 +193,7 @@ export default async function HomePage() {
                   className="block"
                 >
                   <Card
-                    image={event.image ?? eventPlaceholder}
+                    image={event.image ?? PLACEHOLDER_IMAGE}
                     title={event.title}
                     date={new Date(event.date).toLocaleDateString()}
                     tag={event.eventTag ?? "General"}

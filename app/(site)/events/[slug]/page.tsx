@@ -3,13 +3,11 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getEventBySlug } from "@/lib/site-data";
 import { formatDateWithTime } from "@/lib/utils";
+import { PLACEHOLDER_IMAGE } from "@/lib/constants";
 
 interface EventPageProps {
   readonly params: Promise<{ slug: string }>;
 }
-
-const placeholder =
-  "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=800&q=80";
 
 export default async function EventPage({ params }: EventPageProps) {
   const { slug } = await params;
@@ -34,7 +32,7 @@ export default async function EventPage({ params }: EventPageProps) {
           {/* Event Image */}
           <div className="relative">
             <Image
-              src={event.image ?? placeholder}
+              src={event.image ?? PLACEHOLDER_IMAGE}
               alt={event.title}
               width={1200}
               height={900}
