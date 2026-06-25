@@ -7,6 +7,7 @@ import {
   type RocketSummary,
 } from "@/lib/site-data";
 import { formatDateShort } from "@/lib/utils";
+import { PLACEHOLDER_IMAGE } from "@/lib/constants";
 
 type RocketItem = RocketSummary;
 
@@ -65,7 +66,7 @@ export default async function RocketsPage() {
                   className="block"
                 >
                   <Card
-                    image={rocket.image ?? ""}
+                    image={rocket.image ?? PLACEHOLDER_IMAGE}
                     title={rocket.name}
                     date={
                       rocket.launchedAt
