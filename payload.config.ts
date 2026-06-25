@@ -3,6 +3,12 @@ import { fileURLToPath } from "node:url";
 import { postgresAdapter } from "@payloadcms/db-postgres";
 import { s3Storage } from "@payloadcms/storage-s3";
 import { buildConfig } from "payload";
+import {
+  buildAllowedOrigins,
+  resolveDatabaseUrl,
+  resolvePayloadSecret,
+  resolveServerUrl,
+} from "@/lib/env";
 import { Events } from "./payload/collections/Events.ts";
 import { Executives } from "./payload/collections/Executives.ts";
 import { JourneyItems } from "./payload/collections/JourneyItems.ts";
@@ -18,9 +24,10 @@ import { SiteSettings } from "./payload/globals/SiteSettings.ts";
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 
-const databaseUrl = process.env.DIRECT_URL || process.env.DATABASE_URL || "";
-const payloadSecret =
-  process.env.PAYLOAD_SECRET || "dev-only-secret-change-before-production";
+const databaseUrl = resolveDatabaseUrl();
+const payloadSecret = resolvePayloadSecret();
+const allowedOrigins = buildAllowedOrigins();
+const serverUrl = resolveServerUrl();
 const supabaseBucket = process.env.SUPABASE_STORAGE_BUCKET || "";
 const supabaseS3Endpoint = process.env.SUPABASE_STORAGE_S3_ENDPOINT || "";
 const supabaseS3Region = process.env.SUPABASE_STORAGE_S3_REGION || "us-east-1";
@@ -100,12 +107,6 @@ const supabaseStoragePlugins = isSupabaseStorageConfigured
     ]
   : [];
 
-if (!databaseUrl) {
-  throw new Error(
-    "Missing database connection string. Set DIRECT_URL or DATABASE_URL.",
-  );
-}
-
 export default buildConfig({
   admin: {
     user: Users.slug,
@@ -126,6 +127,9 @@ export default buildConfig({
     Stats,
   ],
   globals: [SiteSettings],
+  serverURL: serverUrl,
+  cors: allowedOrigins,
+  csrf: allowedOrigins,
   secret: payloadSecret,
   db: postgresAdapter({
     push: false,
