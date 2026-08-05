@@ -3,10 +3,7 @@ import { fileURLToPath } from "node:url";
 import { postgresAdapter } from "@payloadcms/db-postgres";
 import { s3Storage } from "@payloadcms/storage-s3";
 import { buildConfig } from "payload";
-import {
-  buildAllowedOrigins,
-  resolveServerUrl,
-} from "@/lib/env";
+import { buildAllowedOrigins, resolveServerUrl } from "@/lib/env";
 import { Events } from "./payload/collections/Events.ts";
 import { Executives } from "./payload/collections/Executives.ts";
 import { JourneyItems } from "./payload/collections/JourneyItems.ts";
