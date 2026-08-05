@@ -1,5 +1,6 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { resendAdapter } from "@payloadcms/email-resend";
 import { postgresAdapter } from "@payloadcms/db-postgres";
 import { s3Storage } from "@payloadcms/storage-s3";
 import { buildConfig } from "payload";
@@ -24,6 +25,11 @@ const databaseUrl =
 const payloadSecret =
   process.env.PAYLOAD_SECRET?.trim() ||
   "dev-only-secret-change-before-production";
+const resendApiKey = process.env.RESEND_API_KEY?.trim() || "";
+const resendFromAddress =
+  process.env.PAYLOAD_EMAIL_FROM_ADDRESS?.trim() || "no-reply@example.com";
+const resendFromName =
+  process.env.PAYLOAD_EMAIL_FROM_NAME?.trim() || "UARC Website";
 const allowedOrigins = buildAllowedOrigins();
 const serverUrl = resolveServerUrl();
 const supabaseBucket = process.env.SUPABASE_STORAGE_BUCKET || "";
@@ -112,6 +118,15 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
+  ...(resendApiKey
+    ? {
+        email: resendAdapter({
+          apiKey: resendApiKey,
+          defaultFromAddress: resendFromAddress,
+          defaultFromName: resendFromName,
+        }),
+      }
+    : {}),
   collections: [
     Users,
     Media,
