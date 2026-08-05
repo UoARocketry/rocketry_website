@@ -5,8 +5,6 @@ import { s3Storage } from "@payloadcms/storage-s3";
 import { buildConfig } from "payload";
 import {
   buildAllowedOrigins,
-  resolveDatabaseUrl,
-  resolvePayloadSecret,
   resolveServerUrl,
 } from "@/lib/env";
 import { Events } from "./payload/collections/Events.ts";
@@ -24,8 +22,11 @@ import { SiteSettings } from "./payload/globals/SiteSettings.ts";
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 
-const databaseUrl = resolveDatabaseUrl();
-const payloadSecret = resolvePayloadSecret();
+const databaseUrl =
+  process.env.DIRECT_URL?.trim() || process.env.DATABASE_URL?.trim() || "";
+const payloadSecret =
+  process.env.PAYLOAD_SECRET?.trim() ||
+  "dev-only-secret-change-before-production";
 const allowedOrigins = buildAllowedOrigins();
 const serverUrl = resolveServerUrl();
 const supabaseBucket = process.env.SUPABASE_STORAGE_BUCKET || "";
