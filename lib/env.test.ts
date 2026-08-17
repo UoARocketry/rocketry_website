@@ -25,10 +25,10 @@ describe("isProductionRuntime", () => {
 });
 
 describe("resolveDatabaseUrl", () => {
-  it("prefers DIRECT_URL", () => {
+  it("prefers DATABASE_URL", () => {
     expect(
       resolveDatabaseUrl({ DIRECT_URL: "a", DATABASE_URL: "b" }),
-    ).toBe("a");
+    ).toBe("b");
   });
   it("throws when neither is set", () => {
     expect(() => resolveDatabaseUrl({})).toThrow(/database/i);

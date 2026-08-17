@@ -14,7 +14,7 @@ export function isProductionRuntime(env: EnvRecord = process.env): boolean {
 }
 
 export function resolveDatabaseUrl(env: EnvRecord = process.env): string {
-  const url = (env.DIRECT_URL || env.DATABASE_URL || "").trim();
+  const url = (env.DATABASE_URL || env.DIRECT_URL || "").trim();
   if (!url) {
     throw new Error(
       "Missing database connection string. Set DIRECT_URL or DATABASE_URL.",

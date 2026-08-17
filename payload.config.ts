@@ -21,7 +21,7 @@ const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 
 const databaseUrl =
-  process.env.DIRECT_URL?.trim() || process.env.DATABASE_URL?.trim() || "";
+  process.env.DATABASE_URL?.trim() || process.env.DIRECT_URL?.trim() || "";
 const payloadSecret =
   process.env.PAYLOAD_SECRET?.trim() ||
   "dev-only-secret-change-before-production";
