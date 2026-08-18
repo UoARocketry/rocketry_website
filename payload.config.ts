@@ -4,6 +4,7 @@ import { resendAdapter } from "@payloadcms/email-resend";
 import { postgresAdapter } from "@payloadcms/db-postgres";
 import { s3Storage } from "@payloadcms/storage-s3";
 import { buildConfig } from "payload";
+import sharp from "sharp";
 import { buildAllowedOrigins, resolveServerUrl } from "@/lib/env";
 import { Events } from "./payload/collections/Events.ts";
 import { Executives } from "./payload/collections/Executives.ts";
@@ -151,6 +152,7 @@ export default buildConfig({
     },
   }),
   plugins: supabaseStoragePlugins,
+  sharp,
   typescript: {
     outputFile: path.resolve(dirname, "payload-types.ts"),
   },

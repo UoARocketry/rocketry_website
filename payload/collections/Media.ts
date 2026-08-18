@@ -36,6 +36,16 @@ export const Media: CollectionConfig = {
   },
   upload: {
     mimeTypes: ["image/*"],
+    resizeOptions: {
+      width: 2560,
+      height: 2560,
+      fit: "inside",
+      withoutEnlargement: true,
+    },
+    formatOptions: {
+      format: "webp",
+      options: { quality: 80 },
+    },
   },
   fields: [
     {
