@@ -92,7 +92,15 @@ export const Events: CollectionConfig = {
     },
     { name: "description", type: "textarea", required: true },
     { name: "date", type: "date", required: true },
-    { name: "eventTag", type: "text", required: false },
+    {
+      name: "eventTag",
+      type: "relationship",
+      relationTo: "event-tags" as never,
+      required: false,
+      admin: {
+        description: "Manage the available tags in the Event Tags collection.",
+      },
+    },
     {
       name: "signupUrl",
       type: "text",

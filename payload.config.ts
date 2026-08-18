@@ -6,12 +6,14 @@ import { s3Storage } from "@payloadcms/storage-s3";
 import { buildConfig } from "payload";
 import sharp from "sharp";
 import { buildAllowedOrigins, resolveServerUrl } from "./lib/env.ts";
+import { EventTags } from "./payload/collections/EventTags.ts";
 import { Events } from "./payload/collections/Events.ts";
 import { Executives } from "./payload/collections/Executives.ts";
 import { JourneyItems } from "./payload/collections/JourneyItems.ts";
 import { Media } from "./payload/collections/Media.ts";
 import { Rockets } from "./payload/collections/Rockets.ts";
 import { Sponsors } from "./payload/collections/Sponsors.ts";
+import { SponsorTiers } from "./payload/collections/SponsorTiers.ts";
 import { Stats } from "./payload/collections/Stats.ts";
 import { TeamRoles } from "./payload/collections/TeamRoles.ts";
 import { Users } from "./payload/collections/Users.ts";
@@ -132,9 +134,11 @@ export default buildConfig({
     Users,
     Media,
     Events,
+    EventTags,
     Rockets,
     Executives,
     Sponsors,
+    SponsorTiers,
     WhatWeDo,
     JourneyItems,
     TeamRoles,

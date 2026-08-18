@@ -57,19 +57,21 @@ export default async function SponsorsPage() {
       {/* Sponsor Tiers */}
       {tierSections.map((tier, idx) => (
         <section
-          key={tier.key}
+          key={tier.id}
           className={`py-24 px-4 relative ${idx % 2 === 0 ? "bg-surface" : "bg-background"}`}
         >
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
           <div className="max-w-7xl mx-auto">
             <div className="mb-10">
               <p className="text-primary text-sm font-medium uppercase tracking-wider mb-2">
-                {tier.key} Tier
+                {tier.name} Tier
               </p>
               <h2 className="text-2xl md:text-3xl font-bold mb-2">
-                {tier.title}
+                {tier.name} Sponsors
               </h2>
-              <p className="text-text-secondary">{tier.description}</p>
+              {tier.description && (
+                <p className="text-text-secondary">{tier.description}</p>
+              )}
             </div>
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
               {tier.sponsors.map((sponsor: Sponsor) => (

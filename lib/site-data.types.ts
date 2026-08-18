@@ -52,13 +52,20 @@ export type Stat = {
   label: string;
 };
 
+export type SponsorTier = {
+  id: number;
+  name: string;
+  description?: string | null;
+  order: number;
+};
+
 export type Sponsor = {
   id: number;
   name: string;
   logo: string;
   url: string;
   description?: string | null;
-  tier?: string | null;
+  tier?: SponsorTier | null;
 };
 
 export type EventsOverview = {

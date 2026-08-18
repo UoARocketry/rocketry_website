@@ -70,9 +70,11 @@ export interface Config {
     users: User;
     media: Media;
     events: Event;
+    'event-tags': EventTag;
     rockets: Rocket;
     executives: Executive;
     sponsors: Sponsor;
+    'sponsor-tiers': SponsorTier;
     'what-we-do': WhatWeDo;
     'journey-items': JourneyItem;
     'team-roles': TeamRole;
@@ -87,9 +89,11 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
+    'event-tags': EventTagsSelect<false> | EventTagsSelect<true>;
     rockets: RocketsSelect<false> | RocketsSelect<true>;
     executives: ExecutivesSelect<false> | ExecutivesSelect<true>;
     sponsors: SponsorsSelect<false> | SponsorsSelect<true>;
+    'sponsor-tiers': SponsorTiersSelect<false> | SponsorTiersSelect<true>;
     'what-we-do': WhatWeDoSelect<false> | WhatWeDoSelect<true>;
     'journey-items': JourneyItemsSelect<false> | JourneyItemsSelect<true>;
     'team-roles': TeamRolesSelect<false> | TeamRolesSelect<true>;
@@ -201,12 +205,26 @@ export interface Event {
   image?: string | null;
   description: string;
   date: string;
-  eventTag?: string | null;
+  /**
+   * Manage the available tags in the Event Tags collection.
+   */
+  eventTag?: (number | null) | EventTag;
   signupUrl?: string | null;
   location?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "event-tags".
+ */
+export interface EventTag {
+  id: number;
+  name: string;
+  order: number;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -271,10 +289,25 @@ export interface Sponsor {
   logo: string;
   url: string;
   description?: string | null;
-  tier?: ('GOLD' | 'SILVER' | 'BRONZE') | null;
+  /**
+   * Manage the available tiers in the Sponsor Tiers collection.
+   */
+  tier?: (number | null) | SponsorTier;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sponsor-tiers".
+ */
+export interface SponsorTier {
+  id: number;
+  name: string;
+  description?: string | null;
+  order: number;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -384,6 +417,10 @@ export interface PayloadLockedDocument {
         value: number | Event;
       } | null)
     | ({
+        relationTo: 'event-tags';
+        value: number | EventTag;
+      } | null)
+    | ({
         relationTo: 'rockets';
         value: number | Rocket;
       } | null)
@@ -394,6 +431,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'sponsors';
         value: number | Sponsor;
+      } | null)
+    | ({
+        relationTo: 'sponsor-tiers';
+        value: number | SponsorTier;
       } | null)
     | ({
         relationTo: 'what-we-do';
@@ -515,6 +556,16 @@ export interface EventsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "event-tags_select".
+ */
+export interface EventTagsSelect<T extends boolean = true> {
+  name?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "rockets_select".
  */
 export interface RocketsSelect<T extends boolean = true> {
@@ -559,6 +610,17 @@ export interface SponsorsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sponsor-tiers_select".
+ */
+export interface SponsorTiersSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

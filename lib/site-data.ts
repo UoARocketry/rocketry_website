@@ -6,6 +6,7 @@ import type {
   Rocket as PayloadRocket,
   SiteSetting as PayloadSiteSettings,
   Sponsor as PayloadSponsor,
+  SponsorTier as PayloadSponsorTier,
   Stat as PayloadStat,
   TeamRole as PayloadTeamRole,
   WhatWeDo as PayloadWhatWeDo,
@@ -23,6 +24,7 @@ import type {
   RocketSummary,
   SiteSettings,
   Sponsor,
+  SponsorTier,
   Stat,
   TeamRole,
 } from "@/lib/site-data.types";
@@ -39,6 +41,7 @@ export type {
   RocketSummary,
   SiteSettings,
   Sponsor,
+  SponsorTier,
   Stat,
   TeamRole,
 } from "@/lib/site-data.types";
@@ -140,6 +143,11 @@ function mapRocket(doc: PayloadRocket): RocketSummary {
 }
 
 function mapEvent(doc: PayloadEvent): EventSummary {
+  const eventTag =
+    doc.eventTag && typeof doc.eventTag === "object"
+      ? doc.eventTag.name
+      : null;
+
   return {
     id: doc.id,
     title: doc.title,
@@ -147,7 +155,7 @@ function mapEvent(doc: PayloadEvent): EventSummary {
     image: doc.image ?? null,
     description: doc.description ?? null,
     date: normalizeEventDate(doc.date),
-    eventTag: doc.eventTag ?? null,
+    eventTag,
     signupUrl: doc.signupUrl ?? null,
     location: doc.location ?? null,
   };
@@ -190,14 +198,26 @@ function mapStat(doc: PayloadStat): Stat {
   };
 }
 
+function mapSponsorTier(doc: PayloadSponsorTier): SponsorTier {
+  return {
+    id: doc.id,
+    name: doc.name,
+    description: doc.description ?? null,
+    order: doc.order,
+  };
+}
+
 function mapSponsor(doc: PayloadSponsor): Sponsor {
+  const tier =
+    doc.tier && typeof doc.tier === "object" ? mapSponsorTier(doc.tier) : null;
+
   return {
     id: doc.id,
     name: doc.name,
     logo: doc.logo,
     url: doc.url,
     description: doc.description ?? null,
-    tier: doc.tier ?? null,
+    tier,
   };
 }
 

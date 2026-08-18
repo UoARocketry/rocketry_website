@@ -2,7 +2,6 @@ import type { CollectionConfig } from "payload";
 import { isLoggedIn, isPublicRead } from "../access/policies.ts";
 import { createMediaRelationUrlSyncHook } from "../hooks/media-url-sync.ts";
 import { revalidatePaths, revalidateTags } from "../hooks/revalidation.ts";
-import { SPONSOR_TIER_OPTIONS } from "../fields/options.ts";
 import { validateRequiredUrl } from "../fields/validators.ts";
 
 export const Sponsors: CollectionConfig = {
@@ -71,9 +70,12 @@ export const Sponsors: CollectionConfig = {
     { name: "description", type: "textarea", required: false },
     {
       name: "tier",
-      type: "select",
+      type: "relationship",
+      relationTo: "sponsor-tiers" as never,
       required: false,
-      options: SPONSOR_TIER_OPTIONS,
+      admin: {
+        description: "Manage the available tiers in the Sponsor Tiers collection.",
+      },
     },
   ],
 };
