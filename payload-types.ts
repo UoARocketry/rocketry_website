@@ -195,6 +195,9 @@ export interface Event {
    * Upload or select an image. This auto-fills the Event image URL.
    */
   imageMedia?: (number | null) | Media;
+  /**
+   * Auto-filled from the upload above whenever a file is selected there (overwrites this field on save). Leave the upload empty to link an external image URL directly instead.
+   */
   image?: string | null;
   description: string;
   date: string;
@@ -217,6 +220,9 @@ export interface Rocket {
    * Upload or select an image. This auto-fills the Rocket image URL.
    */
   imageMedia?: (number | null) | Media;
+  /**
+   * Auto-filled from the upload above whenever a file is selected there (overwrites this field on save). Leave the upload empty to link an external image URL directly instead.
+   */
   image?: string | null;
   description?: string | null;
   launchedAt?: string | null;
@@ -237,6 +243,9 @@ export interface Executive {
    * Upload or select a headshot. This auto-fills the Photo URL.
    */
   photoMedia?: (number | null) | Media;
+  /**
+   * Auto-filled from the upload above whenever a file is selected there (overwrites this field on save). Leave the upload empty to link an external image URL directly instead.
+   */
   photo: string;
   year: number;
   order: number;
@@ -256,6 +265,9 @@ export interface Sponsor {
    * Upload or select a logo. This auto-fills the Logo URL field.
    */
   logoMedia?: (number | null) | Media;
+  /**
+   * Auto-filled from the upload above whenever a file is selected there (overwrites this field on save). Leave the upload empty to link an external logo URL directly instead.
+   */
   logo: string;
   url: string;
   description?: string | null;
