@@ -67,12 +67,12 @@ function partitionEventsByDate(events: EventSummary[]): EventsOverview {
   });
 
   const upcoming = withSortKey
-    .filter(({ event, timestamp }) => !event.isPast && timestamp >= now)
+    .filter(({ timestamp }) => timestamp >= now)
     .sort((a, b) => a.timestamp - b.timestamp)
     .map(({ event }) => event);
 
   const past = withSortKey
-    .filter(({ event, timestamp }) => event.isPast || timestamp < now)
+    .filter(({ timestamp }) => timestamp < now)
     .sort((a, b) => b.timestamp - a.timestamp)
     .map(({ event }) => event);
 
@@ -149,7 +149,6 @@ function mapEvent(doc: PayloadEvent): EventSummary {
     date: normalizeEventDate(doc.date),
     eventTag: doc.eventTag ?? null,
     signupUrl: doc.signupUrl ?? null,
-    isPast: Boolean(doc.isPast),
     location: doc.location ?? null,
   };
 }

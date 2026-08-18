@@ -9,6 +9,10 @@ interface EventPageProps {
   readonly params: Promise<{ slug: string }>;
 }
 
+function isUpcoming(dateValue: string): boolean {
+  return new Date(dateValue).getTime() >= Date.now();
+}
+
 export default async function EventPage({ params }: EventPageProps) {
   const { slug } = await params;
   const event = await getEventBySlug(slug);
@@ -68,7 +72,7 @@ export default async function EventPage({ params }: EventPageProps) {
               {event.description}
             </p>
 
-            {!event.isPast && event.signupUrl && (
+            {isUpcoming(event.date) && event.signupUrl && (
               <div className="mt-8">
                 <a
                   href={event.signupUrl}

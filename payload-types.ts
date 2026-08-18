@@ -200,7 +200,6 @@ export interface Event {
   date: string;
   eventTag?: string | null;
   signupUrl?: string | null;
-  isPast: boolean;
   location?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -497,7 +496,6 @@ export interface EventsSelect<T extends boolean = true> {
   date?: T;
   eventTag?: T;
   signupUrl?: T;
-  isPast?: T;
   location?: T;
   updatedAt?: T;
   createdAt?: T;

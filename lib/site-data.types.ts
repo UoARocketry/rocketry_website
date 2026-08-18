@@ -18,7 +18,6 @@ export type EventSummary = {
   date: string;
   eventTag?: string | null;
   signupUrl?: string | null;
-  isPast?: boolean;
   location?: string | null;
 };
 

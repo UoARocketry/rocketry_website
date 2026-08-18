@@ -12,7 +12,7 @@ export const Events: CollectionConfig = {
   slug: "events",
   admin: {
     useAsTitle: "title",
-    defaultColumns: ["title", "date", "eventTag", "isPast"],
+    defaultColumns: ["title", "date", "eventTag"],
   },
   versions: {
     drafts: true,
@@ -85,6 +85,10 @@ export const Events: CollectionConfig = {
       required: false,
       validate: (value: unknown) =>
         validateOptionalUrl(value, "Event image URL"),
+      admin: {
+        description:
+          "Auto-filled from the upload above whenever a file is selected there (overwrites this field on save). Leave the upload empty to link an external image URL directly instead.",
+      },
     },
     { name: "description", type: "textarea", required: true },
     { name: "date", type: "date", required: true },
@@ -95,7 +99,6 @@ export const Events: CollectionConfig = {
       required: false,
       validate: (value: unknown) => validateOptionalUrl(value, "Signup URL"),
     },
-    { name: "isPast", type: "checkbox", required: true, defaultValue: false },
     { name: "location", type: "text", required: false },
   ],
 };
