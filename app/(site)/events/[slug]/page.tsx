@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
@@ -13,6 +14,31 @@ function isUpcoming(dateValue: string): boolean {
   return new Date(dateValue).getTime() >= Date.now();
 }
 
+export async function generateMetadata({
+  params,
+}: EventPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const event = await getEventBySlug(slug);
+
+  if (!event) {
+    return {};
+  }
+
+  const description =
+    event.description ??
+    `Details on ${event.title}, an event hosted by the University of Auckland Rocketry Club.`;
+
+  return {
+    title: event.title,
+    description,
+    openGraph: {
+      title: event.title,
+      description,
+      images: event.image ? [{ url: event.image }] : undefined,
+    },
+  };
+}
+
 export default async function EventPage({ params }: EventPageProps) {
   const { slug } = await params;
   const event = await getEventBySlug(slug);
@@ -21,8 +47,31 @@ export default async function EventPage({ params }: EventPageProps) {
     notFound();
   }
 
+  const eventJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Event",
+    name: event.title,
+    description: event.description ?? undefined,
+    startDate: event.date,
+    eventStatus: "https://schema.org/EventScheduledStatus",
+    eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+    location: event.location
+      ? { "@type": "Place", name: event.location }
+      : undefined,
+    image: event.image ?? undefined,
+    organizer: {
+      "@type": "CollegeOrUniversity",
+      name: "University of Auckland Rocketry Club",
+      url: "https://www.uoarocketry.com",
+    },
+  };
+
   return (
     <main className="min-h-screen max-w-7xl mx-auto pb-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(eventJsonLd) }}
+      />
       <section className="max-w-7xl mx-auto pt-16 pb-8 px-4">
         <div className="mb-6">
           <Link

@@ -1,7 +1,14 @@
+import type { Metadata } from "next";
 import React from "react";
 import SponsorCard from "@/components/ui/sponsor-card";
 import { getSponsors, type Sponsor } from "@/lib/site-data";
 import { buildSponsorTierSections } from "@/lib/sponsor-utils";
+
+export const metadata: Metadata = {
+  title: "Sponsors",
+  description:
+    "The organisations supporting the University of Auckland Rocketry Club's rockets, events, and student engineering projects.",
+};
 
 export default async function SponsorsPage() {
   let sponsors: Sponsor[] = [];

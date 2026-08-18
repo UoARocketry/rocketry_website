@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getRocketBySlug } from "@/lib/site-data";
@@ -6,6 +7,31 @@ import RocketImageCycler from "@/components/ui/rocket-image-cycler";
 
 interface RocketPageProps {
   readonly params: Promise<{ slug: string }>;
+}
+
+export async function generateMetadata({
+  params,
+}: RocketPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const rocket = await getRocketBySlug(slug);
+
+  if (!rocket) {
+    return {};
+  }
+
+  const description =
+    rocket.description ??
+    `Details on ${rocket.name}, a rocket built by the University of Auckland Rocketry Club.`;
+
+  return {
+    title: rocket.name,
+    description,
+    openGraph: {
+      title: rocket.name,
+      description,
+      images: rocket.image ? [{ url: rocket.image }] : undefined,
+    },
+  };
 }
 
 export default async function RocketPage({ params }: RocketPageProps) {

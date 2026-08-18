@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Card from "@/components/ui/card";
 import SectionFallback from "@/components/SectionFallback";
 import Link from "next/link";
@@ -10,6 +11,12 @@ import { formatDateShort } from "@/lib/utils";
 import { PLACEHOLDER_IMAGE } from "@/lib/constants";
 
 type RocketItem = RocketSummary;
+
+export const metadata: Metadata = {
+  title: "Our Rockets",
+  description:
+    "Explore the rockets designed, built, and launched by the University of Auckland Rocketry Club.",
+};
 
 export default async function RocketsPage() {
   let rockets: RocketItem[] = [];

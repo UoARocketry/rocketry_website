@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Card from "@/components/ui/card";
 import SectionFallback from "@/components/SectionFallback";
@@ -13,6 +14,12 @@ import {
 import { PLACEHOLDER_IMAGE } from "@/lib/constants";
 
 type EventLocal = EventSummary;
+
+export const metadata: Metadata = {
+  title: "Events",
+  description:
+    "See upcoming and past events from the University of Auckland Rocketry Club, including launches, workshops, and meetups.",
+};
 
 interface EventsPageProps {
   readonly searchParams: Promise<{ tag?: string }>;

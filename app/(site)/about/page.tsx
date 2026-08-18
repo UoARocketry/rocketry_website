@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import FeatureCard from "@/components/FeatureCard";
 import StatCard from "@/components/StatCard";
@@ -13,6 +14,12 @@ import {
 } from "@/lib/site-data";
 
 export const revalidate = 300;
+
+export const metadata: Metadata = {
+  title: "About Us",
+  description:
+    "Meet the team behind the University of Auckland Rocketry Club, learn what we do, and see our journey building and launching student rockets.",
+};
 
 export default async function AboutPage() {
   let executives: Exec[] = [];
