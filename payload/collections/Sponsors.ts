@@ -57,6 +57,10 @@ export const Sponsors: CollectionConfig = {
       type: "text",
       required: true,
       validate: (value: unknown) => validateRequiredUrl(value, "Logo URL"),
+      admin: {
+        description:
+          "Auto-filled from the upload above whenever a file is selected there (overwrites this field on save). Leave the upload empty to link an external logo URL directly instead.",
+      },
     },
     {
       name: "url",

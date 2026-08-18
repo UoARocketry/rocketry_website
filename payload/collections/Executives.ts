@@ -77,7 +77,15 @@ export const Executives: CollectionConfig = {
           "Upload or select a headshot. This auto-fills the Photo URL.",
       },
     },
-    { name: "photo", type: "text", required: true },
+    {
+      name: "photo",
+      type: "text",
+      required: true,
+      admin: {
+        description:
+          "Auto-filled from the upload above whenever a file is selected there (overwrites this field on save). Leave the upload empty to link an external image URL directly instead.",
+      },
+    },
     { name: "year", type: "number", required: true, index: true },
     { name: "order", type: "number", required: true, defaultValue: 1 },
     {

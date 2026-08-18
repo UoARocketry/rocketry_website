@@ -82,7 +82,15 @@ export const Rockets: CollectionConfig = {
           "Upload or select an image. This auto-fills the Rocket image URL.",
       },
     },
-    { name: "image", type: "text", required: false },
+    {
+      name: "image",
+      type: "text",
+      required: false,
+      admin: {
+        description:
+          "Auto-filled from the upload above whenever a file is selected there (overwrites this field on save). Leave the upload empty to link an external image URL directly instead.",
+      },
+    },
     { name: "description", type: "textarea", required: false },
     { name: "launchedAt", type: "date", required: false },
   ],
