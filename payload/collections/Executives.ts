@@ -86,7 +86,13 @@ export const Executives: CollectionConfig = {
           "Auto-filled from the upload above whenever a file is selected there (overwrites this field on save). Leave the upload empty to link an external image URL directly instead.",
       },
     },
-    { name: "year", type: "number", required: true, index: true },
+    {
+      name: "year",
+      type: "number",
+      required: true,
+      index: true,
+      defaultValue: () => new Date().getFullYear(),
+    },
     { name: "order", type: "number", required: true, defaultValue: 1 },
     {
       name: "linkedinUrl",
