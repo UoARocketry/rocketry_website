@@ -750,6 +750,12 @@ export interface SiteSetting {
    */
   execTeamImageMedia?: (number | null) | Media;
   execTeamImageUrl?: string | null;
+  /**
+   * Invite link shown in the footer. Use a Discord invite set to never expire.
+   */
+  discordUrl?: string | null;
+  instagramUrl?: string | null;
+  linkedinUrl?: string | null;
   _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -762,6 +768,9 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   memberJoinUrl?: T;
   execTeamImageMedia?: T;
   execTeamImageUrl?: T;
+  discordUrl?: T;
+  instagramUrl?: T;
+  linkedinUrl?: T;
   _status?: T;
   updatedAt?: T;
   createdAt?: T;

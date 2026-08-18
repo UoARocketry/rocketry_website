@@ -92,4 +92,7 @@ export type ExecTeamPayload = {
 export type SiteSettings = {
   memberJoinUrl: string;
   execTeamImageUrl?: string | null;
+  discordUrl?: string | null;
+  instagramUrl?: string | null;
+  linkedinUrl?: string | null;
 };

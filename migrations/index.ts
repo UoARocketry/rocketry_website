@@ -6,6 +6,7 @@ import * as migration_20260819_120000_remove_events_is_past from "./20260819_120
 import * as migration_20260819_130000_add_event_tags_and_sponsor_tiers from "./20260819_130000_add_event_tags_and_sponsor_tiers";
 import * as migration_20260819_140000_add_rocket_gallery from "./20260819_140000_add_rocket_gallery";
 import * as migration_20260819_150000_add_locked_documents_rels_new_collections from "./20260819_150000_add_locked_documents_rels_new_collections";
+import * as migration_20260819_160000_add_site_settings_social_links from "./20260819_160000_add_site_settings_social_links";
 
 export const migrations = [
   {
@@ -47,5 +48,10 @@ export const migrations = [
     up: migration_20260819_150000_add_locked_documents_rels_new_collections.up,
     down: migration_20260819_150000_add_locked_documents_rels_new_collections.down,
     name: "20260819_150000_add_locked_documents_rels_new_collections",
+  },
+  {
+    up: migration_20260819_160000_add_site_settings_social_links.up,
+    down: migration_20260819_160000_add_site_settings_social_links.down,
+    name: "20260819_160000_add_site_settings_social_links",
   },
 ];

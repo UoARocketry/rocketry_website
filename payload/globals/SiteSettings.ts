@@ -55,5 +55,28 @@ export const SiteSettings: GlobalConfig = {
       validate: (value: unknown) =>
         validateOptionalUrl(value, "Executive team image URL"),
     },
+    {
+      name: "discordUrl",
+      type: "text",
+      required: false,
+      validate: (value: unknown) => validateOptionalUrl(value, "Discord URL"),
+      admin: {
+        description: "Invite link shown in the footer. Use a Discord invite set to never expire.",
+      },
+    },
+    {
+      name: "instagramUrl",
+      type: "text",
+      required: false,
+      validate: (value: unknown) =>
+        validateOptionalUrl(value, "Instagram URL"),
+    },
+    {
+      name: "linkedinUrl",
+      type: "text",
+      required: false,
+      validate: (value: unknown) =>
+        validateOptionalUrl(value, "LinkedIn URL"),
+    },
   ],
 };

@@ -9,6 +9,11 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { getSiteSettings } from "@/lib/site-data";
 import { resolveServerUrl } from "@/lib/env";
 import { toSafeJsonLd } from "@/lib/utils";
+import {
+  DEFAULT_DISCORD_URL,
+  DEFAULT_INSTAGRAM_URL,
+  DEFAULT_LINKEDIN_URL,
+} from "@/lib/constants";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -65,37 +70,39 @@ export const metadata: Metadata = {
   },
 };
 
-const organizationJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "CollegeOrUniversity",
-  "@id": `${SITE_URL}/#organization`,
-  name: SITE_NAME,
-  alternateName: "UARC",
-  url: SITE_URL,
-  logo: `${SITE_URL}/UARC logo.png`,
-  email: "uoarocketryclub@auckland.ac.nz",
-  sameAs: [
-    "https://discord.gg/8afab78eyf",
-    "https://www.linkedin.com/company/the-university-of-auckland-rocketry-club/home/",
-    "https://www.instagram.com/uoarocketryclub/",
-  ],
-  parentOrganization: {
-    "@type": "CollegeOrUniversity",
-    name: "University of Auckland",
-  },
-};
-
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   let joinUrl = "";
+  let linkedinUrl = DEFAULT_LINKEDIN_URL;
+  let instagramUrl = DEFAULT_INSTAGRAM_URL;
+  let discordUrl = DEFAULT_DISCORD_URL;
 
   try {
     const settings = await getSiteSettings();
     joinUrl = settings.memberJoinUrl;
+    linkedinUrl = settings.linkedinUrl?.trim() || DEFAULT_LINKEDIN_URL;
+    instagramUrl = settings.instagramUrl?.trim() || DEFAULT_INSTAGRAM_URL;
+    discordUrl = settings.discordUrl?.trim() || DEFAULT_DISCORD_URL;
   } catch (error) {
     console.error("[app/layout] Failed to load site settings:", error);
   }
+
+  const organizationJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollegeOrUniversity",
+    "@id": `${SITE_URL}/#organization`,
+    name: SITE_NAME,
+    alternateName: "UARC",
+    url: SITE_URL,
+    logo: `${SITE_URL}/UARC logo.png`,
+    email: "uoarocketryclub@auckland.ac.nz",
+    sameAs: [discordUrl, linkedinUrl, instagramUrl],
+    parentOrganization: {
+      "@type": "CollegeOrUniversity",
+      name: "University of Auckland",
+    },
+  };
 
   return (
     <html lang="en">

@@ -490,6 +490,9 @@ export const getSiteSettings = unstable_cache(
     return {
       memberJoinUrl: doc.memberJoinUrl ?? "",
       execTeamImageUrl: doc.execTeamImageUrl ?? null,
+      discordUrl: doc.discordUrl ?? null,
+      instagramUrl: doc.instagramUrl ?? null,
+      linkedinUrl: doc.linkedinUrl ?? null,
     };
   },
   ["site-settings"],

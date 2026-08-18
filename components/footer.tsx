@@ -4,6 +4,11 @@ import LinkedInIcon from "./ui/linkedin-icon";
 import InstagramIcon from "./ui/instagram-icon";
 import DiscordIcon from "./ui/discord-icon";
 import { getSiteSettings } from "@/lib/site-data";
+import {
+  DEFAULT_DISCORD_URL,
+  DEFAULT_INSTAGRAM_URL,
+  DEFAULT_LINKEDIN_URL,
+} from "@/lib/constants";
 
 export default async function Footer() {
   const navLinks = [
@@ -14,31 +19,26 @@ export default async function Footer() {
     { href: "/sponsors", label: "Sponsors" },
   ];
 
-  const socialLinks = [
-    {
-      href: "https://www.linkedin.com/company/the-university-of-auckland-rocketry-club/home/",
-      icon: LinkedInIcon,
-      label: "LinkedIn",
-    },
-    {
-      href: "https://www.instagram.com/uoarocketryclub/",
-      icon: InstagramIcon,
-      label: "Instagram",
-    },
-    {
-      href: "https://discord.gg/8afab78eyf",
-      icon: DiscordIcon,
-      label: "Discord",
-    },
-  ];
-
   let joinUrl = "";
+  let linkedinUrl = DEFAULT_LINKEDIN_URL;
+  let instagramUrl = DEFAULT_INSTAGRAM_URL;
+  let discordUrl = DEFAULT_DISCORD_URL;
+
   try {
     const settings = await getSiteSettings();
     joinUrl = settings.memberJoinUrl;
+    linkedinUrl = settings.linkedinUrl?.trim() || DEFAULT_LINKEDIN_URL;
+    instagramUrl = settings.instagramUrl?.trim() || DEFAULT_INSTAGRAM_URL;
+    discordUrl = settings.discordUrl?.trim() || DEFAULT_DISCORD_URL;
   } catch {
     // Fall back to database value only
   }
+
+  const socialLinks = [
+    { href: linkedinUrl, icon: LinkedInIcon, label: "LinkedIn" },
+    { href: instagramUrl, icon: InstagramIcon, label: "Instagram" },
+    { href: discordUrl, icon: DiscordIcon, label: "Discord" },
+  ];
 
   const hasJoinUrl = Boolean(joinUrl.trim());
 
