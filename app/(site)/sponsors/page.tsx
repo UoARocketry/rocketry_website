@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   title: "Sponsors",
   description:
     "The organisations supporting the University of Auckland Rocketry Club's rockets, events, and student engineering projects.",
+  alternates: {
+    canonical: "/sponsors",
+  },
 };
 
 export default async function SponsorsPage() {

@@ -19,6 +19,9 @@ export const metadata: Metadata = {
   title: "Events",
   description:
     "See upcoming and past events from the University of Auckland Rocketry Club, including launches, workshops, and meetups.",
+  alternates: {
+    canonical: "/events",
+  },
 };
 
 interface EventsPageProps {

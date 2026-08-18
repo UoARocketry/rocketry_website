@@ -10,6 +10,13 @@ function toValidDate(value: string | Date): Date | null {
 
 export const ALL_EVENTS_TAG = "all";
 
+export function toSafeJsonLd(data: unknown): string {
+  // JSON.stringify doesn't escape "<", so a literal "</script>" inside a
+  // string field (e.g. an admin-entered title) would break out of the
+  // <script> tag when injected via dangerouslySetInnerHTML.
+  return JSON.stringify(data).replace(/</g, "\\u003c");
+}
+
 export function formatDateShort(date: string | Date, locale = DEFAULT_LOCALE) {
   const parsed = toValidDate(date);
   return parsed ? parsed.toLocaleDateString(locale) : "";

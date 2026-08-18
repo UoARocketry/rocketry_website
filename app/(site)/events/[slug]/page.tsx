@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getEventBySlug } from "@/lib/site-data";
-import { formatDateWithTime } from "@/lib/utils";
+import { formatDateWithTime, toSafeJsonLd } from "@/lib/utils";
 import { PLACEHOLDER_IMAGE } from "@/lib/constants";
 
 interface EventPageProps {
@@ -31,6 +31,9 @@ export async function generateMetadata({
   return {
     title: event.title,
     description,
+    alternates: {
+      canonical: `/events/${slug}`,
+    },
     openGraph: {
       title: event.title,
       description,
@@ -56,7 +59,7 @@ export default async function EventPage({ params }: EventPageProps) {
     eventStatus: "https://schema.org/EventScheduledStatus",
     eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
     location: event.location
-      ? { "@type": "Place", name: event.location }
+      ? { "@type": "Place", name: event.location, address: event.location }
       : undefined,
     image: event.image ?? undefined,
     organizer: {
@@ -70,7 +73,7 @@ export default async function EventPage({ params }: EventPageProps) {
     <main className="min-h-screen max-w-7xl mx-auto pb-16">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(eventJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: toSafeJsonLd(eventJsonLd) }}
       />
       <section className="max-w-7xl mx-auto pt-16 pb-8 px-4">
         <div className="mb-6">

@@ -8,6 +8,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { getSiteSettings } from "@/lib/site-data";
 import { resolveServerUrl } from "@/lib/env";
+import { toSafeJsonLd } from "@/lib/utils";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,6 +41,9 @@ export const metadata: Metadata = {
     "rockets",
     "space",
   ],
+  alternates: {
+    canonical: "/",
+  },
   icons: {
     icon: "/UARC logo.png",
     shortcut: "/UARC logo.png",
@@ -100,7 +104,7 @@ export default async function RootLayout({
       >
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+          dangerouslySetInnerHTML={{ __html: toSafeJsonLd(organizationJsonLd) }}
         />
         <Navigation joinUrl={joinUrl} />
         <ScrollToTop />

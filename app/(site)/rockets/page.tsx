@@ -16,6 +16,9 @@ export const metadata: Metadata = {
   title: "Our Rockets",
   description:
     "Explore the rockets designed, built, and launched by the University of Auckland Rocketry Club.",
+  alternates: {
+    canonical: "/rockets",
+  },
 };
 
 export default async function RocketsPage() {

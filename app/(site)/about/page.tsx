@@ -19,6 +19,9 @@ export const metadata: Metadata = {
   title: "About Us",
   description:
     "Meet the team behind the University of Auckland Rocketry Club, learn what we do, and see our journey building and launching student rockets.",
+  alternates: {
+    canonical: "/about",
+  },
 };
 
 export default async function AboutPage() {
