@@ -80,6 +80,9 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve(dirname),
   },
+  experimental: {
+    globalNotFound: true,
+  },
 };
 
 export default withPayload(nextConfig, { devBundleServerPackages: false });
