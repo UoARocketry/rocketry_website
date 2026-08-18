@@ -15,8 +15,16 @@ export default async function Footer() {
   ];
 
   const socialLinks = [
-    { href: "https://linkedin.com", icon: LinkedInIcon, label: "LinkedIn" },
-    { href: "https://instagram.com", icon: InstagramIcon, label: "Instagram" },
+    {
+      href: "https://www.linkedin.com/company/the-university-of-auckland-rocketry-club/home/",
+      icon: LinkedInIcon,
+      label: "LinkedIn",
+    },
+    {
+      href: "https://www.instagram.com/uoarocketryclub/",
+      icon: InstagramIcon,
+      label: "Instagram",
+    },
     {
       href: "https://discord.gg/8afab78eyf",
       icon: DiscordIcon,

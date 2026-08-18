@@ -70,7 +70,11 @@ const organizationJsonLd = {
   url: SITE_URL,
   logo: `${SITE_URL}/UARC logo.png`,
   email: "uoarocketryclub@auckland.ac.nz",
-  sameAs: ["https://discord.gg/8afab78eyf"],
+  sameAs: [
+    "https://discord.gg/8afab78eyf",
+    "https://www.linkedin.com/company/the-university-of-auckland-rocketry-club/home/",
+    "https://www.instagram.com/uoarocketryclub/",
+  ],
   parentOrganization: {
     "@type": "CollegeOrUniversity",
     name: "University of Auckland",
