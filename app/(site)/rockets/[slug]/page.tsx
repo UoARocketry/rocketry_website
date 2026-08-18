@@ -1,8 +1,8 @@
 import Link from "next/link";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getRocketBySlug } from "@/lib/site-data";
 import { formatDateLong, formatDateShort } from "@/lib/utils";
+import RocketImageCycler from "@/components/ui/rocket-image-cycler";
 
 interface RocketPageProps {
   readonly params: Promise<{ slug: string }>;
@@ -29,16 +29,7 @@ export default async function RocketPage({ params }: RocketPageProps) {
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           {/* Rocket Image */}
-          <div className="relative">
-            <Image
-              src={rocket.image ?? "/UARC logo.png"}
-              alt={rocket.name}
-              width={1200}
-              height={900}
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              className="w-full h-96 object-cover rounded-lg shadow-lg"
-            />
-          </div>
+          <RocketImageCycler images={rocket.images} alt={rocket.name} />
 
           {/* Rocket Details */}
           <div className="space-y-6">

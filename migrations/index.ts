@@ -4,6 +4,7 @@ import * as migration_20260401_000001_add_media_prefix from "./20260401_000001_a
 import * as migration_20260401_010000_enable_payload_rls from "./20260401_010000_enable_payload_rls";
 import * as migration_20260819_120000_remove_events_is_past from "./20260819_120000_remove_events_is_past";
 import * as migration_20260819_130000_add_event_tags_and_sponsor_tiers from "./20260819_130000_add_event_tags_and_sponsor_tiers";
+import * as migration_20260819_140000_add_rocket_gallery from "./20260819_140000_add_rocket_gallery";
 
 export const migrations = [
   {
@@ -35,5 +36,10 @@ export const migrations = [
     up: migration_20260819_130000_add_event_tags_and_sponsor_tiers.up,
     down: migration_20260819_130000_add_event_tags_and_sponsor_tiers.down,
     name: "20260819_130000_add_event_tags_and_sponsor_tiers",
+  },
+  {
+    up: migration_20260819_140000_add_rocket_gallery.up,
+    down: migration_20260819_140000_add_rocket_gallery.down,
+    name: "20260819_140000_add_rocket_gallery",
   },
 ];

@@ -93,5 +93,22 @@ export const Rockets: CollectionConfig = {
     },
     { name: "description", type: "textarea", required: false },
     { name: "launchedAt", type: "date", required: false },
+    {
+      name: "gallery",
+      type: "array",
+      required: false,
+      admin: {
+        description:
+          "Additional photos shown in the image gallery on the rocket's detail page, after the cover image above.",
+      },
+      fields: [
+        {
+          name: "image",
+          type: "upload",
+          relationTo: "media" as never,
+          required: true,
+        },
+      ],
+    },
   ],
 };

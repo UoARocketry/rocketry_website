@@ -142,6 +142,23 @@ function mapRocket(doc: PayloadRocket): RocketSummary {
   };
 }
 
+function mapRocketDetail(doc: PayloadRocket): RocketDetail {
+  const galleryImages = (doc.gallery ?? [])
+    .map((item) =>
+      item.image && typeof item.image === "object" ? item.image.url : null,
+    )
+    .filter((url): url is string => Boolean(url));
+
+  const images = [doc.image, ...galleryImages].filter(
+    (url): url is string => Boolean(url),
+  );
+
+  return {
+    ...mapRocket(doc),
+    images,
+  };
+}
+
 function mapEvent(doc: PayloadEvent): EventSummary {
   const eventTag =
     doc.eventTag && typeof doc.eventTag === "object"
@@ -259,7 +276,7 @@ const getRocketBySlugCached = createCachedByStringArg<RocketDetail | null>({
     });
 
     const doc = result.docs[0];
-    return doc ? mapRocket(doc as PayloadRocket) : null;
+    return doc ? mapRocketDetail(doc as PayloadRocket) : null;
   },
 });
 

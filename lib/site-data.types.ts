@@ -7,7 +7,9 @@ export type RocketSummary = {
   launchedAt?: string | null;
 };
 
-export type RocketDetail = RocketSummary;
+export type RocketDetail = RocketSummary & {
+  images: string[];
+};
 
 export type EventSummary = {
   id: number;

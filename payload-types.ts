@@ -244,6 +244,15 @@ export interface Rocket {
   image?: string | null;
   description?: string | null;
   launchedAt?: string | null;
+  /**
+   * Additional photos shown in the image gallery on the rocket's detail page, after the cover image above.
+   */
+  gallery?:
+    | {
+        image: number | Media;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -575,6 +584,12 @@ export interface RocketsSelect<T extends boolean = true> {
   image?: T;
   description?: T;
   launchedAt?: T;
+  gallery?:
+    | T
+    | {
+        image?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
