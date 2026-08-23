@@ -83,7 +83,6 @@ const nextConfig: NextConfig = {
   experimental: {
     globalNotFound: true,
   },
-  serverExternalPackages: ["sharp"],
 };
 
 export default withPayload(nextConfig, { devBundleServerPackages: false });
