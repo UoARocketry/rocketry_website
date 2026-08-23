@@ -1,4 +1,5 @@
 import { unstable_cache } from "next/cache";
+import type { Where } from "payload";
 import type {
   Event as PayloadEvent,
   Executive as PayloadExecutive,
@@ -47,6 +48,17 @@ export type {
 } from "@/lib/site-data.types";
 
 const CONTENT_REVALIDATE_SECONDS = 300;
+
+const PUBLISHED_STATUS_WHERE: Where = { _status: { equals: "published" } };
+
+// Payload's Local API bypasses access control by default (overrideAccess: true),
+// and `draft: false` alone does not exclude documents that only ever exist as a
+// draft (no prior published version to fall back to in the main table). Every
+// public-facing query must explicitly filter by `_status` to keep unpublished
+// content off the site.
+function withPublishedFilter(where?: Where): Where {
+  return where ? { and: [where, PUBLISHED_STATUS_WHERE] } : PUBLISHED_STATUS_WHERE;
+}
 
 function parseDateValue(value: string | null | undefined): Date | null {
   if (!value) return null;
@@ -248,11 +260,11 @@ const getExecTeamByYear = createCachedByNumberArg<Exec[]>({
       draft: false,
       pagination: false,
       sort: "order",
-      where: {
+      where: withPublishedFilter({
         year: {
           equals: year,
         },
-      },
+      }),
     });
 
     return result.docs.map((doc) => mapExec(doc as PayloadExecutive));
@@ -268,11 +280,11 @@ const getRocketBySlugCached = createCachedByStringArg<RocketDetail | null>({
       collection: "rockets",
       draft: false,
       limit: 1,
-      where: {
+      where: withPublishedFilter({
         slug: {
           equals: slug,
         },
-      },
+      }),
     });
 
     const doc = result.docs[0];
@@ -289,11 +301,11 @@ const getEventBySlugCached = createCachedByStringArg<EventDetail | null>({
       collection: "events",
       draft: false,
       limit: 1,
-      where: {
+      where: withPublishedFilter({
         slug: {
           equals: slug,
         },
-      },
+      }),
     });
 
     const doc = result.docs[0];
@@ -309,6 +321,7 @@ export const getRocketSummaries = unstable_cache(
       draft: false,
       limit: 2,
       sort: "-launchedAt",
+      where: PUBLISHED_STATUS_WHERE,
     });
 
     return result.docs.map((doc) => mapRocket(doc as PayloadRocket));
@@ -325,6 +338,7 @@ export const getAllRockets = unstable_cache(
       draft: false,
       pagination: false,
       sort: "-launchedAt",
+      where: PUBLISHED_STATUS_WHERE,
     });
 
     return result.docs.map((doc) => mapRocket(doc as PayloadRocket));
@@ -341,6 +355,7 @@ export const getEventsOverview = unstable_cache(
       draft: false,
       pagination: false,
       sort: "-date",
+      where: PUBLISHED_STATUS_WHERE,
     });
 
     const docs = result.docs.map((doc) => mapEvent(doc as PayloadEvent));
@@ -368,24 +383,28 @@ export const getAboutPayload = unstable_cache(
         draft: false,
         limit: 100,
         sort: "order",
+        where: PUBLISHED_STATUS_WHERE,
       }),
       payload.find({
         collection: "journey-items",
         draft: false,
         limit: 100,
         sort: "order",
+        where: PUBLISHED_STATUS_WHERE,
       }),
       payload.find({
         collection: "team-roles",
         draft: false,
         limit: 100,
         sort: "order",
+        where: PUBLISHED_STATUS_WHERE,
       }),
       payload.find({
         collection: "stats",
         draft: false,
         limit: 100,
         sort: "order",
+        where: PUBLISHED_STATUS_WHERE,
       }),
     ]);
 
@@ -415,6 +434,7 @@ export const getExecYears = unstable_cache(
       draft: false,
       pagination: false,
       sort: "-year",
+      where: PUBLISHED_STATUS_WHERE,
     });
 
     const years = result.docs
@@ -469,6 +489,7 @@ export const getSponsors = unstable_cache(
       draft: false,
       pagination: false,
       sort: "name",
+      where: PUBLISHED_STATUS_WHERE,
     });
 
     return result.docs.map((doc) => mapSponsor(doc as PayloadSponsor));
