@@ -31,7 +31,7 @@ export default function RocketImageCycler({
         width={1200}
         height={900}
         sizes="(max-width: 1024px) 100vw, 50vw"
-        className="w-full h-96 object-cover rounded-lg shadow-lg"
+        className="w-full h-96 object-contain rounded-lg shadow-lg bg-surface"
       />
 
       {hasMultiple && (
