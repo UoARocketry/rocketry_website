@@ -15,6 +15,11 @@ export const Media: CollectionConfig = {
   admin: {
     useAsTitle: "filename",
     group: "Assets",
+    components: {
+      edit: {
+        Upload: "/payload/components/CompressedUpload.tsx#CompressedUpload",
+      },
+    },
   },
   hooks: {
     beforeValidate: [
