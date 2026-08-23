@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getEventBySlug } from "@/lib/site-data";
 import { formatDateWithTime, toSafeJsonLd } from "@/lib/utils";
 import { PLACEHOLDER_IMAGE } from "@/lib/constants";
+import EventHeroImage from "@/components/ui/event-hero-image";
 
 interface EventPageProps {
   readonly params: Promise<{ slug: string }>;
@@ -86,16 +86,10 @@ export default async function EventPage({ params }: EventPageProps) {
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           {/* Event Image */}
-          <div className="relative">
-            <Image
-              src={event.image ?? PLACEHOLDER_IMAGE}
-              alt={event.title}
-              width={1200}
-              height={900}
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              className="w-full h-96 object-contain rounded-lg shadow-lg bg-surface"
-            />
-          </div>
+          <EventHeroImage
+            src={event.image ?? PLACEHOLDER_IMAGE}
+            alt={event.title}
+          />
 
           {/* Event Details */}
           <div className="space-y-6">

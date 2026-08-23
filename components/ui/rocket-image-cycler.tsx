@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { PLACEHOLDER_IMAGE } from "@/lib/constants";
+import ImageLightbox from "@/components/ui/image-lightbox";
 
 interface RocketImageCyclerProps {
   readonly images: readonly string[];
@@ -14,6 +15,7 @@ export default function RocketImageCycler({
   alt,
 }: RocketImageCyclerProps) {
   const [index, setIndex] = useState(0);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
   const gallery = images.length > 0 ? images : [PLACEHOLDER_IMAGE];
   const hasMultiple = gallery.length > 1;
@@ -25,14 +27,31 @@ export default function RocketImageCycler({
 
   return (
     <div className="relative">
-      <Image
-        src={current}
-        alt={alt}
-        width={1200}
-        height={900}
-        sizes="(max-width: 1024px) 100vw, 50vw"
-        className="w-full h-96 object-contain rounded-lg shadow-lg bg-surface"
-      />
+      <button
+        type="button"
+        onClick={() => setIsLightboxOpen(true)}
+        className="block w-full cursor-zoom-in"
+        aria-label="View image in full size"
+      >
+        <Image
+          src={current}
+          alt={alt}
+          width={1200}
+          height={900}
+          sizes="(max-width: 1024px) 100vw, 50vw"
+          className="w-full h-96 object-contain rounded-lg shadow-lg bg-surface"
+        />
+      </button>
+
+      {isLightboxOpen && (
+        <ImageLightbox
+          images={gallery}
+          index={index}
+          alt={alt}
+          onClose={() => setIsLightboxOpen(false)}
+          onIndexChange={setIndex}
+        />
+      )}
 
       {hasMultiple && (
         <>
