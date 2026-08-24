@@ -186,14 +186,19 @@ export default async function HomePage() {
             />
           ) : (
             <div
-              className={`grid gap-6 grid-cols-1 sm:grid-cols-2 ${
+              className={
                 // A lone card would otherwise sit in the left column. Narrowing
-                // the grid to one column's width (half, less the gap) and
-                // centring it keeps the card exactly the same size.
+                // the grid to one column's width (half, less the 1.5rem gap)
+                // and centring it keeps the card exactly the same size.
+                //
+                // The two variants must be mutually exclusive: appending
+                // `sm:grid-cols-1` alongside `sm:grid-cols-2` does not override
+                // it, since equal-specificity Tailwind classes are resolved by
+                // stylesheet order, not class-attribute order.
                 latestEvents.length === 1
-                  ? "sm:grid-cols-1 sm:max-w-[calc(50%-0.75rem)] sm:mx-auto"
-                  : ""
-              }`}
+                  ? "grid gap-6 grid-cols-1 sm:max-w-[calc(50%-0.75rem)] sm:mx-auto"
+                  : "grid gap-6 grid-cols-1 sm:grid-cols-2"
+              }
             >
               {latestEvents.map((event) => (
                 <Link
