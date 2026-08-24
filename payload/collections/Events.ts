@@ -108,5 +108,29 @@ export const Events: CollectionConfig = {
       validate: (value: unknown) => validateOptionalUrl(value, "Signup URL"),
     },
     { name: "location", type: "text", required: false },
+    {
+      name: "sessions",
+      type: "array",
+      required: false,
+      labels: { singular: "Session", plural: "Sessions" },
+      admin: {
+        description:
+          "Optional. For a multi-session series (e.g. Level 1 build workshops), add each session in the order they run. Leave empty for a normal one-off event.",
+      },
+      fields: [
+        { name: "title", type: "text", required: true },
+        { name: "date", type: "date", required: true },
+        { name: "description", type: "textarea", required: false },
+        {
+          name: "location",
+          type: "text",
+          required: false,
+          admin: {
+            description:
+              "Optional. Falls back to the event location above if left empty.",
+          },
+        },
+      ],
+    },
   ],
 };

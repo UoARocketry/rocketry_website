@@ -71,23 +71,54 @@ function normalizeEventDate(value: string | null | undefined): string {
   return parseDateValue(value)?.toISOString() ?? "";
 }
 
+function getSessionTimestamps(event: EventSummary): number[] {
+  return event.sessions
+    .map((session) => parseDateValue(session.date)?.getTime())
+    .filter((timestamp): timestamp is number => typeof timestamp === "number");
+}
+
 function partitionEventsByDate(events: EventSummary[]): EventsOverview {
   const now = Date.now();
 
   const withSortKey = events.map((event) => {
-    const parsedDate = parseDateValue(event.date);
-    const timestamp = parsedDate?.getTime() ?? Number.MIN_SAFE_INTEGER;
+    const baseTimestamp =
+      parseDateValue(event.date)?.getTime() ?? Number.MIN_SAFE_INTEGER;
+    const sessionTimestamps = getSessionTimestamps(event);
 
-    return { event, timestamp };
+    // One-off events keep the original behaviour: a single date decides
+    // everything.
+    if (sessionTimestamps.length === 0) {
+      return {
+        event,
+        timestamp: baseTimestamp,
+        isUpcoming: baseTimestamp >= now,
+      };
+    }
+
+    // A series stays "upcoming" until its final session has passed, so a
+    // term-long workshop doesn't drop into the archive after week one.
+    const futureSessions = sessionTimestamps.filter(
+      (timestamp) => timestamp >= now,
+    );
+    const isUpcoming = futureSessions.length > 0;
+
+    return {
+      event,
+      // Sort upcoming series by their next session, finished ones by their last.
+      timestamp: isUpcoming
+        ? Math.min(...futureSessions)
+        : Math.max(...sessionTimestamps),
+      isUpcoming,
+    };
   });
 
   const upcoming = withSortKey
-    .filter(({ timestamp }) => timestamp >= now)
+    .filter(({ isUpcoming }) => isUpcoming)
     .sort((a, b) => a.timestamp - b.timestamp)
     .map(({ event }) => event);
 
   const past = withSortKey
-    .filter(({ timestamp }) => timestamp < now)
+    .filter(({ isUpcoming }) => !isUpcoming)
     .sort((a, b) => b.timestamp - a.timestamp)
     .map(({ event }) => event);
 
@@ -177,6 +208,15 @@ function mapEvent(doc: PayloadEvent): EventSummary {
       ? doc.eventTag.name
       : null;
 
+  const sessions = (doc.sessions ?? [])
+    .map((session) => ({
+      title: session.title,
+      date: normalizeEventDate(session.date),
+      description: session.description ?? null,
+      location: session.location ?? null,
+    }))
+    .filter((session) => session.date.length > 0);
+
   return {
     id: doc.id,
     title: doc.title,
@@ -187,6 +227,7 @@ function mapEvent(doc: PayloadEvent): EventSummary {
     eventTag,
     signupUrl: doc.signupUrl ?? null,
     location: doc.location ?? null,
+    sessions,
   };
 }
 

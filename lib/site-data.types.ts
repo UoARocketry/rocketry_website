@@ -11,6 +11,13 @@ export type RocketDetail = RocketSummary & {
   images: string[];
 };
 
+export type EventSession = {
+  title: string;
+  date: string;
+  description?: string | null;
+  location?: string | null;
+};
+
 export type EventSummary = {
   id: number;
   title: string;
@@ -21,6 +28,7 @@ export type EventSummary = {
   eventTag?: string | null;
   signupUrl?: string | null;
   location?: string | null;
+  sessions: EventSession[];
 };
 
 export type EventDetail = EventSummary;

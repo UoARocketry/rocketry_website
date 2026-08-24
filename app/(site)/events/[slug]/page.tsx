@@ -2,16 +2,18 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getEventBySlug } from "@/lib/site-data";
-import { formatDateWithTime, toSafeJsonLd } from "@/lib/utils";
+import {
+  findNextSessionIndex,
+  formatDateLong,
+  formatDateWithTime,
+  isEventUpcoming,
+  toSafeJsonLd,
+} from "@/lib/utils";
 import { PLACEHOLDER_IMAGE } from "@/lib/constants";
 import EventHeroImage from "@/components/ui/event-hero-image";
 
 interface EventPageProps {
   readonly params: Promise<{ slug: string }>;
-}
-
-function isUpcoming(dateValue: string): boolean {
-  return new Date(dateValue).getTime() >= Date.now();
 }
 
 export async function generateMetadata({
@@ -50,23 +52,46 @@ export default async function EventPage({ params }: EventPageProps) {
     notFound();
   }
 
+  const { sessions } = event;
+  const hasSessions = sessions.length > 0;
+  const nextSessionIndex = findNextSessionIndex(sessions);
+  const seriesStart = hasSessions ? sessions[0].date : event.date;
+  const seriesEnd = hasSessions ? sessions[sessions.length - 1].date : null;
+
+  const toPlace = (name: string | null | undefined) =>
+    name ? { "@type": "Place", name, address: name } : undefined;
+
+  const organizer = {
+    "@type": "CollegeOrUniversity",
+    name: "University of Auckland Rocketry Club",
+    url: "https://www.uoarocketry.com",
+  };
+
   const eventJsonLd = {
     "@context": "https://schema.org",
-    "@type": "Event",
+    "@type": hasSessions ? "EventSeries" : "Event",
     name: event.title,
     description: event.description ?? undefined,
-    startDate: event.date,
+    startDate: seriesStart,
+    endDate: seriesEnd ?? undefined,
     eventStatus: "https://schema.org/EventScheduledStatus",
     eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
-    location: event.location
-      ? { "@type": "Place", name: event.location, address: event.location }
-      : undefined,
+    location: toPlace(event.location),
     image: event.image ?? undefined,
-    organizer: {
-      "@type": "CollegeOrUniversity",
-      name: "University of Auckland Rocketry Club",
-      url: "https://www.uoarocketry.com",
-    },
+    organizer,
+    subEvent: hasSessions
+      ? sessions.map((session) => ({
+          "@type": "Event",
+          name: session.title,
+          description: session.description ?? undefined,
+          startDate: session.date,
+          eventStatus: "https://schema.org/EventScheduledStatus",
+          eventAttendanceMode:
+            "https://schema.org/OfflineEventAttendanceMode",
+          location: toPlace(session.location ?? event.location),
+          organizer,
+        }))
+      : undefined,
   };
 
   return (
@@ -104,8 +129,14 @@ export default async function EventPage({ params }: EventPageProps) {
               </div>
               <div className="space-y-2 mb-4 text-sm sm:text-base">
                 <p className="text-text-secondary leading-relaxed">
-                  <span className="text-primary font-semibold">Date:</span>{" "}
-                  {formatDateWithTime(event.date)}
+                  <span className="text-primary font-semibold">
+                    {hasSessions ? "Runs:" : "Date:"}
+                  </span>{" "}
+                  {hasSessions
+                    ? `${formatDateLong(seriesStart)} – ${formatDateLong(
+                        seriesEnd ?? seriesStart,
+                      )} (${sessions.length} sessions)`
+                    : formatDateWithTime(event.date)}
                 </p>
                 <p className="text-text-secondary leading-relaxed">
                   <span className="text-primary font-semibold">Location:</span>{" "}
@@ -118,7 +149,7 @@ export default async function EventPage({ params }: EventPageProps) {
               {event.description}
             </p>
 
-            {isUpcoming(event.date) && event.signupUrl && (
+            {isEventUpcoming(event) && event.signupUrl && (
               <div className="mt-8">
                 <a
                   href={event.signupUrl}
@@ -135,6 +166,68 @@ export default async function EventPage({ params }: EventPageProps) {
           </div>
         </div>
       </section>
+
+      {hasSessions && (
+        <section className="max-w-7xl mx-auto px-4 pb-8">
+          <h2 className="text-2xl font-bold mb-6 text-text-main">
+            Session schedule
+          </h2>
+          <ol className="space-y-4">
+            {sessions.map((session, sessionIndex) => {
+              const isPast =
+                nextSessionIndex === -1 || sessionIndex < nextSessionIndex;
+              const isNext = sessionIndex === nextSessionIndex;
+
+              return (
+                <li
+                  key={`${session.title}-${session.date}`}
+                  className={`rounded-xl border p-5 transition-colors ${
+                    isNext
+                      ? "border-primary/50 bg-primary/5"
+                      : "border-border bg-card"
+                  } ${isPast ? "opacity-60" : ""}`}
+                >
+                  <div className="flex flex-wrap items-center gap-3 mb-2">
+                    <span
+                      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
+                        isNext
+                          ? "bg-primary text-white"
+                          : "bg-surface text-text-secondary"
+                      }`}
+                    >
+                      {sessionIndex + 1}
+                    </span>
+                    <h3 className="text-lg font-semibold text-text-main">
+                      {session.title}
+                    </h3>
+                    {isNext && (
+                      <span className="text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 font-medium">
+                        Next up
+                      </span>
+                    )}
+                    {isPast && (
+                      <span className="text-xs text-text-muted">Completed</span>
+                    )}
+                  </div>
+                  <p className="text-sm text-text-secondary mb-1">
+                    {formatDateWithTime(session.date)}
+                  </p>
+                  {(session.location ?? event.location) && (
+                    <p className="text-sm text-text-secondary mb-1">
+                      {session.location ?? event.location}
+                    </p>
+                  )}
+                  {session.description && (
+                    <p className="text-sm text-text-secondary leading-relaxed mt-2">
+                      {session.description}
+                    </p>
+                  )}
+                </li>
+              );
+            })}
+          </ol>
+        </section>
+      )}
     </main>
   );
 }

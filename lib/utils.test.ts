@@ -1,0 +1,133 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  findNextSessionIndex,
+  formatEventCardDate,
+  isEventUpcoming,
+} from "./utils.ts";
+
+const NOW = new Date("2026-06-15T12:00:00.000Z");
+
+const past = (day: number) => ({
+  title: `Past ${day}`,
+  date: `2026-06-${String(day).padStart(2, "0")}T12:00:00.000Z`,
+});
+const future = (day: number) => ({
+  title: `Future ${day}`,
+  date: `2026-07-${String(day).padStart(2, "0")}T12:00:00.000Z`,
+});
+
+beforeEach(() => {
+  vi.useFakeTimers();
+  vi.setSystemTime(NOW);
+});
+
+afterEach(() => {
+  vi.useRealTimers();
+});
+
+describe("isEventUpcoming", () => {
+  it("uses the event date when there are no sessions", () => {
+    expect(isEventUpcoming({ date: future(1).date })).toBe(true);
+    expect(isEventUpcoming({ date: past(1).date })).toBe(false);
+  });
+
+  it("treats an empty sessions array the same as no sessions", () => {
+    expect(isEventUpcoming({ date: future(1).date, sessions: [] })).toBe(true);
+  });
+
+  it("stays upcoming while any session is still to run", () => {
+    // The series' own date has passed, but sessions remain.
+    expect(
+      isEventUpcoming({
+        date: past(1).date,
+        sessions: [past(2), past(10), future(1)],
+      }),
+    ).toBe(true);
+  });
+
+  it("is past once every session has run", () => {
+    expect(
+      isEventUpcoming({ date: past(1).date, sessions: [past(2), past(10)] }),
+    ).toBe(false);
+  });
+
+  it("ignores unparseable session dates", () => {
+    expect(
+      isEventUpcoming({
+        date: past(1).date,
+        sessions: [{ title: "Broken", date: "not-a-date" }],
+      }),
+    ).toBe(false);
+  });
+
+  it("returns false for an unparseable event date", () => {
+    expect(isEventUpcoming({ date: "not-a-date" })).toBe(false);
+  });
+});
+
+describe("findNextSessionIndex", () => {
+  it("finds the first session still to run", () => {
+    expect(findNextSessionIndex([past(2), past(10), future(1)])).toBe(2);
+  });
+
+  it("returns -1 when the series has finished", () => {
+    expect(findNextSessionIndex([past(2), past(10)])).toBe(-1);
+  });
+
+  it("returns -1 for an empty list", () => {
+    expect(findNextSessionIndex([])).toBe(-1);
+  });
+});
+
+describe("formatEventCardDate", () => {
+  // Asserts which session was picked without hard-coding a formatted date,
+  // which would otherwise depend on the machine's timezone.
+  const expectLabel = (actual: string, source: string, count?: number) => {
+    const date = new Date(source).toLocaleDateString("en-US");
+    expect(actual).toBe(count ? `${date} · ${count} sessions` : date);
+  };
+
+  it("falls back to the event date when there are no sessions", () => {
+    expectLabel(formatEventCardDate({ date: future(1).date }), future(1).date);
+  });
+
+  it("shows the next upcoming session and the session count", () => {
+    expectLabel(
+      formatEventCardDate({
+        date: past(1).date,
+        sessions: [past(2), future(1), future(8)],
+      }),
+      future(1).date,
+      3,
+    );
+  });
+
+  it("shows the final session once the series has finished", () => {
+    expectLabel(
+      formatEventCardDate({
+        date: past(1).date,
+        sessions: [past(2), past(10)],
+      }),
+      past(10).date,
+      2,
+    );
+  });
+
+  it("omits the count for a single session", () => {
+    expectLabel(
+      formatEventCardDate({ date: past(1).date, sessions: [future(1)] }),
+      future(1).date,
+    );
+  });
+
+  it("sorts sessions by date rather than trusting array order", () => {
+    expectLabel(
+      formatEventCardDate({
+        date: past(1).date,
+        sessions: [future(8), future(1)],
+      }),
+      future(1).date,
+      2,
+    );
+  });
+});

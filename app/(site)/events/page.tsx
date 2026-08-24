@@ -6,7 +6,7 @@ import EventsTagFilter from "@/components/EventsTagFilter";
 import { getEventsOverview, type EventSummary } from "@/lib/site-data";
 import {
   ALL_EVENTS_TAG,
-  formatDateShort,
+  formatEventCardDate,
   formatEventTagLabel,
   normalizeEventTag,
   normalizeEventTagParam,
@@ -122,7 +122,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
                   <Card
                     image={event.image ?? PLACEHOLDER_IMAGE}
                     title={event.title}
-                    date={formatDateShort(event.date)}
+                    date={formatEventCardDate(event)}
                     tag={formatEventTagLabel(event.eventTag)}
                     description={event.description ?? ""}
                     vertical
@@ -161,7 +161,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
                   <Card
                     image={event.image ?? PLACEHOLDER_IMAGE}
                     title={event.title}
-                    date={formatDateShort(event.date)}
+                    date={formatEventCardDate(event)}
                     tag={formatEventTagLabel(event.eventTag)}
                     description={event.description ?? ""}
                     vertical

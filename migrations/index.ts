@@ -7,6 +7,7 @@ import * as migration_20260819_130000_add_event_tags_and_sponsor_tiers from "./2
 import * as migration_20260819_140000_add_rocket_gallery from "./20260819_140000_add_rocket_gallery";
 import * as migration_20260819_150000_add_locked_documents_rels_new_collections from "./20260819_150000_add_locked_documents_rels_new_collections";
 import * as migration_20260819_160000_add_site_settings_social_links from "./20260819_160000_add_site_settings_social_links";
+import * as migration_20260825_120000_add_event_sessions from "./20260825_120000_add_event_sessions";
 
 export const migrations = [
   {
@@ -53,5 +54,10 @@ export const migrations = [
     up: migration_20260819_160000_add_site_settings_social_links.up,
     down: migration_20260819_160000_add_site_settings_social_links.down,
     name: "20260819_160000_add_site_settings_social_links",
+  },
+  {
+    up: migration_20260825_120000_add_event_sessions.up,
+    down: migration_20260825_120000_add_event_sessions.down,
+    name: "20260825_120000_add_event_sessions",
   },
 ];

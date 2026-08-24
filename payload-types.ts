@@ -211,6 +211,21 @@ export interface Event {
   eventTag?: (number | null) | EventTag;
   signupUrl?: string | null;
   location?: string | null;
+  /**
+   * Optional. For a multi-session series (e.g. Level 1 build workshops), add each session in the order they run. Leave empty for a normal one-off event.
+   */
+  sessions?:
+    | {
+        title: string;
+        date: string;
+        description?: string | null;
+        /**
+         * Optional. Falls back to the event location above if left empty.
+         */
+        location?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -559,6 +574,15 @@ export interface EventsSelect<T extends boolean = true> {
   eventTag?: T;
   signupUrl?: T;
   location?: T;
+  sessions?:
+    | T
+    | {
+        title?: T;
+        date?: T;
+        description?: T;
+        location?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
