@@ -78,5 +78,29 @@ export const SiteSettings: GlobalConfig = {
       validate: (value: unknown) =>
         validateOptionalUrl(value, "LinkedIn URL"),
     },
+    {
+      name: "databaseLimitMb",
+      type: "number",
+      required: false,
+      defaultValue: 500,
+      min: 1,
+      label: "Database limit (MB)",
+      admin: {
+        description:
+          "Only scales the usage bar on this dashboard — the measured size is always accurate. Update if the Supabase plan changes. Free tier is 500 MB.",
+      },
+    },
+    {
+      name: "storageLimitMb",
+      type: "number",
+      required: false,
+      defaultValue: 1024,
+      min: 1,
+      label: "Media storage limit (MB)",
+      admin: {
+        description:
+          "Only scales the usage bar on this dashboard. Free tier is 1024 MB (1 GB).",
+      },
+    },
   ],
 };

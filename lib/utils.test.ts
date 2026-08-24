@@ -82,34 +82,34 @@ describe("findNextSessionIndex", () => {
 describe("formatEventCardDate", () => {
   // Asserts which session was picked without hard-coding a formatted date,
   // which would otherwise depend on the machine's timezone.
-  const expectLabel = (actual: string, source: string, count?: number) => {
+  const expectLabel = (actual: string, source: string, suffix = "") => {
     const date = new Date(source).toLocaleDateString("en-US");
-    expect(actual).toBe(count ? `${date} · ${count} sessions` : date);
+    expect(actual).toBe(suffix ? `${date} · ${suffix}` : date);
   };
 
   it("falls back to the event date when there are no sessions", () => {
     expectLabel(formatEventCardDate({ date: future(1).date }), future(1).date);
   });
 
-  it("shows the next upcoming session and the session count", () => {
+  it("counts sessions still to run, not the total, while any remain", () => {
     expectLabel(
       formatEventCardDate({
         date: past(1).date,
         sessions: [past(2), future(1), future(8)],
       }),
       future(1).date,
-      3,
+      "2 of 3 left",
     );
   });
 
-  it("shows the final session once the series has finished", () => {
+  it("shows the total once the series has finished", () => {
     expectLabel(
       formatEventCardDate({
         date: past(1).date,
         sessions: [past(2), past(10)],
       }),
       past(10).date,
-      2,
+      "2 sessions",
     );
   });
 
@@ -127,7 +127,7 @@ describe("formatEventCardDate", () => {
         sessions: [future(8), future(1)],
       }),
       future(1).date,
-      2,
+      "2 of 2 left",
     );
   });
 });

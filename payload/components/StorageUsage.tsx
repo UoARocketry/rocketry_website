@@ -1,32 +1,22 @@
 import { getPayloadClient } from "../../lib/payload.ts";
 
 /**
- * Supabase plan allowances, defaulting to the free tier as of 2026-08-25.
- *
- * These only scale the percentage bars — the byte figures beside them are
- * measured live and stay accurate regardless. If Supabase changes its tiers
- * (or the project moves to Pro), override without a code change by setting
- * SUPABASE_DATABASE_LIMIT_MB / SUPABASE_STORAGE_LIMIT_MB in the environment.
+ * Supabase plan allowances, editable in Site Settings and defaulting to the
+ * free tier as of 2026-08-25. These only scale the percentage bars — the byte
+ * figures beside them are measured live and stay accurate regardless.
  *
  * @see https://supabase.com/pricing
  */
 const DEFAULT_DATABASE_LIMIT_MB = 500;
 const DEFAULT_STORAGE_LIMIT_MB = 1024;
 
-function resolveLimitBytes(envValue: string | undefined, fallbackMb: number) {
-  const parsed = Number(envValue?.trim());
-  const megabytes = Number.isFinite(parsed) && parsed > 0 ? parsed : fallbackMb;
+function toLimitBytes(value: unknown, fallbackMb: number): number {
+  const megabytes =
+    typeof value === "number" && Number.isFinite(value) && value > 0
+      ? value
+      : fallbackMb;
   return megabytes * 1024 * 1024;
 }
-
-const DATABASE_LIMIT_BYTES = resolveLimitBytes(
-  process.env.SUPABASE_DATABASE_LIMIT_MB,
-  DEFAULT_DATABASE_LIMIT_MB,
-);
-const STORAGE_LIMIT_BYTES = resolveLimitBytes(
-  process.env.SUPABASE_STORAGE_LIMIT_MB,
-  DEFAULT_STORAGE_LIMIT_MB,
-);
 
 const SUPABASE_DASHBOARD_URL = "https://supabase.com/dashboard";
 
@@ -121,14 +111,22 @@ export default async function StorageUsage() {
     ).drizzle;
     const { sql } = await import("@payloadcms/db-postgres");
 
-    const [databaseResult, mediaResult] = await Promise.all([
+    const [databaseResult, mediaResult, settings] = await Promise.all([
       drizzle.execute(
         sql`SELECT pg_database_size(current_database()) AS bytes`,
       ),
       drizzle.execute(
         sql`SELECT COALESCE(SUM(filesize), 0) AS bytes FROM media`,
       ),
+      payload
+        .findGlobal({ slug: "site-settings" as never, depth: 0 })
+        .catch(() => null),
     ]);
+
+    const limits = settings as {
+      databaseLimitMb?: unknown;
+      storageLimitMb?: unknown;
+    } | null;
 
     const databaseBytes = toNumber(
       (databaseResult.rows[0] as { bytes?: unknown } | undefined)?.bytes,
@@ -141,13 +139,13 @@ export default async function StorageUsage() {
       {
         label: "Database",
         used: databaseBytes,
-        limit: DATABASE_LIMIT_BYTES,
+        limit: toLimitBytes(limits?.databaseLimitMb, DEFAULT_DATABASE_LIMIT_MB),
         note: "Postgres, measured live",
       },
       {
         label: "Media storage",
         used: mediaBytes,
-        limit: STORAGE_LIMIT_BYTES,
+        limit: toLimitBytes(limits?.storageLimitMb, DEFAULT_STORAGE_LIMIT_MB),
         note: "Sum of uploaded files",
       },
     ];
@@ -186,10 +184,8 @@ export default async function StorageUsage() {
         }}
       >
         Media storage counts files tracked by the CMS, so anything uploaded to
-        the bucket outside Payload is not included. Limits default to the free
-        tier as of August 2026 and can be changed with the
-        SUPABASE_DATABASE_LIMIT_MB / SUPABASE_STORAGE_LIMIT_MB environment
-        variables —{" "}
+        the bucket outside Payload is not included. Limits are editable in Site
+        Settings and default to the free tier —{" "}
         <a
           href={SUPABASE_DASHBOARD_URL}
           target="_blank"

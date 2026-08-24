@@ -67,9 +67,11 @@ function getSortedSessionTimestamps(
 
 /**
  * The date to show on an event card. For a multi-session series this is the
- * next upcoming session (or the final one once the series has finished),
- * annotated with the session count, since the series' own `date` field says
- * little on its own.
+ * next upcoming session (or the final one once the series has finished).
+ *
+ * While sessions remain it reads "<next date> · 4 of 6 left" so the count is
+ * unambiguously the number still to run; once finished it falls back to the
+ * total, e.g. "<last date> · 6 sessions".
  */
 export function formatEventCardDate(
   event: EventLike,
@@ -81,14 +83,18 @@ export function formatEventCardDate(
     return formatDateShort(event.date, locale);
   }
 
-  const nextTimestamp =
-    timestamps.find((timestamp) => timestamp >= Date.now()) ??
-    timestamps[timestamps.length - 1];
+  const now = Date.now();
+  const remaining = timestamps.filter((timestamp) => timestamp >= now);
+  const nextTimestamp = remaining[0] ?? timestamps[timestamps.length - 1];
   const label = formatDateShort(new Date(nextTimestamp), locale);
 
-  return timestamps.length > 1
-    ? `${label} · ${timestamps.length} sessions`
-    : label;
+  if (timestamps.length === 1) {
+    return label;
+  }
+
+  return remaining.length > 0
+    ? `${label} · ${remaining.length} of ${timestamps.length} left`
+    : `${label} · ${timestamps.length} sessions`;
 }
 
 /** True while any part of the event (or series) is still in the future. */

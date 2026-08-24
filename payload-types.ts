@@ -782,6 +782,14 @@ export interface SiteSetting {
   discordUrl?: string | null;
   instagramUrl?: string | null;
   linkedinUrl?: string | null;
+  /**
+   * Only scales the usage bar on this dashboard — the measured size is always accurate. Update if the Supabase plan changes. Free tier is 500 MB.
+   */
+  databaseLimitMb?: number | null;
+  /**
+   * Only scales the usage bar on this dashboard. Free tier is 1024 MB (1 GB).
+   */
+  storageLimitMb?: number | null;
   _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -797,6 +805,8 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   discordUrl?: T;
   instagramUrl?: T;
   linkedinUrl?: T;
+  databaseLimitMb?: T;
+  storageLimitMb?: T;
   _status?: T;
   updatedAt?: T;
   createdAt?: T;

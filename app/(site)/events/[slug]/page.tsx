@@ -178,50 +178,83 @@ export default async function EventPage({ params }: EventPageProps) {
                 nextSessionIndex === -1 || sessionIndex < nextSessionIndex;
               const isNext = sessionIndex === nextSessionIndex;
 
+              const sessionLocation = session.location ?? event.location;
+
               return (
-                <li
-                  key={`${session.title}-${session.date}`}
-                  className={`rounded-xl border p-5 transition-colors ${
-                    isNext
-                      ? "border-primary/50 bg-primary/5"
-                      : "border-border bg-card"
-                  } ${isPast ? "opacity-60" : ""}`}
-                >
-                  <div className="flex flex-wrap items-center gap-3 mb-2">
-                    <span
-                      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
-                        isNext
-                          ? "bg-primary text-white"
-                          : "bg-surface text-text-secondary"
-                      }`}
-                    >
-                      {sessionIndex + 1}
-                    </span>
-                    <h3 className="text-lg font-semibold text-text-main">
-                      {session.title}
-                    </h3>
-                    {isNext && (
-                      <span className="text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 font-medium">
-                        Next up
+                <li key={`${session.title}-${session.date}`}>
+                  {/* Native <details> keeps this a server component — the next
+                      session opens by default, the rest stay collapsed so a
+                      long series with long descriptions isn't overwhelming. */}
+                  <details
+                    open={isNext}
+                    className={`group rounded-xl border transition-colors ${
+                      isNext
+                        ? "border-primary/50 bg-primary/5"
+                        : "border-border bg-card"
+                    } ${isPast ? "opacity-60" : ""}`}
+                  >
+                    <summary className="flex cursor-pointer flex-wrap items-center gap-3 p-5 list-none [&::-webkit-details-marker]:hidden">
+                      <span
+                        className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
+                          isNext
+                            ? "bg-primary text-white"
+                            : "bg-surface text-text-secondary"
+                        }`}
+                      >
+                        {sessionIndex + 1}
                       </span>
-                    )}
-                    {isPast && (
-                      <span className="text-xs text-text-muted">Completed</span>
-                    )}
-                  </div>
-                  <p className="text-sm text-text-secondary mb-1">
-                    {formatDateWithTime(session.date)}
-                  </p>
-                  {(session.location ?? event.location) && (
-                    <p className="text-sm text-text-secondary mb-1">
-                      {session.location ?? event.location}
-                    </p>
-                  )}
-                  {session.description && (
-                    <p className="text-sm text-text-secondary leading-relaxed mt-2">
-                      {session.description}
-                    </p>
-                  )}
+                      <h3 className="text-lg font-semibold text-text-main">
+                        {session.title}
+                      </h3>
+                      {isNext && (
+                        <span className="text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 font-medium">
+                          Next up
+                        </span>
+                      )}
+                      {isPast && (
+                        <span className="text-xs text-text-muted">
+                          Completed
+                        </span>
+                      )}
+                      <span className="ml-auto flex items-center gap-3">
+                        <span className="text-sm text-text-secondary">
+                          {formatDateWithTime(session.date)}
+                        </span>
+                        <svg
+                          className="h-4 w-4 shrink-0 text-text-muted transition-transform duration-200 group-open:rotate-90"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          aria-hidden="true"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
+                      </span>
+                    </summary>
+                    <div className="px-5 pb-5 pl-15 space-y-1">
+                      {sessionLocation && (
+                        <p className="text-sm text-text-secondary">
+                          {sessionLocation}
+                        </p>
+                      )}
+                      {session.description ? (
+                        <p className="text-sm text-text-secondary leading-relaxed">
+                          {session.description}
+                        </p>
+                      ) : (
+                        !sessionLocation && (
+                          <p className="text-sm text-text-muted">
+                            No further details for this session.
+                          </p>
+                        )
+                      )}
+                    </div>
+                  </details>
                 </li>
               );
             })}
