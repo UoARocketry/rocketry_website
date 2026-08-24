@@ -6,7 +6,10 @@ import {
   revalidateTags,
 } from "../hooks/revalidation.ts";
 import { createMediaRelationUrlSyncHook } from "../hooks/media-url-sync.ts";
-import { validateOptionalUrl } from "../fields/validators.ts";
+import {
+  validateOptionalUrl,
+  validateUrlOrUpload,
+} from "../fields/validators.ts";
 
 export const Events: CollectionConfig = {
   slug: "events",
@@ -84,8 +87,8 @@ export const Events: CollectionConfig = {
       name: "image",
       type: "text",
       required: false,
-      validate: (value: unknown) =>
-        validateOptionalUrl(value, "Event image URL"),
+      validate: (value: unknown, { siblingData }: { siblingData: unknown }) =>
+        validateUrlOrUpload(value, siblingData, "imageMedia", "Event image"),
       admin: {
         description:
           "Auto-filled from the upload above whenever a file is selected there (overwrites this field on save). Leave the upload empty to link an external image URL directly instead.",

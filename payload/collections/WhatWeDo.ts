@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 import { isLoggedIn, isPublicRead } from "../access/policies.ts";
 import { BACKGROUND_SURFACE_OPTIONS } from "../fields/options.ts";
 import { createMediaRelationUrlSyncHook } from "../hooks/media-url-sync.ts";
+import { validateUrlOrUpload } from "../fields/validators.ts";
 import { revalidateAboutContent } from "../hooks/revalidation.ts";
 
 export const WhatWeDo: CollectionConfig = {
@@ -51,7 +52,13 @@ export const WhatWeDo: CollectionConfig = {
           "Upload or select an image. This auto-fills the image URL field.",
       },
     },
-    { name: "image", type: "text", required: false },
+    {
+      name: "image",
+      type: "text",
+      required: false,
+      validate: (value: unknown, { siblingData }: { siblingData: unknown }) =>
+        validateUrlOrUpload(value, siblingData, "imageMedia", "Image"),
+    },
     {
       name: "variant",
       type: "select",

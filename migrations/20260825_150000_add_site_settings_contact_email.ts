@@ -4,19 +4,20 @@ import type {
   MigrateUpArgs,
 } from "@payloadcms/drizzle/postgres";
 
-const DEFAULT_CONTACT_EMAIL = "uoarocketryclub@auckland.ac.nz";
-
+// NOTE: values must be inlined as SQL literals, not interpolated as template
+// parameters. Interpolating turns this into a prepared statement, and Postgres
+// rejects prepared statements containing multiple commands.
 export async function up({ db }: MigrateUpArgs): Promise<void> {
   await db.execute(sql`
     ALTER TABLE "site_settings" ADD COLUMN "contact_email" varchar;
     ALTER TABLE "_site_settings_v" ADD COLUMN "version_contact_email" varchar;
 
     UPDATE "site_settings"
-      SET "contact_email" = ${DEFAULT_CONTACT_EMAIL}
+      SET "contact_email" = 'uoarocketryclub@gmail.com'
       WHERE "contact_email" IS NULL;
 
     UPDATE "_site_settings_v"
-      SET "version_contact_email" = ${DEFAULT_CONTACT_EMAIL}
+      SET "version_contact_email" = 'uoarocketryclub@gmail.com'
       WHERE "latest" = true;
   `);
 }

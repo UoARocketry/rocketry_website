@@ -6,6 +6,7 @@ import {
   revalidateTags,
 } from "../hooks/revalidation.ts";
 import { createMediaRelationUrlSyncHook } from "../hooks/media-url-sync.ts";
+import { validateUrlOrUpload } from "../fields/validators.ts";
 
 export const Rockets: CollectionConfig = {
   slug: "rockets",
@@ -87,6 +88,8 @@ export const Rockets: CollectionConfig = {
       name: "image",
       type: "text",
       required: false,
+      validate: (value: unknown, { siblingData }: { siblingData: unknown }) =>
+        validateUrlOrUpload(value, siblingData, "imageMedia", "Rocket image"),
       admin: {
         description:
           "Auto-filled from the upload above whenever a file is selected there (overwrites this field on save). Leave the upload empty to link an external image URL directly instead.",
