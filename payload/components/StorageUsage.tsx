@@ -1,17 +1,32 @@
 import { getPayloadClient } from "../../lib/payload.ts";
 
 /**
- * Supabase free-tier allowances, correct as of 2026-08-25.
+ * Supabase plan allowances, defaulting to the free tier as of 2026-08-25.
  *
- * These are only used to draw the percentage bars — the byte figures beside
- * them are measured from the live database and stay accurate regardless.
- * If Supabase changes its tiers, update these two numbers; nothing else
- * depends on them.
+ * These only scale the percentage bars — the byte figures beside them are
+ * measured live and stay accurate regardless. If Supabase changes its tiers
+ * (or the project moves to Pro), override without a code change by setting
+ * SUPABASE_DATABASE_LIMIT_MB / SUPABASE_STORAGE_LIMIT_MB in the environment.
  *
  * @see https://supabase.com/pricing
  */
-const DATABASE_LIMIT_BYTES = 500 * 1024 * 1024; // 500 MB
-const STORAGE_LIMIT_BYTES = 1024 * 1024 * 1024; // 1 GB
+const DEFAULT_DATABASE_LIMIT_MB = 500;
+const DEFAULT_STORAGE_LIMIT_MB = 1024;
+
+function resolveLimitBytes(envValue: string | undefined, fallbackMb: number) {
+  const parsed = Number(envValue?.trim());
+  const megabytes = Number.isFinite(parsed) && parsed > 0 ? parsed : fallbackMb;
+  return megabytes * 1024 * 1024;
+}
+
+const DATABASE_LIMIT_BYTES = resolveLimitBytes(
+  process.env.SUPABASE_DATABASE_LIMIT_MB,
+  DEFAULT_DATABASE_LIMIT_MB,
+);
+const STORAGE_LIMIT_BYTES = resolveLimitBytes(
+  process.env.SUPABASE_STORAGE_LIMIT_MB,
+  DEFAULT_STORAGE_LIMIT_MB,
+);
 
 const SUPABASE_DASHBOARD_URL = "https://supabase.com/dashboard";
 
@@ -171,8 +186,10 @@ export default async function StorageUsage() {
         }}
       >
         Media storage counts files tracked by the CMS, so anything uploaded to
-        the bucket outside Payload is not included. Free-tier limits are correct
-        as of August 2026 —{" "}
+        the bucket outside Payload is not included. Limits default to the free
+        tier as of August 2026 and can be changed with the
+        SUPABASE_DATABASE_LIMIT_MB / SUPABASE_STORAGE_LIMIT_MB environment
+        variables —{" "}
         <a
           href={SUPABASE_DASHBOARD_URL}
           target="_blank"

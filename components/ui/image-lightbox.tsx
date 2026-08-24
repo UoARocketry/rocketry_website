@@ -191,6 +191,9 @@ export default function ImageLightbox({
           zoom > MIN_ZOOM ? "cursor-grab active:cursor-grabbing" : ""
         }`}
       >
+        {/* h-full/w-full (not h-auto) so smaller source images scale UP to fill
+            the viewport — otherwise a small upload renders at its intrinsic
+            size and the "view closely" action shows it no larger than the page. */}
         <Image
           src={current}
           alt={alt}
@@ -201,7 +204,7 @@ export default function ImageLightbox({
           style={{
             transform: `translate(${offset.x}px, ${offset.y}px) scale(${zoom})`,
           }}
-          className="h-auto max-h-[90vh] w-auto max-w-[95vw] select-none rounded-lg object-contain transition-transform duration-150"
+          className="h-full w-full select-none rounded-lg object-contain transition-transform duration-150"
         />
       </div>
 

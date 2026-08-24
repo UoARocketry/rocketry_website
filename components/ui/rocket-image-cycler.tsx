@@ -30,16 +30,28 @@ export default function RocketImageCycler({
       <button
         type="button"
         onClick={() => setIsLightboxOpen(true)}
-        className="block w-full cursor-zoom-in"
+        className="relative block w-full cursor-zoom-in overflow-hidden rounded-lg border border-border bg-surface shadow-lg"
         aria-label="View image in full size"
       >
+        {/* A blurred copy fills the letterbox area. Without it, images whose
+            aspect ratio doesn't match the box leave dead space that is
+            indistinguishable from the near-black page background. */}
+        <Image
+          src={current}
+          alt=""
+          aria-hidden="true"
+          width={1200}
+          height={900}
+          sizes="(max-width: 1024px) 100vw, 50vw"
+          className="absolute inset-0 h-full w-full scale-110 object-cover opacity-30 blur-2xl"
+        />
         <Image
           src={current}
           alt={alt}
           width={1200}
           height={900}
           sizes="(max-width: 1024px) 100vw, 50vw"
-          className="w-full h-96 object-contain rounded-lg shadow-lg bg-surface"
+          className="relative w-full h-96 object-contain"
         />
       </button>
 
