@@ -1,5 +1,6 @@
 import React from "react";
 import Image from "next/image";
+import ClampedDescription from "@/components/ui/clamped-description";
 
 interface CardProps {
   readonly image: string;
@@ -54,10 +55,6 @@ export default function Card({
     ? "border-primary/50 hover:border-primary shadow-lg shadow-primary/10 ring-1 ring-primary/20"
     : "border-border hover:border-primary/50";
   const trimmedDescription = description.trim();
-  const eventCardDescription =
-    trimmedDescription.length > 0
-      ? `${trimmedDescription} ... see more`
-      : "See more";
 
   if (vertical) {
     return (
@@ -93,17 +90,7 @@ export default function Card({
             <h3 className="text-lg font-semibold text-text-main mb-2 group-hover:text-primary transition-colors duration-200">
               {title}
             </h3>
-            <p
-              className="text-text-secondary text-sm leading-relaxed"
-              style={{
-                display: "-webkit-box",
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: "vertical",
-                overflow: "hidden",
-              }}
-            >
-              {eventCardDescription}
-            </p>
+            <ClampedDescription text={trimmedDescription} lines={2} />
           </div>
           <div className="mt-4 flex items-center text-primary text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200">
             Learn more
@@ -161,9 +148,7 @@ export default function Card({
         <h3 className="text-xl font-semibold text-text-main mb-2 group-hover:text-primary transition-colors duration-200">
           {title}
         </h3>
-        <p className="text-text-secondary text-sm leading-relaxed line-clamp-3">
-          {description}
-        </p>
+        <ClampedDescription text={trimmedDescription} lines={3} />
         <div className="mt-4 flex items-center text-primary text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200">
           View details
           <svg
