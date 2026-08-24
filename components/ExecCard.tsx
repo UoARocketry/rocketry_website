@@ -8,6 +8,7 @@ type ExecCardModel = {
   role?: Exec["role"];
   bio?: Exec["bio"];
   photo?: Exec["photo"];
+  photoPosition?: Exec["photoPosition"];
   linkedinUrl?: Exec["linkedinUrl"];
 };
 
@@ -38,6 +39,7 @@ export default function ExecCard({
             alt={exec.name}
             fill
             sizes="112px"
+            style={{ objectPosition: exec.photoPosition || "50% 50%" }}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
           <div className="absolute inset-0 bg-linear-to-t from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

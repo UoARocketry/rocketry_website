@@ -87,6 +87,17 @@ export const Executives: CollectionConfig = {
       },
     },
     {
+      name: "photoPosition",
+      type: "text",
+      required: false,
+      defaultValue: "50% 50%",
+      admin: {
+        components: {
+          Field: "/payload/components/PhotoPositionField.tsx#PhotoPositionField",
+        },
+      },
+    },
+    {
       name: "year",
       type: "number",
       required: true,

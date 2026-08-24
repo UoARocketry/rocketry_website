@@ -39,6 +39,7 @@ export type Exec = {
   role: string;
   bio: string;
   photo: string;
+  photoPosition?: string | null;
   year: number;
   linkedinUrl?: string | null;
 };

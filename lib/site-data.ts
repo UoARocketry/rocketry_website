@@ -238,6 +238,7 @@ function mapExec(doc: PayloadExecutive): Exec {
     role: doc.role,
     bio: doc.bio,
     photo: doc.photo,
+    photoPosition: doc.photoPosition ?? null,
     year: doc.year,
     linkedinUrl: doc.linkedinUrl ?? null,
   };

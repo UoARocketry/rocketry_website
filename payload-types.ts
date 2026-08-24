@@ -289,6 +289,7 @@ export interface Executive {
    * Auto-filled from the upload above whenever a file is selected there (overwrites this field on save). Leave the upload empty to link an external image URL directly instead.
    */
   photo: string;
+  photoPosition?: string | null;
   year: number;
   order: number;
   linkedinUrl?: string | null;
@@ -628,6 +629,7 @@ export interface ExecutivesSelect<T extends boolean = true> {
   bio?: T;
   photoMedia?: T;
   photo?: T;
+  photoPosition?: T;
   year?: T;
   order?: T;
   linkedinUrl?: T;
