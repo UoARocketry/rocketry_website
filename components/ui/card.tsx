@@ -48,8 +48,8 @@ export default function Card({
 }: CardProps) {
   const imageSrc = image || "/UARC logo.png";
   const isSeries = Boolean(meta);
-  // A multi-session series gets a warmer border, a primary wash and a left
-  // accent stripe so it is unmistakable in a grid of one-off events.
+  // A multi-session series gets a warmer border, ring and primary wash so it
+  // reads as distinct in a grid of one-off events.
   const seriesShell = isSeries
     ? "border-primary/50 hover:border-primary shadow-lg shadow-primary/10 ring-1 ring-primary/20"
     : "border-border hover:border-primary/50";
@@ -62,14 +62,8 @@ export default function Card({
   if (vertical) {
     return (
       <div
-        className={`group relative bg-card rounded-xl border overflow-hidden flex flex-col h-full transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 ${seriesShell}`}
+        className={`group bg-card rounded-xl border overflow-hidden flex flex-col h-full transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 ${seriesShell}`}
       >
-        {isSeries && (
-          <span
-            aria-hidden="true"
-            className="absolute inset-y-0 left-0 z-20 w-1 bg-primary"
-          />
-        )}
         <div className="relative overflow-hidden">
           <Image
             src={imageSrc}
@@ -134,18 +128,12 @@ export default function Card({
 
   return (
     <div
-      className={`group relative bg-card rounded-xl border overflow-hidden flex h-80 md:h-72 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 ${seriesShell} ${
+      className={`group bg-card rounded-xl border overflow-hidden flex h-80 md:h-72 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 ${seriesShell} ${
         reverse
           ? "flex-col-reverse md:flex-row-reverse"
           : "flex-col md:flex-row"
       }`}
     >
-      {isSeries && (
-        <span
-          aria-hidden="true"
-          className="absolute inset-y-0 left-0 z-20 w-1 bg-primary"
-        />
-      )}
       <div className="relative overflow-hidden h-48 md:h-full md:w-1/2">
         <Image
           src={imageSrc}
