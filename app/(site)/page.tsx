@@ -185,7 +185,16 @@ export default async function HomePage() {
               description="We do not have any future events scheduled yet. Check back soon for new workshops, talks, and launch activities."
             />
           ) : (
-            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
+            <div
+              className={`grid gap-6 grid-cols-1 sm:grid-cols-2 ${
+                // A lone card would otherwise sit in the left column. Narrowing
+                // the grid to one column's width (half, less the gap) and
+                // centring it keeps the card exactly the same size.
+                latestEvents.length === 1
+                  ? "sm:grid-cols-1 sm:max-w-[calc(50%-0.75rem)] sm:mx-auto"
+                  : ""
+              }`}
+            >
               {latestEvents.map((event) => (
                 <Link
                   key={event.id}

@@ -113,16 +113,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
               }
             />
           ) : (
-            <div
-              className={`grid gap-6 grid-cols-1 sm:grid-cols-2 ${
-                // A lone card would otherwise sit in the left column. Narrowing
-                // the grid to one column's width (half, less the gap) and
-                // centring it keeps the card exactly the same size.
-                filteredUpcoming.length === 1
-                  ? "sm:grid-cols-1 sm:max-w-[calc(50%-0.75rem)] sm:mx-auto"
-                  : ""
-              }`}
-            >
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
               {filteredUpcoming.map((event: EventLocal) => (
                 <Link
                   key={event.id}
