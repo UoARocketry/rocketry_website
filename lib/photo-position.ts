@@ -66,6 +66,13 @@ export function photoFramingStyle({ x, y, zoom }: PhotoFraming): CSSProperties {
     // next/image's `fill` sets right/bottom, which would fight the offsets.
     right: "auto",
     bottom: "auto",
+    // Tailwind Preflight (and Payload's admin reset) apply
+    // `img { max-width: 100% }`, which silently clamps the zoomed width back to
+    // the container while the offset above still shifts the image — leaving a
+    // gap at one edge that grows as you pan. An inline `width` does not
+    // override a stylesheet `max-width`, so it must be cleared explicitly.
+    maxWidth: "none",
+    maxHeight: "none",
     objectFit: "cover",
     objectPosition: `${x}% ${y}%`,
   };

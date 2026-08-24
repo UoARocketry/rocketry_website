@@ -47,10 +47,11 @@ export default function Card({
   vertical = false,
 }: CardProps) {
   const imageSrc = image || "/UARC logo.png";
-  // A multi-session series gets a warmer border and a subtle primary wash so
-  // it reads as different in a grid of one-off events.
-  const seriesShell = meta
-    ? "border-primary/30 hover:border-primary/60 shadow-primary/10"
+  const isSeries = Boolean(meta);
+  // A multi-session series gets a warmer border, a primary wash and a left
+  // accent stripe so it is unmistakable in a grid of one-off events.
+  const seriesShell = isSeries
+    ? "border-primary/50 hover:border-primary shadow-lg shadow-primary/10 ring-1 ring-primary/20"
     : "border-border hover:border-primary/50";
   const trimmedDescription = description.trim();
   const eventCardDescription =
@@ -61,8 +62,14 @@ export default function Card({
   if (vertical) {
     return (
       <div
-        className={`group bg-card rounded-xl border overflow-hidden flex flex-col h-full transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 ${seriesShell}`}
+        className={`group relative bg-card rounded-xl border overflow-hidden flex flex-col h-full transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 ${seriesShell}`}
       >
+        {isSeries && (
+          <span
+            aria-hidden="true"
+            className="absolute inset-y-0 left-0 z-20 w-1 bg-primary"
+          />
+        )}
         <div className="relative overflow-hidden">
           <Image
             src={imageSrc}
@@ -74,7 +81,11 @@ export default function Card({
           />
           <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         </div>
-        <div className="flex-1 p-6 flex flex-col justify-between">
+        <div
+          className={`flex-1 p-6 flex flex-col justify-between ${
+            isSeries ? "bg-linear-to-br from-primary/8 to-transparent" : ""
+          }`}
+        >
           <div>
             <div className="flex items-center gap-3 mb-3">
               <span className="text-xs font-medium text-primary">{date}</span>
@@ -123,12 +134,18 @@ export default function Card({
 
   return (
     <div
-      className={`group bg-card rounded-xl border overflow-hidden flex h-80 md:h-72 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 ${seriesShell} ${
+      className={`group relative bg-card rounded-xl border overflow-hidden flex h-80 md:h-72 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 ${seriesShell} ${
         reverse
           ? "flex-col-reverse md:flex-row-reverse"
           : "flex-col md:flex-row"
       }`}
     >
+      {isSeries && (
+        <span
+          aria-hidden="true"
+          className="absolute inset-y-0 left-0 z-20 w-1 bg-primary"
+        />
+      )}
       <div className="relative overflow-hidden h-48 md:h-full md:w-1/2">
         <Image
           src={imageSrc}
@@ -139,7 +156,11 @@ export default function Card({
         />
         <div className="absolute inset-0 bg-linear-to-r from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       </div>
-      <div className="flex-1 p-6 flex flex-col justify-center">
+      <div
+        className={`flex-1 p-6 flex flex-col justify-center ${
+          isSeries ? "bg-linear-to-br from-primary/8 to-transparent" : ""
+        }`}
+      >
         <div className="flex items-center gap-3 mb-3">
           <span className="text-xs font-medium text-primary">{date}</span>
           {tag && (

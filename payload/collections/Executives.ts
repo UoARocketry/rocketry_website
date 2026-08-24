@@ -84,7 +84,8 @@ export const Executives: CollectionConfig = {
     {
       name: "photo",
       type: "text",
-      required: false,
+      // See Events.ts: `required` is the asterisk only; `validate` is the gate.
+      required: true,
       validate: (value: unknown, { siblingData }: { siblingData: unknown }) =>
         validateUrlOrUpload(value, siblingData, "photoMedia", "Photo"),
       admin: {

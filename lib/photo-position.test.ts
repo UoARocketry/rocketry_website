@@ -83,4 +83,12 @@ describe("photoFramingStyle", () => {
     expect(style.bottom).toBe("auto");
     expect(style.position).toBe("absolute");
   });
+
+  it("clears the max-width/height reset that would clamp a zoomed image", () => {
+    // Tailwind Preflight's `img { max-width: 100% }` would otherwise cap the
+    // width back to the container while the offset still pans, leaving a gap.
+    const style = photoFramingStyle({ x: 32, y: 0, zoom: 1.5 });
+    expect(style.maxWidth).toBe("none");
+    expect(style.maxHeight).toBe("none");
+  });
 });

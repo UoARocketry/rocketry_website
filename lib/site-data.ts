@@ -237,8 +237,8 @@ function mapExec(doc: PayloadExecutive): Exec {
     name: doc.name,
     role: doc.role,
     bio: doc.bio,
-    // Optional at the schema level since it may be supplied via the upload
-    // relation instead; the sync hook fills it in on save.
+    // Typed non-null, but the column is nullable and rows published before the
+    // image became mandatory may still hold null. Cards fall back to the logo.
     photo: doc.photo ?? "",
     photoPosition: doc.photoPosition ?? null,
     year: doc.year,
@@ -287,8 +287,8 @@ function mapSponsor(doc: PayloadSponsor): Sponsor {
   return {
     id: doc.id,
     name: doc.name,
-    // Optional at the schema level since it may be supplied via the upload
-    // relation instead; the sync hook fills it in on save.
+    // Typed non-null, but the column is nullable and rows published before the
+    // image became mandatory may still hold null. Cards fall back to the logo.
     logo: doc.logo ?? "",
     url: doc.url,
     description: doc.description ?? null,

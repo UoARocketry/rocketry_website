@@ -202,7 +202,7 @@ export interface Event {
   /**
    * Auto-filled from the upload above whenever a file is selected there (overwrites this field on save). Leave the upload empty to link an external image URL directly instead.
    */
-  image?: string | null;
+  image: string;
   description: string;
   date: string;
   /**
@@ -256,7 +256,7 @@ export interface Rocket {
   /**
    * Auto-filled from the upload above whenever a file is selected there (overwrites this field on save). Leave the upload empty to link an external image URL directly instead.
    */
-  image?: string | null;
+  image: string;
   description?: string | null;
   launchedAt?: string | null;
   /**
@@ -288,7 +288,7 @@ export interface Executive {
   /**
    * Auto-filled from the upload above whenever a file is selected there (overwrites this field on save). Leave the upload empty to link an external image URL directly instead.
    */
-  photo?: string | null;
+  photo: string;
   photoPosition?: string | null;
   year: number;
   order: number;
@@ -311,7 +311,7 @@ export interface Sponsor {
   /**
    * Auto-filled from the upload above whenever a file is selected there (overwrites this field on save). Leave the upload empty to link an external logo URL directly instead.
    */
-  logo?: string | null;
+  logo: string;
   url: string;
   description?: string | null;
   /**
@@ -346,7 +346,7 @@ export interface WhatWeDo {
    * Upload or select an image. This auto-fills the image URL field.
    */
   imageMedia?: (number | null) | Media;
-  image?: string | null;
+  image: string;
   variant?: ('background' | 'surface') | null;
   order: number;
   updatedAt: string;
@@ -365,7 +365,7 @@ export interface JourneyItem {
    * Upload or select an image. This auto-fills the image URL field.
    */
   imageMedia?: (number | null) | Media;
-  image?: string | null;
+  image: string;
   variant?: ('background' | 'surface') | null;
   order: number;
   updatedAt: string;

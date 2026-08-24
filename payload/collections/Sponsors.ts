@@ -58,7 +58,8 @@ export const Sponsors: CollectionConfig = {
     {
       name: "logo",
       type: "text",
-      required: false,
+      // See Events.ts: `required` is the asterisk only; `validate` is the gate.
+      required: true,
       validate: (value: unknown, { siblingData }: { siblingData: unknown }) =>
         validateUrlOrUpload(value, siblingData, "logoMedia", "Logo URL"),
       admin: {

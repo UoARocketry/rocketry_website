@@ -86,7 +86,10 @@ export const Events: CollectionConfig = {
     {
       name: "image",
       type: "text",
-      required: false,
+      // `required` only drives the admin's asterisk here: supplying a custom
+      // `validate` replaces Payload's built-in required check entirely, so the
+      // upload-or-URL rule below is what actually gates saving.
+      required: true,
       validate: (value: unknown, { siblingData }: { siblingData: unknown }) =>
         validateUrlOrUpload(value, siblingData, "imageMedia", "Event image"),
       admin: {
