@@ -32,3 +32,36 @@ export function validateRequiredUrl(
 
   return isValidUrl(value) || `${fieldLabel} must be a valid http(s) URL.`;
 }
+
+/**
+ * For URL fields that are auto-filled from a sibling upload relation by a
+ * `beforeChange` hook.
+ *
+ * Marking such a field `required` does not work: Payload validates fields
+ * *before* running `beforeChange`, so a freshly uploaded file fails validation
+ * even though the URL is about to be populated. This accepts either source and
+ * only complains when both are genuinely empty.
+ */
+export function validateUrlOrUpload(
+  value: unknown,
+  siblingData: unknown,
+  relationField: string,
+  fieldLabel = "URL",
+): true | string {
+  if (isNonEmptyString(value)) {
+    return isValidUrl(value) || `${fieldLabel} must be a valid http(s) URL.`;
+  }
+
+  const sibling =
+    siblingData && typeof siblingData === "object"
+      ? (siblingData as Record<string, unknown>)
+      : {};
+  const relationValue = sibling[relationField];
+  const hasUpload =
+    relationValue !== null && relationValue !== undefined && relationValue !== "";
+
+  return (
+    hasUpload ||
+    `${fieldLabel} is required — either upload a file above or paste an image URL here.`
+  );
+}

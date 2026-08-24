@@ -7,6 +7,7 @@ import { getEventsOverview, type EventSummary } from "@/lib/site-data";
 import {
   ALL_EVENTS_TAG,
   formatEventCardDate,
+  formatEventSessionsLabel,
   formatEventTagLabel,
   normalizeEventTag,
   normalizeEventTagParam,
@@ -124,6 +125,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
                     title={event.title}
                     date={formatEventCardDate(event)}
                     tag={formatEventTagLabel(event.eventTag)}
+                    meta={formatEventSessionsLabel(event)}
                     description={event.description ?? ""}
                     vertical
                   />
@@ -163,6 +165,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
                     title={event.title}
                     date={formatEventCardDate(event)}
                     tag={formatEventTagLabel(event.eventTag)}
+                    meta={formatEventSessionsLabel(event)}
                     description={event.description ?? ""}
                     vertical
                   />

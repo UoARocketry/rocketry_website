@@ -2,7 +2,10 @@ import type { CollectionConfig } from "payload";
 import { isLoggedIn, isPublicRead } from "../access/policies.ts";
 import { createMediaRelationUrlSyncHook } from "../hooks/media-url-sync.ts";
 import { revalidatePaths, revalidateTags } from "../hooks/revalidation.ts";
-import { validateRequiredUrl } from "../fields/validators.ts";
+import {
+  validateRequiredUrl,
+  validateUrlOrUpload,
+} from "../fields/validators.ts";
 
 export const Sponsors: CollectionConfig = {
   slug: "sponsors",
@@ -54,8 +57,9 @@ export const Sponsors: CollectionConfig = {
     {
       name: "logo",
       type: "text",
-      required: true,
-      validate: (value: unknown) => validateRequiredUrl(value, "Logo URL"),
+      required: false,
+      validate: (value: unknown, { siblingData }: { siblingData: unknown }) =>
+        validateUrlOrUpload(value, siblingData, "logoMedia", "Logo URL"),
       admin: {
         description:
           "Auto-filled from the upload above whenever a file is selected there (overwrites this field on save). Leave the upload empty to link an external logo URL directly instead.",

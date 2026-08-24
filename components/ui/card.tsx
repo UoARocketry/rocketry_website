@@ -7,6 +7,8 @@ interface CardProps {
   readonly date: string;
   readonly description: string;
   readonly tag?: string | null;
+  /** Optional right-aligned detail, e.g. a multi-session series summary. */
+  readonly meta?: string | null;
   readonly reverse?: boolean;
   readonly vertical?: boolean;
 }
@@ -17,6 +19,7 @@ export default function Card({
   date,
   description,
   tag,
+  meta,
   reverse = false,
   vertical = false,
 }: CardProps) {
@@ -48,6 +51,11 @@ export default function Card({
               {tag && (
                 <span className="text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 font-medium">
                   {tag}
+                </span>
+              )}
+              {meta && (
+                <span className="ml-auto shrink-0 text-xs text-text-secondary">
+                  {meta}
                 </span>
               )}
             </div>
@@ -111,6 +119,11 @@ export default function Card({
           {tag && (
             <span className="text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 font-medium">
               {tag}
+            </span>
+          )}
+          {meta && (
+            <span className="ml-auto shrink-0 text-xs text-text-secondary">
+              {meta}
             </span>
           )}
         </div>

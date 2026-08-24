@@ -67,11 +67,7 @@ function getSortedSessionTimestamps(
 
 /**
  * The date to show on an event card. For a multi-session series this is the
- * next upcoming session (or the final one once the series has finished).
- *
- * While sessions remain it reads "<next date> · 4 of 6 left" so the count is
- * unambiguously the number still to run; once finished it falls back to the
- * total, e.g. "<last date> · 6 sessions".
+ * next upcoming session, or the final one once the series has finished.
  */
 export function formatEventCardDate(
   event: EventLike,
@@ -84,17 +80,34 @@ export function formatEventCardDate(
   }
 
   const now = Date.now();
-  const remaining = timestamps.filter((timestamp) => timestamp >= now);
-  const nextTimestamp = remaining[0] ?? timestamps[timestamps.length - 1];
-  const label = formatDateShort(new Date(nextTimestamp), locale);
+  const nextTimestamp =
+    timestamps.find((timestamp) => timestamp >= now) ??
+    timestamps[timestamps.length - 1];
 
-  if (timestamps.length === 1) {
-    return label;
+  return formatDateShort(new Date(nextTimestamp), locale);
+}
+
+/**
+ * Session summary shown alongside the date on an event card, or null for
+ * one-off and single-session events.
+ *
+ * While sessions remain it counts what is still to run ("4 of 6 left") rather
+ * than the total, so it can't be misread against the next-session date beside
+ * it. Once finished it reports the total instead.
+ */
+export function formatEventSessionsLabel(event: EventLike): string | null {
+  const timestamps = getSortedSessionTimestamps(event.sessions ?? []);
+
+  if (timestamps.length < 2) {
+    return null;
   }
 
-  return remaining.length > 0
-    ? `${label} · ${remaining.length} of ${timestamps.length} left`
-    : `${label} · ${timestamps.length} sessions`;
+  const now = Date.now();
+  const remaining = timestamps.filter((timestamp) => timestamp >= now).length;
+
+  return remaining > 0
+    ? `${remaining} of ${timestamps.length} left`
+    : `${timestamps.length} sessions`;
 }
 
 /** True while any part of the event (or series) is still in the future. */

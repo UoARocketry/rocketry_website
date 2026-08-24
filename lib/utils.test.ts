@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   findNextSessionIndex,
   formatEventCardDate,
+  formatEventSessionsLabel,
   isEventUpcoming,
 } from "./utils.ts";
 
@@ -82,52 +83,80 @@ describe("findNextSessionIndex", () => {
 describe("formatEventCardDate", () => {
   // Asserts which session was picked without hard-coding a formatted date,
   // which would otherwise depend on the machine's timezone.
-  const expectLabel = (actual: string, source: string, suffix = "") => {
-    const date = new Date(source).toLocaleDateString("en-US");
-    expect(actual).toBe(suffix ? `${date} · ${suffix}` : date);
+  const expectDate = (actual: string, source: string) => {
+    expect(actual).toBe(new Date(source).toLocaleDateString("en-US"));
   };
 
   it("falls back to the event date when there are no sessions", () => {
-    expectLabel(formatEventCardDate({ date: future(1).date }), future(1).date);
+    expectDate(formatEventCardDate({ date: future(1).date }), future(1).date);
   });
 
-  it("counts sessions still to run, not the total, while any remain", () => {
-    expectLabel(
+  it("shows the next session still to run", () => {
+    expectDate(
       formatEventCardDate({
         date: past(1).date,
         sessions: [past(2), future(1), future(8)],
       }),
       future(1).date,
-      "2 of 3 left",
     );
   });
 
-  it("shows the total once the series has finished", () => {
-    expectLabel(
+  it("shows the final session once the series has finished", () => {
+    expectDate(
       formatEventCardDate({
         date: past(1).date,
         sessions: [past(2), past(10)],
       }),
       past(10).date,
-      "2 sessions",
-    );
-  });
-
-  it("omits the count for a single session", () => {
-    expectLabel(
-      formatEventCardDate({ date: past(1).date, sessions: [future(1)] }),
-      future(1).date,
     );
   });
 
   it("sorts sessions by date rather than trusting array order", () => {
-    expectLabel(
+    expectDate(
       formatEventCardDate({
         date: past(1).date,
         sessions: [future(8), future(1)],
       }),
       future(1).date,
-      "2 of 2 left",
     );
+  });
+});
+
+describe("formatEventSessionsLabel", () => {
+  it("returns null when there are no sessions", () => {
+    expect(formatEventSessionsLabel({ date: future(1).date })).toBeNull();
+  });
+
+  it("returns null for a single session", () => {
+    expect(
+      formatEventSessionsLabel({ date: past(1).date, sessions: [future(1)] }),
+    ).toBeNull();
+  });
+
+  it("counts sessions still to run, not the total, while any remain", () => {
+    expect(
+      formatEventSessionsLabel({
+        date: past(1).date,
+        sessions: [past(2), future(1), future(8)],
+      }),
+    ).toBe("2 of 3 left");
+  });
+
+  it("reports the total once the series has finished", () => {
+    expect(
+      formatEventSessionsLabel({
+        date: past(1).date,
+        sessions: [past(2), past(10)],
+      }),
+    ).toBe("2 sessions");
+  });
+
+  it("ignores unparseable session dates", () => {
+    expect(
+      formatEventSessionsLabel({
+        date: past(1).date,
+        sessions: [future(1), { title: "Broken", date: "not-a-date" }],
+      }),
+    ).toBeNull();
   });
 });
