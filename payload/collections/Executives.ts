@@ -19,6 +19,7 @@ export const Executives: CollectionConfig = {
   },
   versions: {
     drafts: true,
+    maxPerDoc: 20,
   },
   access: {
     read: isPublicRead,

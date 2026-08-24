@@ -10,6 +10,7 @@ import { getSiteSettings } from "@/lib/site-data";
 import { resolveServerUrl } from "@/lib/env";
 import { toSafeJsonLd } from "@/lib/utils";
 import {
+  DEFAULT_CONTACT_EMAIL,
   DEFAULT_DISCORD_URL,
   DEFAULT_INSTAGRAM_URL,
   DEFAULT_LINKEDIN_URL,
@@ -77,6 +78,7 @@ export default async function RootLayout({
   let linkedinUrl = DEFAULT_LINKEDIN_URL;
   let instagramUrl = DEFAULT_INSTAGRAM_URL;
   let discordUrl = DEFAULT_DISCORD_URL;
+  let contactEmail = DEFAULT_CONTACT_EMAIL;
 
   try {
     const settings = await getSiteSettings();
@@ -84,6 +86,7 @@ export default async function RootLayout({
     linkedinUrl = settings.linkedinUrl?.trim() || DEFAULT_LINKEDIN_URL;
     instagramUrl = settings.instagramUrl?.trim() || DEFAULT_INSTAGRAM_URL;
     discordUrl = settings.discordUrl?.trim() || DEFAULT_DISCORD_URL;
+    contactEmail = settings.contactEmail?.trim() || DEFAULT_CONTACT_EMAIL;
   } catch (error) {
     console.error("[app/layout] Failed to load site settings:", error);
   }
@@ -96,7 +99,7 @@ export default async function RootLayout({
     alternateName: "UARC",
     url: SITE_URL,
     logo: `${SITE_URL}/UARC logo.png`,
-    email: "uoarocketryclub@auckland.ac.nz",
+    email: contactEmail,
     sameAs: [discordUrl, linkedinUrl, instagramUrl],
     parentOrganization: {
       "@type": "CollegeOrUniversity",

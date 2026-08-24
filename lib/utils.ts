@@ -106,8 +106,8 @@ export function formatEventSessionsLabel(event: EventLike): string | null {
   const remaining = timestamps.filter((timestamp) => timestamp >= now).length;
 
   return remaining > 0
-    ? `${remaining} of ${timestamps.length} left`
-    : `${timestamps.length} sessions`;
+    ? `Sessions: ${remaining} of ${timestamps.length} left`
+    : `Sessions: ${timestamps.length} total`;
 }
 
 /** True while any part of the event (or series) is still in the future. */

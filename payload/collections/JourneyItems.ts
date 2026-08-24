@@ -12,6 +12,7 @@ export const JourneyItems: CollectionConfig = {
   },
   versions: {
     drafts: true,
+    maxPerDoc: 20,
   },
   access: {
     read: isPublicRead,

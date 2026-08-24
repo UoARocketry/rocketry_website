@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import React from "react";
 import SponsorCard from "@/components/ui/sponsor-card";
-import { getSponsors, type Sponsor } from "@/lib/site-data";
+import { getSiteSettings, getSponsors, type Sponsor } from "@/lib/site-data";
 import { buildSponsorTierSections } from "@/lib/sponsor-utils";
+import { DEFAULT_CONTACT_EMAIL } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Sponsors",
@@ -21,6 +22,14 @@ export default async function SponsorsPage() {
     const message =
       error instanceof Error ? error.message : "Unknown sponsors load failure";
     console.warn("[app/sponsors] Could not load sponsors:", message);
+  }
+
+  let contactEmail = DEFAULT_CONTACT_EMAIL;
+  try {
+    const settings = await getSiteSettings();
+    contactEmail = settings.contactEmail?.trim() || DEFAULT_CONTACT_EMAIL;
+  } catch {
+    // Fall back to the built-in address.
   }
 
   const tierSections = buildSponsorTierSections(sponsors);
@@ -42,7 +51,7 @@ export default async function SponsorsPage() {
             contributions make our rocketry projects and events possible.
           </p>
           <a
-            href="mailto:uoarocketryclub@gmail.com"
+            href={`mailto:${contactEmail}`}
             className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark px-6 py-3 rounded-lg font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-primary/20"
             style={{ color: "#ffffff" }}
           >
@@ -110,7 +119,7 @@ export default async function SponsorsPage() {
                 benefits.
               </p>
               <a
-                href="mailto:uoarocketryclub@gmail.com"
+                href={`mailto:${contactEmail}`}
                 className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark px-6 py-3 rounded-lg font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-primary/20"
                 style={{ color: "#ffffff" }}
               >

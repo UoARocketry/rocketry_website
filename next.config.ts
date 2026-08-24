@@ -36,6 +36,11 @@ const nextConfig: NextConfig = {
             },
           ]
         : []),
+      // Image fields across the CMS offer pasting an external URL as an
+      // alternative to uploading. Without a matching pattern next/image
+      // rejects those hosts outright and the image silently fails to load.
+      // Only authenticated admins can set these fields.
+      { protocol: "https" as const, hostname: "**" },
     ],
   },
   async headers() {
@@ -46,7 +51,8 @@ const nextConfig: NextConfig = {
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com",
       "style-src 'self' 'unsafe-inline'",
-      `img-src 'self' data: blob: ${supabaseSrc}`.trim(),
+      // https: covers externally-linked images from CMS image URL fields.
+      `img-src 'self' data: blob: https: ${supabaseSrc}`.trim(),
       "font-src 'self' data:",
       `connect-src 'self' https://vitals.vercel-insights.com ${supabaseSrc}`.trim(),
       "frame-ancestors 'none'",

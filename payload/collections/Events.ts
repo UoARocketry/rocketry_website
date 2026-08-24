@@ -16,6 +16,7 @@ export const Events: CollectionConfig = {
   },
   versions: {
     drafts: true,
+    maxPerDoc: 20,
   },
   access: {
     read: isPublicRead,

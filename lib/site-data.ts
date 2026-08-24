@@ -237,7 +237,9 @@ function mapExec(doc: PayloadExecutive): Exec {
     name: doc.name,
     role: doc.role,
     bio: doc.bio,
-    photo: doc.photo,
+    // Optional at the schema level since it may be supplied via the upload
+    // relation instead; the sync hook fills it in on save.
+    photo: doc.photo ?? "",
     photoPosition: doc.photoPosition ?? null,
     year: doc.year,
     linkedinUrl: doc.linkedinUrl ?? null,
@@ -285,7 +287,9 @@ function mapSponsor(doc: PayloadSponsor): Sponsor {
   return {
     id: doc.id,
     name: doc.name,
-    logo: doc.logo,
+    // Optional at the schema level since it may be supplied via the upload
+    // relation instead; the sync hook fills it in on save.
+    logo: doc.logo ?? "",
     url: doc.url,
     description: doc.description ?? null,
     tier,
@@ -556,6 +560,7 @@ export const getSiteSettings = unstable_cache(
       discordUrl: doc.discordUrl ?? null,
       instagramUrl: doc.instagramUrl ?? null,
       linkedinUrl: doc.linkedinUrl ?? null,
+      contactEmail: doc.contactEmail ?? null,
     };
   },
   ["site-settings"],

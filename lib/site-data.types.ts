@@ -104,4 +104,5 @@ export type SiteSettings = {
   discordUrl?: string | null;
   instagramUrl?: string | null;
   linkedinUrl?: string | null;
+  contactEmail?: string | null;
 };

@@ -15,6 +15,7 @@ export const Sponsors: CollectionConfig = {
   },
   versions: {
     drafts: true,
+    maxPerDoc: 20,
   },
   access: {
     read: isPublicRead,

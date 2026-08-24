@@ -139,7 +139,7 @@ describe("formatEventSessionsLabel", () => {
         date: past(1).date,
         sessions: [past(2), future(1), future(8)],
       }),
-    ).toBe("2 of 3 left");
+    ).toBe("Sessions: 2 of 3 left");
   });
 
   it("reports the total once the series has finished", () => {
@@ -148,7 +148,7 @@ describe("formatEventSessionsLabel", () => {
         date: past(1).date,
         sessions: [past(2), past(10)],
       }),
-    ).toBe("2 sessions");
+    ).toBe("Sessions: 2 total");
   });
 
   it("ignores unparseable session dates", () => {

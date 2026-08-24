@@ -13,6 +13,29 @@ interface CardProps {
   readonly vertical?: boolean;
 }
 
+/** Marks a card as part of a series — a stacked-layers glyph beside the count. */
+function SeriesBadge({ label }: { readonly label: string }) {
+  return (
+    <span className="ml-auto inline-flex shrink-0 items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
+      <svg
+        className="h-3.5 w-3.5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M4 7l8-4 8 4-8 4-8-4zm0 5l8 4 8-4M4 17l8 4 8-4"
+        />
+      </svg>
+      {label}
+    </span>
+  );
+}
+
 export default function Card({
   image,
   title,
@@ -24,6 +47,11 @@ export default function Card({
   vertical = false,
 }: CardProps) {
   const imageSrc = image || "/UARC logo.png";
+  // A multi-session series gets a warmer border and a subtle primary wash so
+  // it reads as different in a grid of one-off events.
+  const seriesShell = meta
+    ? "border-primary/30 hover:border-primary/60 shadow-primary/10"
+    : "border-border hover:border-primary/50";
   const trimmedDescription = description.trim();
   const eventCardDescription =
     trimmedDescription.length > 0
@@ -32,7 +60,9 @@ export default function Card({
 
   if (vertical) {
     return (
-      <div className="group bg-card rounded-xl border border-border overflow-hidden flex flex-col h-full transition-all duration-300 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1">
+      <div
+        className={`group bg-card rounded-xl border overflow-hidden flex flex-col h-full transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 ${seriesShell}`}
+      >
         <div className="relative overflow-hidden">
           <Image
             src={imageSrc}
@@ -53,11 +83,7 @@ export default function Card({
                   {tag}
                 </span>
               )}
-              {meta && (
-                <span className="ml-auto shrink-0 text-xs text-text-secondary">
-                  {meta}
-                </span>
-              )}
+              {meta && <SeriesBadge label={meta} />}
             </div>
             <h3 className="text-lg font-semibold text-text-main mb-2 group-hover:text-primary transition-colors duration-200">
               {title}
@@ -97,7 +123,7 @@ export default function Card({
 
   return (
     <div
-      className={`group bg-card rounded-xl border border-border overflow-hidden flex h-80 md:h-72 transition-all duration-300 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 ${
+      className={`group bg-card rounded-xl border overflow-hidden flex h-80 md:h-72 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 ${seriesShell} ${
         reverse
           ? "flex-col-reverse md:flex-row-reverse"
           : "flex-col md:flex-row"
@@ -121,11 +147,7 @@ export default function Card({
               {tag}
             </span>
           )}
-          {meta && (
-            <span className="ml-auto shrink-0 text-xs text-text-secondary">
-              {meta}
-            </span>
-          )}
+          {meta && <SeriesBadge label={meta} />}
         </div>
         <h3 className="text-xl font-semibold text-text-main mb-2 group-hover:text-primary transition-colors duration-200">
           {title}

@@ -10,6 +10,7 @@ import * as migration_20260819_160000_add_site_settings_social_links from "./202
 import * as migration_20260825_120000_add_event_sessions from "./20260825_120000_add_event_sessions";
 import * as migration_20260825_130000_add_exec_photo_position from "./20260825_130000_add_exec_photo_position";
 import * as migration_20260825_140000_add_site_settings_usage_limits from "./20260825_140000_add_site_settings_usage_limits";
+import * as migration_20260825_150000_add_site_settings_contact_email from "./20260825_150000_add_site_settings_contact_email";
 
 export const migrations = [
   {
@@ -71,5 +72,10 @@ export const migrations = [
     up: migration_20260825_140000_add_site_settings_usage_limits.up,
     down: migration_20260825_140000_add_site_settings_usage_limits.down,
     name: "20260825_140000_add_site_settings_usage_limits",
+  },
+  {
+    up: migration_20260825_150000_add_site_settings_contact_email.up,
+    down: migration_20260825_150000_add_site_settings_contact_email.down,
+    name: "20260825_150000_add_site_settings_contact_email",
   },
 ];

@@ -28,7 +28,9 @@ export const SiteSettings: GlobalConfig = {
     ],
   },
   versions: {
+    // Globals use `max`; collections use `maxPerDoc`.
     drafts: true,
+    max: 20,
   },
   fields: [
     {
@@ -77,6 +79,15 @@ export const SiteSettings: GlobalConfig = {
       required: false,
       validate: (value: unknown) =>
         validateOptionalUrl(value, "LinkedIn URL"),
+    },
+    {
+      name: "contactEmail",
+      type: "email",
+      required: false,
+      admin: {
+        description:
+          "Used by every Contact / email link on the site (footer, sponsorship enquiries) and in search-engine structured data. Leave blank to fall back to the built-in default.",
+      },
     },
     {
       name: "databaseLimitMb",

@@ -4,21 +4,17 @@ import { useEffect, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent } from "react";
 import type { TextFieldClientComponent } from "payload";
 import { useField, useFormFields } from "@payloadcms/ui";
+import {
+  DEFAULT_FRAMING,
+  MAX_ZOOM,
+  MIN_ZOOM,
+  formatPhotoFraming,
+  parsePhotoFraming,
+  photoFramingStyle,
+} from "../../lib/photo-position.ts";
 
-const DEFAULT_POSITION = "50% 50%";
 const PREVIEW_SIZE = 180;
-
-function parsePosition(value: unknown): { x: number; y: number } {
-  if (typeof value !== "string") return { x: 50, y: 50 };
-
-  const matches = value.match(/(-?\d+(?:\.\d+)?)%\s+(-?\d+(?:\.\d+)?)%/);
-  if (!matches) return { x: 50, y: 50 };
-
-  return {
-    x: clampPercent(Number(matches[1])),
-    y: clampPercent(Number(matches[2])),
-  };
-}
+const ZOOM_STEP = 0.25;
 
 function clampPercent(value: number): number {
   if (!Number.isFinite(value)) return 50;
@@ -89,17 +85,17 @@ export const PhotoPositionField: TextFieldClientComponent = ({ path }) => {
     };
   }, [directUrl, uploadId]);
 
-  const position = parsePosition(value);
+  const framing = parsePhotoFraming(value);
   const [isDragging, setIsDragging] = useState(false);
   const dragState = useRef<{
     startX: number;
     startY: number;
-    startPosX: number;
-    startPosY: number;
+    originX: number;
+    originY: number;
   } | null>(null);
 
-  const commit = (next: { x: number; y: number }) => {
-    setValue(`${Math.round(next.x)}% ${Math.round(next.y)}%`);
+  const commit = (next: Partial<typeof framing>) => {
+    setValue(formatPhotoFraming({ ...framing, ...next }));
   };
 
   const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -107,8 +103,8 @@ export const PhotoPositionField: TextFieldClientComponent = ({ path }) => {
     dragState.current = {
       startX: event.clientX,
       startY: event.clientY,
-      startPosX: position.x,
-      startPosY: position.y,
+      originX: framing.x,
+      originY: framing.y,
     };
     setIsDragging(true);
     event.currentTarget.setPointerCapture(event.pointerId);
@@ -118,14 +114,14 @@ export const PhotoPositionField: TextFieldClientComponent = ({ path }) => {
     const drag = dragState.current;
     if (!drag) return;
 
-    // Dragging the image down reveals more of its top, which is a *lower*
-    // object-position percentage — hence the inverted delta.
+    // Dragging right reveals more of the image's left side, so the focus
+    // percentage moves the opposite way to the pointer.
     const deltaX = ((event.clientX - drag.startX) / PREVIEW_SIZE) * 100;
     const deltaY = ((event.clientY - drag.startY) / PREVIEW_SIZE) * 100;
 
     commit({
-      x: clampPercent(drag.startPosX - deltaX),
-      y: clampPercent(drag.startPosY - deltaY),
+      x: clampPercent(drag.originX - deltaX),
+      y: clampPercent(drag.originY - deltaY),
     });
   };
 
@@ -133,6 +129,9 @@ export const PhotoPositionField: TextFieldClientComponent = ({ path }) => {
     dragState.current = null;
     setIsDragging(false);
   };
+
+  const setZoom = (next: number) =>
+    commit({ zoom: Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, next)) });
 
   return (
     <div className="field-type" style={{ marginBottom: "1.5rem" }}>
@@ -146,7 +145,7 @@ export const PhotoPositionField: TextFieldClientComponent = ({ path }) => {
         }}
       >
         {photoUrl
-          ? "Drag the photo to choose which part shows inside the circular crop on the site. This preview matches the website exactly."
+          ? "Drag the photo to choose which part shows inside the circular crop on the site, and zoom in to reframe more tightly. This preview matches the website exactly."
           : "Upload a photo above to position it."}
       </p>
 
@@ -157,6 +156,7 @@ export const PhotoPositionField: TextFieldClientComponent = ({ path }) => {
           onPointerUp={handlePointerUp}
           onPointerLeave={handlePointerUp}
           style={{
+            position: "relative",
             width: PREVIEW_SIZE,
             height: PREVIEW_SIZE,
             borderRadius: "50%",
@@ -174,28 +174,59 @@ export const PhotoPositionField: TextFieldClientComponent = ({ path }) => {
               src={photoUrl}
               alt="Photo position preview"
               draggable={false}
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                objectPosition: `${position.x}% ${position.y}%`,
-                userSelect: "none",
-              }}
+              style={{ ...photoFramingStyle(framing), userSelect: "none" }}
             />
           )}
         </div>
 
         <div style={{ fontSize: "0.85rem" }}>
-          <div style={{ marginBottom: "0.5rem", opacity: 0.7 }}>
-            Position: {position.x}% {position.y}%
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              marginBottom: "0.75rem",
+            }}
+          >
+            <button
+              type="button"
+              className="btn btn--style-secondary btn--size-small"
+              onClick={() => setZoom(framing.zoom - ZOOM_STEP)}
+              disabled={!photoUrl || framing.zoom <= MIN_ZOOM}
+              aria-label="Zoom out"
+              style={{ margin: 0 }}
+            >
+              −
+            </button>
+            <span
+              style={{ minWidth: "3.5rem", textAlign: "center", opacity: 0.8 }}
+            >
+              {Math.round(framing.zoom * 100)}%
+            </span>
+            <button
+              type="button"
+              className="btn btn--style-secondary btn--size-small"
+              onClick={() => setZoom(framing.zoom + ZOOM_STEP)}
+              disabled={!photoUrl || framing.zoom >= MAX_ZOOM}
+              aria-label="Zoom in"
+              style={{ margin: 0 }}
+            >
+              +
+            </button>
           </div>
+
+          <div style={{ marginBottom: "0.5rem", opacity: 0.6 }}>
+            Focus: {framing.x}% {framing.y}%
+          </div>
+
           <button
             type="button"
             className="btn btn--style-secondary btn--size-small"
-            onClick={() => setValue(DEFAULT_POSITION)}
+            onClick={() => setValue(formatPhotoFraming(DEFAULT_FRAMING))}
             disabled={!photoUrl}
+            style={{ margin: 0 }}
           >
-            Reset to centre
+            Reset
           </button>
         </div>
       </div>

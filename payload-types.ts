@@ -288,7 +288,7 @@ export interface Executive {
   /**
    * Auto-filled from the upload above whenever a file is selected there (overwrites this field on save). Leave the upload empty to link an external image URL directly instead.
    */
-  photo: string;
+  photo?: string | null;
   photoPosition?: string | null;
   year: number;
   order: number;
@@ -311,7 +311,7 @@ export interface Sponsor {
   /**
    * Auto-filled from the upload above whenever a file is selected there (overwrites this field on save). Leave the upload empty to link an external logo URL directly instead.
    */
-  logo: string;
+  logo?: string | null;
   url: string;
   description?: string | null;
   /**
@@ -783,6 +783,10 @@ export interface SiteSetting {
   instagramUrl?: string | null;
   linkedinUrl?: string | null;
   /**
+   * Used by every Contact / email link on the site (footer, sponsorship enquiries) and in search-engine structured data. Leave blank to fall back to the built-in default.
+   */
+  contactEmail?: string | null;
+  /**
    * Only scales the usage bar on this dashboard — the measured size is always accurate. Update if the Supabase plan changes. Free tier is 500 MB.
    */
   databaseLimitMb?: number | null;
@@ -805,6 +809,7 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   discordUrl?: T;
   instagramUrl?: T;
   linkedinUrl?: T;
+  contactEmail?: T;
   databaseLimitMb?: T;
   storageLimitMb?: T;
   _status?: T;

@@ -1,6 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import type { Exec } from "@/lib/site-data";
+import { parsePhotoFraming, photoFramingStyle } from "@/lib/photo-position";
 
 type ExecCardModel = {
   id?: Exec["id"];
@@ -39,8 +40,8 @@ export default function ExecCard({
             alt={exec.name}
             fill
             sizes="112px"
-            style={{ objectPosition: exec.photoPosition || "50% 50%" }}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            style={photoFramingStyle(parsePhotoFraming(exec.photoPosition))}
+            className="transition-transform duration-500 group-hover:scale-110"
           />
           <div className="absolute inset-0 bg-linear-to-t from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         </div>
