@@ -1,6 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <!-- Colours sampled directly from bannerv7.png: black airframe, red-orange
-       nose cone, cream exhaust, warm smoky background. -->
+  <!-- Browser-tab icon with rounded corners; outside the radius is transparent.
+       Colours sampled from bannerv7.png: black airframe, red-orange nose cone,
+       cream exhaust, warm smoky background.
+       See icon-square.svg for the full-bleed variant used by apple-touch-icon,
+       which iOS masks itself and would render transparent corners as black. -->
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#3d1401"/>
@@ -15,17 +18,21 @@
       <stop offset="0%" stop-color="#fff2c2"/>
       <stop offset="100%" stop-color="#fff2c2" stop-opacity="0"/>
     </linearGradient>
+    <clipPath id="round">
+      <rect width="512" height="512" rx="104"/>
+    </clipPath>
   </defs>
 
-  <rect width="512" height="512" fill="url(#bg)"/>
-
-  <!-- Rotated 45deg so the rocket runs along the square's diagonal, the
-       longest axis available, letting the shape read larger at 16-32px. -->
-  <g transform="translate(256 256) rotate(45) scale(1.12) translate(-256 -256)">
-    <path d="M214 380 L256 486 L298 380 Z" fill="url(#flame)"/>
-    <path d="M198 306 L142 400 L198 382 Z" fill="#1c1d1c"/>
-    <path d="M314 306 L370 400 L314 382 Z" fill="#1c1d1c"/>
-    <rect x="198" y="188" width="116" height="194" fill="#212123"/>
-    <path d="M256 46 L314 192 L198 192 Z" fill="url(#nose)"/>
+  <g clip-path="url(#round)">
+    <rect width="512" height="512" rx="104" fill="url(#bg)"/>
+    <!-- Rotated 45deg so the rocket runs along the longest axis available,
+         letting the shape read larger at 16-32px. -->
+    <g transform="translate(256 256) rotate(45) scale(1.12) translate(-256 -256)">
+      <path d="M214 380 L256 486 L298 380 Z" fill="url(#flame)"/>
+      <path d="M198 306 L142 400 L198 382 Z" fill="#1c1d1c"/>
+      <path d="M314 306 L370 400 L314 382 Z" fill="#1c1d1c"/>
+      <rect x="198" y="188" width="116" height="194" fill="#212123"/>
+      <path d="M256 46 L314 192 L198 192 Z" fill="url(#nose)"/>
+    </g>
   </g>
 </svg>
