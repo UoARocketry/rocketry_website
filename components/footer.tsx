@@ -59,7 +59,7 @@ export default async function Footer() {
               className="h-10 w-auto mb-6"
             />
             <p className="text-text-secondary text-sm leading-relaxed max-w-sm mb-6">
-              The University of Auckland Rocketry Club is a student-led
+              The University of Auckland Rocketry Club (UARC) is a student-led
               organisation dedicated to designing, building, and launching
               rockets. Join us in exploring aerospace engineering and space
               exploration.

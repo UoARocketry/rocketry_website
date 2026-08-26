@@ -58,9 +58,11 @@ export default async function HomePage() {
             University of Auckland
             <span className="block text-primary">Rocketry Club</span>
           </h1>
+          {/* The acronym is spelled out here on purpose: it is the term people
+              search for, and it previously appeared nowhere in visible text. */}
           <p className="text-lg md:text-xl text-text-secondary mb-10 max-w-2xl mx-auto leading-relaxed text-pretty">
-            We give students the opportunity to design, build and fly rockets as
-            we explore the exciting world of aerospace engineering together.
+            UARC gives students the opportunity to design, build and fly rockets
+            as we explore the exciting world of aerospace engineering together.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             {hasJoinUrl && (

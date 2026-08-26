@@ -27,26 +27,24 @@ const geistMono = Geist_Mono({
 });
 
 const SITE_NAME = "University of Auckland Rocketry Club";
+// The acronym is in the title because that is what people actually search for,
+// and a word can only rank if it appears in the page rather than only in
+// metadata Google ignores.
+const SITE_TITLE = `${SITE_NAME} (UARC)`;
 const SITE_DESCRIPTION =
-  "Student-led rocketry club dedicated to designing, building, and launching rockets. Join us in exploring aerospace engineering and space exploration.";
+  "UARC is the University of Auckland Rocketry Club, a student-led club dedicated to designing, building, and launching rockets. Join us in exploring aerospace engineering and space exploration.";
 const SITE_URL = resolveServerUrl() ?? "https://www.uoarocketry.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: SITE_NAME,
-    template: `%s | ${SITE_NAME}`,
+    default: SITE_TITLE,
+    template: `%s | ${SITE_TITLE}`,
   },
   description: SITE_DESCRIPTION,
-  keywords: [
-    "rocketry",
-    "aerospace",
-    "engineering",
-    "university of auckland",
-    "UARC",
-    "rockets",
-    "space",
-  ],
+  // No `keywords`: Google has ignored the meta keywords tag since 2009
+  // (developers.google.com/search/blog/2009/09/google-does-not-use-keywords-meta-tag),
+  // so it was carrying the only on-site mention of "UARC" nowhere.
   alternates: {
     canonical: "/",
   },
@@ -54,25 +52,30 @@ export const metadata: Metadata = {
     // SVG first so capable browsers get a crisp icon at any size; the PNGs are
     // the fallback. The wordmark is 2.8:1 and turned to mush in a square slot,
     // so the icon is a dedicated square rocket mark instead.
+    //
+    // The 96px PNG exists for Google Search, which recommends a favicon larger
+    // than 48x48 and was previously only offered the 32px one via `shortcut`.
+    // https://developers.google.com/search/docs/appearance/favicon-in-search
     icon: [
       { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon-96.png", sizes: "96x96", type: "image/png" },
       { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
       { url: "/favicon-16.png", sizes: "16x16", type: "image/png" },
     ],
-    shortcut: "/favicon-32.png",
+    shortcut: "/favicon-96.png",
     apple: "/apple-touch-icon.png",
   },
   openGraph: {
     type: "website",
     url: "/",
     siteName: SITE_NAME,
-    title: SITE_NAME,
+    title: SITE_TITLE,
     description: SITE_DESCRIPTION,
     images: [{ url: "/UARC logo.png" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: SITE_NAME,
+    title: SITE_TITLE,
     description: SITE_DESCRIPTION,
     images: ["/UARC logo.png"],
   },
@@ -100,10 +103,13 @@ export default async function RootLayout({
 
   const organizationJsonLd = {
     "@context": "https://schema.org",
-    "@type": "CollegeOrUniversity",
+    // Not CollegeOrUniversity: this is a student club *inside* a university,
+    // and claiming to be the university itself muddles the entity for Google.
+    "@type": "Organization",
     "@id": `${SITE_URL}/#organization`,
     name: SITE_NAME,
-    alternateName: "UARC",
+    alternateName: ["UARC", "UoA Rocketry Club"],
+    description: SITE_DESCRIPTION,
     url: SITE_URL,
     logo: `${SITE_URL}/UARC logo.png`,
     email: contactEmail,
