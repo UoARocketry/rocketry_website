@@ -1,5 +1,5 @@
 import React from "react";
-import Image from "next/image";
+import ImageWithFallback from "@/components/ui/image-with-fallback";
 
 type BaseProps = {
   image?: string;
@@ -65,7 +65,7 @@ export default function FeatureCard(props: Props) {
       {/* Card image */}
       {image ? (
         <div className="relative w-full h-42 overflow-hidden">
-          <Image
+          <ImageWithFallback
             src={image}
             alt={imageAlt || (typeof title === "string" ? title : "")}
             fill

@@ -1,4 +1,4 @@
-import Image from "next/image";
+import ImageWithFallback from "@/components/ui/image-with-fallback";
 import type { Sponsor } from "@/lib/site-data";
 
 export default function SponsorCard({
@@ -20,7 +20,7 @@ export default function SponsorCard({
 
       <div className="relative z-10 flex flex-col items-center">
         <div className="bg-white rounded-lg p-4 mb-4 transition-transform duration-300 group-hover:scale-105">
-          <Image
+          <ImageWithFallback
             src={logoSrc}
             alt={sponsor.name}
             width={160}
@@ -30,6 +30,9 @@ export default function SponsorCard({
               maxHeight: 60,
               maxWidth: 160,
             }}
+            // The logo is sized by its own intrinsic dimensions under a max,
+            // so the failure panel has nothing to inherit and needs a box.
+            fallbackClassName="h-[60px] w-[160px]"
           />
         </div>
         <h3 className="text-base font-semibold text-text-main mb-1 text-center group-hover:text-primary transition-colors duration-200">

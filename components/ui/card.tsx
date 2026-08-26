@@ -1,5 +1,5 @@
 import React from "react";
-import Image from "next/image";
+import ImageWithFallback from "@/components/ui/image-with-fallback";
 import ClampedDescription from "@/components/ui/clamped-description";
 import StatusBadgePill, {
   type StatusBadge,
@@ -80,7 +80,7 @@ export default function Card({
         className={`group bg-card rounded-xl border overflow-hidden flex flex-col h-full transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 ${seriesShell}`}
       >
         <div className="relative overflow-hidden">
-          <Image
+          <ImageWithFallback
             src={imageSrc}
             alt={title}
             width={1200}
@@ -141,7 +141,7 @@ export default function Card({
       }`}
     >
       <div className="relative overflow-hidden h-48 md:h-full md:w-1/2">
-        <Image
+        <ImageWithFallback
           src={imageSrc}
           alt={title}
           fill

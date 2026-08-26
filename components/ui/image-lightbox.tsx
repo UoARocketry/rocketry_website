@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
+import ImageWithFallback from "@/components/ui/image-with-fallback";
 
 const MIN_ZOOM = 1;
 const MAX_ZOOM = 3;
@@ -194,7 +195,7 @@ export default function ImageLightbox({
         {/* h-full/w-full (not h-auto) so smaller source images scale UP to fill
             the viewport — otherwise a small upload renders at its intrinsic
             size and the "view closely" action shows it no larger than the page. */}
-        <Image
+        <ImageWithFallback
           src={current}
           alt={alt}
           width={1920}

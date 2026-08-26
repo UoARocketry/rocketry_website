@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import ImageWithFallback from "@/components/ui/image-with-fallback";
 import ImageLightbox from "@/components/ui/image-lightbox";
 
 interface EventHeroImageProps {
@@ -30,7 +31,7 @@ export default function EventHeroImage({ src, alt }: EventHeroImageProps) {
           sizes="(max-width: 1024px) 100vw, 50vw"
           className="absolute inset-0 h-full w-full scale-110 object-cover opacity-30 blur-2xl"
         />
-        <Image
+        <ImageWithFallback
           src={src}
           alt={alt}
           width={1200}

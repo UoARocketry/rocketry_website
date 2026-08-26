@@ -1,5 +1,5 @@
 import React from "react";
-import Image from "next/image";
+import ImageWithFallback from "@/components/ui/image-with-fallback";
 import type { Exec } from "@/lib/site-data";
 import { parsePhotoFraming, photoFramingStyle } from "@/lib/photo-position";
 
@@ -35,7 +35,7 @@ export default function ExecCard({
       {/* Photo with hover effect */}
       <div className="relative mb-5 inline-block">
         <div className="relative w-28 h-28 mx-auto rounded-full overflow-hidden border-2 border-border group-hover:border-primary/50 transition-all duration-300">
-          <Image
+          <ImageWithFallback
             src={photoSrc}
             alt={exec.name}
             fill
