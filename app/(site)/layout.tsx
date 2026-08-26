@@ -51,9 +51,16 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   icons: {
-    icon: "/UARC logo.png",
-    shortcut: "/UARC logo.png",
-    apple: "/UARC logo.png",
+    // SVG first so capable browsers get a crisp icon at any size; the PNGs are
+    // the fallback. The wordmark is 2.8:1 and turned to mush in a square slot,
+    // so the icon is a dedicated square rocket mark instead.
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16.png", sizes: "16x16", type: "image/png" },
+    ],
+    shortcut: "/favicon-32.png",
+    apple: "/apple-touch-icon.png",
   },
   openGraph: {
     type: "website",
