@@ -198,9 +198,20 @@ function mapRocketDetail(doc: PayloadRocket): RocketDetail {
     (url): url is string => Boolean(url),
   );
 
+  // Both fields are required in the CMS, but the columns are nullable and a row
+  // could predate that, so drop anything half-filled rather than render a
+  // blank cell in the Details grid.
+  const specs = (doc.specs ?? [])
+    .map((spec) => ({
+      label: spec.label?.trim() ?? "",
+      value: spec.value?.trim() ?? "",
+    }))
+    .filter((spec) => spec.label.length > 0 && spec.value.length > 0);
+
   return {
     ...mapRocket(doc),
     images,
+    specs,
   };
 }
 
@@ -552,6 +563,28 @@ export const getSponsors = unstable_cache(
     return result.docs.map((doc) => mapSponsor(doc as PayloadSponsor));
   },
   ["sponsors"],
+  { revalidate: CONTENT_REVALIDATE_SECONDS, tags: ["sponsors"] },
+);
+
+/**
+ * The sponsor tiers themselves, so the sponsors page can drive its sections
+ * from the collection. Shares the `sponsors` cache tag, which both the Sponsors
+ * and SponsorTiers collections already revalidate.
+ *
+ * SponsorTiers has no drafts enabled, so there is no `_status` to filter on.
+ */
+export const getSponsorTiers = unstable_cache(
+  async (): Promise<SponsorTier[]> => {
+    const payload = await getPayloadClient();
+    const result = await payload.find({
+      collection: "sponsor-tiers",
+      pagination: false,
+      sort: "order",
+    });
+
+    return result.docs.map((doc) => mapSponsorTier(doc as PayloadSponsorTier));
+  },
+  ["sponsor-tiers"],
   { revalidate: CONTENT_REVALIDATE_SECONDS, tags: ["sponsors"] },
 );
 

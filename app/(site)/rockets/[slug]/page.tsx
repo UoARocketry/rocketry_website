@@ -2,12 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getRocketBySlug } from "@/lib/site-data";
-import {
-  ROCKET_STATUS_LABELS,
-  formatDateLong,
-  formatDateShort,
-  getRocketStatus,
-} from "@/lib/utils";
+import { formatDateShort, getRocketStatus } from "@/lib/utils";
 import StatusBadgePill, {
   rocketStatusBadge,
 } from "@/components/ui/status-badge";
@@ -94,34 +89,24 @@ export default async function RocketPage({ params }: RocketPageProps) {
               </p>
             </div>
 
-            {/* Additional Details */}
-            <div className="bg-surface rounded-lg p-6 border border-accent">
-              <h3 className="text-xl font-bold text-primary mb-4">About</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-text-secondary">Rocket Name</p>
-                  <p className="font-semibold">{rocket.name}</p>
+            {/* Details, entirely CMS-driven. The name, status and launch date
+                that used to sit here are all already shown above, so the box
+                now holds only what an editor adds in Payload. */}
+            {rocket.specs.length > 0 && (
+              <div className="bg-surface rounded-lg p-6 border border-accent">
+                <h3 className="text-xl font-bold text-primary mb-4">Details</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {rocket.specs.map((spec) => (
+                    <div key={`${spec.label}-${spec.value}`}>
+                      <p className="text-sm text-text-secondary">
+                        {spec.label}
+                      </p>
+                      <p className="font-semibold">{spec.value}</p>
+                    </div>
+                  ))}
                 </div>
-                <div>
-                  <p className="text-sm text-text-secondary">Status</p>
-                  <p className="font-semibold">
-                    {ROCKET_STATUS_LABELS[status]}
-                  </p>
-                </div>
-                {rocket.launchedAt && (
-                  <div>
-                    <p className="text-sm text-text-secondary">
-                      {status === "scheduled"
-                        ? "Scheduled Launch Date"
-                        : "Launch Date"}
-                    </p>
-                    <p className="font-semibold">
-                      {formatDateLong(rocket.launchedAt)}
-                    </p>
-                  </div>
-                )}
               </div>
-            </div>
+            )}
           </div>
         </div>
       </section>

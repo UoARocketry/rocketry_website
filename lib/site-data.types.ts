@@ -9,8 +9,15 @@ export type RocketSummary = {
   featured: boolean;
 };
 
+/** One row of the CMS-managed Details box on a rocket's page. */
+export type RocketSpec = {
+  label: string;
+  value: string;
+};
+
 export type RocketDetail = RocketSummary & {
   images: string[];
+  specs: RocketSpec[];
 };
 
 export type EventSession = {

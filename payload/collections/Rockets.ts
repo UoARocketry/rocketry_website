@@ -118,6 +118,38 @@ export const Rockets: CollectionConfig = {
       },
     },
     {
+      name: "specs",
+      type: "array",
+      label: "Details",
+      required: false,
+      labels: { singular: "Detail", plural: "Details" },
+      admin: {
+        initCollapsed: true,
+        description:
+          "Entries shown in the Details box on this rocket's page, in this order, laid out in two columns. Leave empty and the box is hidden entirely.",
+      },
+      fields: [
+        {
+          name: "label",
+          type: "text",
+          required: true,
+          admin: {
+            description:
+              'The small heading, e.g. "Height", "Motor", "Recovery".',
+          },
+        },
+        {
+          name: "value",
+          type: "text",
+          required: true,
+          admin: {
+            description:
+              'The figure itself, including units, e.g. "2.4 m", "Cesaroni J410".',
+          },
+        },
+      ],
+    },
+    {
       name: "gallery",
       type: "array",
       required: false,

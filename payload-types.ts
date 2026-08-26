@@ -266,6 +266,22 @@ export interface Rocket {
    */
   launchedAt?: string | null;
   /**
+   * Entries shown in the Details box on this rocket's page, in this order, laid out in two columns. Leave empty and the box is hidden entirely.
+   */
+  specs?:
+    | {
+        /**
+         * The small heading, e.g. "Height", "Motor", "Recovery".
+         */
+        label: string;
+        /**
+         * The figure itself, including units, e.g. "2.4 m", "Cesaroni J410".
+         */
+        value: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
    * Additional photos shown in the image gallery on the rocket's detail page, after the cover image above.
    */
   gallery?:
@@ -321,9 +337,9 @@ export interface Sponsor {
   url: string;
   description?: string | null;
   /**
-   * Manage the available tiers in the Sponsor Tiers collection.
+   * Which section of the sponsors page this sponsor appears in. Manage the available tiers in the Sponsor Tiers collection.
    */
-  tier?: (number | null) | SponsorTier;
+  tier: number | SponsorTier;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -615,6 +631,13 @@ export interface RocketsSelect<T extends boolean = true> {
   description?: T;
   featured?: T;
   launchedAt?: T;
+  specs?:
+    | T
+    | {
+        label?: T;
+        value?: T;
+        id?: T;
+      };
   gallery?:
     | T
     | {
