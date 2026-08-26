@@ -78,9 +78,12 @@ export const Sponsors: CollectionConfig = {
       name: "tier",
       type: "relationship",
       relationTo: "sponsor-tiers" as never,
-      required: false,
+      // Required because the sponsors page groups purely by tier: a sponsor
+      // without one has no section to appear in and renders nowhere.
+      required: true,
       admin: {
-        description: "Manage the available tiers in the Sponsor Tiers collection.",
+        description:
+          "Which section of the sponsors page this sponsor appears in. Manage the available tiers in the Sponsor Tiers collection.",
       },
     },
   ],

@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
 import React from "react";
 import SponsorCard from "@/components/ui/sponsor-card";
-import { getSiteSettings, getSponsors, type Sponsor } from "@/lib/site-data";
+import {
+  getSiteSettings,
+  getSponsorTiers,
+  getSponsors,
+  type Sponsor,
+  type SponsorTier,
+} from "@/lib/site-data";
 import { buildSponsorTierSections } from "@/lib/sponsor-utils";
 import { DEFAULT_CONTACT_EMAIL } from "@/lib/constants";
 
@@ -16,8 +22,9 @@ export const metadata: Metadata = {
 
 export default async function SponsorsPage() {
   let sponsors: Sponsor[] = [];
+  let tiers: SponsorTier[] = [];
   try {
-    sponsors = await getSponsors();
+    [sponsors, tiers] = await Promise.all([getSponsors(), getSponsorTiers()]);
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Unknown sponsors load failure";
@@ -32,7 +39,20 @@ export default async function SponsorsPage() {
     // Fall back to the built-in address.
   }
 
-  const tierSections = buildSponsorTierSections(sponsors);
+  const { sections: tierSections, orphans } = buildSponsorTierSections(
+    tiers,
+    sponsors,
+  );
+
+  // `tier` is required now, so this can only catch rows saved before that was
+  // true, or one pointing at a deleted tier. They have no section to render in,
+  // but say so loudly rather than dropping a published sponsor in silence.
+  if (orphans.length > 0) {
+    console.warn(
+      `[app/sponsors] ${orphans.length} published sponsor(s) have no valid tier and are not shown: ` +
+        orphans.map((sponsor) => sponsor.name).join(", "),
+    );
+  }
 
   return (
     <main className="min-h-screen bg-background text-text-main">
