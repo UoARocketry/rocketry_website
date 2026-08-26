@@ -32,26 +32,16 @@ function SectionDivider({
   description,
   count,
   icon,
-  accent,
 }: {
   readonly title: string;
   readonly description: string;
   readonly count: number;
   readonly icon: keyof typeof SECTION_ICONS;
-  readonly accent: "primary" | "muted";
 }) {
-  const isPrimary = accent === "primary";
-
   return (
     <div className="mb-8">
       <div className="flex items-center gap-4 mb-3">
-        <span
-          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${
-            isPrimary
-              ? "border-primary/40 bg-primary/15 text-primary"
-              : "border-border bg-elevated text-text-secondary"
-          }`}
-        >
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-primary/40 bg-primary/15 text-primary">
           <svg
             className="h-5 w-5"
             fill="none"
@@ -67,24 +57,14 @@ function SectionDivider({
             />
           </svg>
         </span>
-        <h2 className="text-2xl font-bold text-text-main">{title}</h2>
-        <span
-          className={`shrink-0 rounded-full border px-2.5 py-1 text-xs font-medium ${
-            isPrimary
-              ? "border-primary/30 bg-primary/10 text-primary"
-              : "border-border bg-elevated text-text-secondary"
-          }`}
-        >
+        <h2 className="text-2xl font-bold text-primary">{title}</h2>
+        <span className="shrink-0 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
           {count} {count === 1 ? "rocket" : "rockets"}
         </span>
       </div>
       <p className="text-sm text-text-secondary mb-4 pl-14">{description}</p>
       <div
-        className={`h-px ${
-          isPrimary
-            ? "bg-linear-to-r from-primary via-primary/30 to-transparent"
-            : "bg-linear-to-r from-border-hover via-border to-transparent"
-        }`}
+        className="h-px bg-linear-to-r from-primary via-primary/30 to-transparent"
         aria-hidden="true"
       />
     </div>
@@ -187,8 +167,7 @@ export default async function RocketsPage() {
                   title="In Progress"
                   description="In design, in build, or waiting on a launch date."
                   count={inProgress.length}
-                  icon="blueprint"
-                  accent="primary"
+                  icon="blueprint"
                 />
                 <RocketCards rockets={inProgress} />
               </div>
@@ -197,8 +176,7 @@ export default async function RocketsPage() {
                   title="Launched"
                   description="Rockets that have already flown."
                   count={launched.length}
-                  icon="launched"
-                  accent="muted"
+                  icon="launched"
                 />
                 <RocketCards rockets={launched} />
               </div>
