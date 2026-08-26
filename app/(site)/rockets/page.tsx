@@ -13,36 +13,80 @@ import { PLACEHOLDER_IMAGE } from "@/lib/constants";
 
 type RocketItem = RocketSummary;
 
+// Drawn coarsely so they stay legible at 20px inside the chip.
+const SECTION_ICONS = {
+  // Matches the "In Development" badge glyph on the cards below it.
+  blueprint: "M4 4h16v16H4zM4 9h16M9 9v11",
+  // An ascending flight path, for rockets that have already flown.
+  launched: "M4 20L20 4M20 4h-7M20 4v7",
+} as const;
+
 /**
- * A labelled hairline that splits the list into rockets still being worked on
- * and rockets that have flown. Reuses the site's eyebrow type treatment and
- * the fading-rule motif already used between page sections.
+ * Splits the list into rockets still being worked on and rockets that have
+ * flown. Built from the site's existing section-header language (icon chip,
+ * bold heading, supporting line, fading rule) rather than a bare hairline, so
+ * the split is obvious while scrolling.
  */
 function SectionDivider({
   title,
+  description,
   count,
+  icon,
   accent,
 }: {
   readonly title: string;
+  readonly description: string;
   readonly count: number;
+  readonly icon: keyof typeof SECTION_ICONS;
   readonly accent: "primary" | "muted";
 }) {
+  const isPrimary = accent === "primary";
+
   return (
-    <div className="flex items-center gap-4 mb-8">
-      <h2
-        className={`shrink-0 text-sm font-medium uppercase tracking-wider ${
-          accent === "primary" ? "text-primary" : "text-text-secondary"
+    <div className="mb-8">
+      <div className="flex items-center gap-4 mb-3">
+        <span
+          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${
+            isPrimary
+              ? "border-primary/40 bg-primary/15 text-primary"
+              : "border-border bg-elevated text-text-secondary"
+          }`}
+        >
+          <svg
+            className="h-5 w-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d={SECTION_ICONS[icon]}
+            />
+          </svg>
+        </span>
+        <h2 className="text-2xl font-bold text-text-main">{title}</h2>
+        <span
+          className={`shrink-0 rounded-full border px-2.5 py-1 text-xs font-medium ${
+            isPrimary
+              ? "border-primary/30 bg-primary/10 text-primary"
+              : "border-border bg-elevated text-text-secondary"
+          }`}
+        >
+          {count} {count === 1 ? "rocket" : "rockets"}
+        </span>
+      </div>
+      <p className="text-sm text-text-secondary mb-4 pl-14">{description}</p>
+      <div
+        className={`h-px ${
+          isPrimary
+            ? "bg-linear-to-r from-primary via-primary/30 to-transparent"
+            : "bg-linear-to-r from-border-hover via-border to-transparent"
         }`}
-      >
-        {title}
-      </h2>
-      <span
-        className="h-px flex-1 bg-linear-to-r from-border to-transparent"
         aria-hidden="true"
       />
-      <span className="shrink-0 text-xs text-text-muted">
-        {count} {count === 1 ? "rocket" : "rockets"}
-      </span>
     </div>
   );
 }
@@ -141,7 +185,9 @@ export default async function RocketsPage() {
               <div>
                 <SectionDivider
                   title="In Progress"
+                  description="In design, in build, or waiting on a launch date."
                   count={inProgress.length}
+                  icon="blueprint"
                   accent="primary"
                 />
                 <RocketCards rockets={inProgress} />
@@ -149,7 +195,9 @@ export default async function RocketsPage() {
               <div>
                 <SectionDivider
                   title="Launched"
+                  description="Rockets that have already flown."
                   count={launched.length}
+                  icon="launched"
                   accent="muted"
                 />
                 <RocketCards rockets={launched} />
