@@ -71,6 +71,29 @@ function SectionDivider({
   );
 }
 
+/**
+ * One banded page section, matching the alternating surface/background bands
+ * and top hairline the events and sponsors pages use.
+ */
+function PageSection({
+  tone,
+  children,
+}: {
+  readonly tone: "surface" | "background";
+  readonly children: React.ReactNode;
+}) {
+  return (
+    <section
+      className={`py-24 px-4 relative ${
+        tone === "surface" ? "bg-surface" : "bg-background"
+      }`}
+    >
+      <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-border to-transparent" />
+      <div className="max-w-7xl mx-auto">{children}</div>
+    </section>
+  );
+}
+
 function RocketCards({ rockets }: { readonly rockets: readonly RocketItem[] }) {
   return (
     <div className="grid grid-cols-1 gap-6">
@@ -128,6 +151,9 @@ export default async function RocketsPage() {
   // With only one group there is nothing to divide, so the headings would be
   // noise rather than orientation.
   const showDividers = inProgress.length > 0 && launched.length > 0;
+  // Keeps the CTA's band alternating: two rocket sections above it end on
+  // background, one ends on surface.
+  const ctaTone = showDividers ? "bg-surface" : "bg-background";
 
   return (
     <main className="min-h-screen bg-background text-text-main">
@@ -149,45 +175,45 @@ export default async function RocketsPage() {
         </div>
       </section>
 
-      {/* Rockets Grid Section */}
-      <section className="py-24 px-4 bg-surface relative">
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-        <div className="max-w-7xl mx-auto">
-          {rockets.length === 0 ? (
-            <SectionFallback
-              title="No rockets yet"
-              description="Our rocket projects will appear here soon. Stay tuned!"
+      {/* Each group gets its own band, matching the events page, so the split
+          registers before the headings are even read. */}
+      {rockets.length === 0 ? (
+        <PageSection tone="surface">
+          <SectionFallback
+            title="No rockets yet"
+            description="Our rocket projects will appear here soon. Stay tuned!"
+          />
+        </PageSection>
+      ) : !showDividers ? (
+        <PageSection tone="surface">
+          <RocketCards rockets={rockets} />
+        </PageSection>
+      ) : (
+        <>
+          <PageSection tone="surface">
+            <SectionDivider
+              title="In Progress"
+              description="In design, in build, or waiting on a launch date."
+              count={inProgress.length}
+              icon="blueprint"
             />
-          ) : !showDividers ? (
-            <RocketCards rockets={rockets} />
-          ) : (
-            <div className="space-y-16">
-              <div>
-                <SectionDivider
-                  title="In Progress"
-                  description="In design, in build, or waiting on a launch date."
-                  count={inProgress.length}
-                  icon="blueprint"
-                />
-                <RocketCards rockets={inProgress} />
-              </div>
-              <div>
-                <SectionDivider
-                  title="Launched"
-                  description="Rockets that have already flown."
-                  count={launched.length}
-                  icon="launched"
-                />
-                <RocketCards rockets={launched} />
-              </div>
-            </div>
-          )}
-        </div>
-      </section>
+            <RocketCards rockets={inProgress} />
+          </PageSection>
+          <PageSection tone="background">
+            <SectionDivider
+              title="Launched"
+              description="Rockets that have already flown."
+              count={launched.length}
+              icon="launched"
+            />
+            <RocketCards rockets={launched} />
+          </PageSection>
+        </>
+      )}
 
       {/* CTA Section */}
-      <section className="py-24 px-4 bg-background relative">
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+      <section className={`py-24 px-4 relative ${ctaTone}`}>
+        <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-border to-transparent" />
         <div className="max-w-2xl mx-auto">
           <div className="relative bg-card rounded-2xl p-10 text-center border border-border overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent" />
