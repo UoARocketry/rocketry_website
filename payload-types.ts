@@ -174,7 +174,6 @@ export interface User {
 export interface Media {
   id: number;
   alt?: string | null;
-  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -258,6 +257,13 @@ export interface Rocket {
    */
   image: string;
   description?: string | null;
+  /**
+   * Tick to feature this rocket in the Featured Rockets section on the home page. Up to 3 are shown, next launch first. If none are ticked the home page falls back to the most recently launched rockets.
+   */
+  featured?: boolean | null;
+  /**
+   * Leave empty while the rocket is still in development. A date in the future marks it as a scheduled launch; a date in the past marks it as launched.
+   */
   launchedAt?: string | null;
   /**
    * Additional photos shown in the image gallery on the rocket's detail page, after the cover image above.
@@ -548,7 +554,6 @@ export interface UsersSelect<T extends boolean = true> {
  */
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
-  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -608,6 +613,7 @@ export interface RocketsSelect<T extends boolean = true> {
   imageMedia?: T;
   image?: T;
   description?: T;
+  featured?: T;
   launchedAt?: T;
   gallery?:
     | T

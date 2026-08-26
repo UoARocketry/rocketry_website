@@ -5,6 +5,8 @@ export type RocketSummary = {
   image?: string | null;
   description?: string | null;
   launchedAt?: string | null;
+  /** Editor-controlled: show this rocket in the home page's featured strip. */
+  featured: boolean;
 };
 
 export type RocketDetail = RocketSummary & {

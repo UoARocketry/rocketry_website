@@ -7,10 +7,66 @@ import {
   getSiteSettings,
   type RocketSummary,
 } from "@/lib/site-data";
-import { formatDateShort } from "@/lib/utils";
+import { formatDateShort, getRocketStatus } from "@/lib/utils";
+import { rocketStatusBadge } from "@/components/ui/status-badge";
 import { PLACEHOLDER_IMAGE } from "@/lib/constants";
 
 type RocketItem = RocketSummary;
+
+/**
+ * A labelled hairline that splits the list into rockets still being worked on
+ * and rockets that have flown. Reuses the site's eyebrow type treatment and
+ * the fading-rule motif already used between page sections.
+ */
+function SectionDivider({
+  title,
+  count,
+  accent,
+}: {
+  readonly title: string;
+  readonly count: number;
+  readonly accent: "primary" | "muted";
+}) {
+  return (
+    <div className="flex items-center gap-4 mb-8">
+      <h2
+        className={`shrink-0 text-sm font-medium uppercase tracking-wider ${
+          accent === "primary" ? "text-primary" : "text-text-secondary"
+        }`}
+      >
+        {title}
+      </h2>
+      <span
+        className="h-px flex-1 bg-linear-to-r from-border to-transparent"
+        aria-hidden="true"
+      />
+      <span className="shrink-0 text-xs text-text-muted">
+        {count} {count === 1 ? "rocket" : "rockets"}
+      </span>
+    </div>
+  );
+}
+
+function RocketCards({ rockets }: { readonly rockets: readonly RocketItem[] }) {
+  return (
+    <div className="grid grid-cols-1 gap-6">
+      {rockets.map((rocket, idx) => (
+        <Link key={rocket.id} href={`/rockets/${rocket.slug}`} className="block">
+          <Card
+            image={rocket.image ?? PLACEHOLDER_IMAGE}
+            title={rocket.name}
+            date={
+              rocket.launchedAt ? formatDateShort(rocket.launchedAt) : "TBA"
+            }
+            description={rocket.description ?? ""}
+            badge={rocketStatusBadge(rocket)}
+            reverse={idx % 2 === 1}
+          />
+        </Link>
+      ))}
+    </div>
+  );
+}
 
 export const metadata: Metadata = {
   title: "Our Rockets",
@@ -37,6 +93,17 @@ export default async function RocketsPage() {
   }
 
   const hasJoinUrl = Boolean(joinUrl.trim());
+  // getAllRockets already orders these scheduled → in development → launched,
+  // so partitioning preserves that order inside each section.
+  const inProgress = rockets.filter(
+    (rocket) => getRocketStatus(rocket) !== "launched",
+  );
+  const launched = rockets.filter(
+    (rocket) => getRocketStatus(rocket) === "launched",
+  );
+  // With only one group there is nothing to divide, so the headings would be
+  // noise rather than orientation.
+  const showDividers = inProgress.length > 0 && launched.length > 0;
 
   return (
     <main className="min-h-screen bg-background text-text-main">
@@ -67,27 +134,26 @@ export default async function RocketsPage() {
               title="No rockets yet"
               description="Our rocket projects will appear here soon. Stay tuned!"
             />
+          ) : !showDividers ? (
+            <RocketCards rockets={rockets} />
           ) : (
-            <div className="grid grid-cols-1 gap-6">
-              {rockets.map((rocket: RocketItem, idx: number) => (
-                <Link
-                  key={rocket.id}
-                  href={`/rockets/${rocket.slug}`}
-                  className="block"
-                >
-                  <Card
-                    image={rocket.image ?? PLACEHOLDER_IMAGE}
-                    title={rocket.name}
-                    date={
-                      rocket.launchedAt
-                        ? formatDateShort(rocket.launchedAt)
-                        : "TBA"
-                    }
-                    description={rocket.description ?? ""}
-                    reverse={idx % 2 === 1}
-                  />
-                </Link>
-              ))}
+            <div className="space-y-16">
+              <div>
+                <SectionDivider
+                  title="In Progress"
+                  count={inProgress.length}
+                  accent="primary"
+                />
+                <RocketCards rockets={inProgress} />
+              </div>
+              <div>
+                <SectionDivider
+                  title="Launched"
+                  count={launched.length}
+                  accent="muted"
+                />
+                <RocketCards rockets={launched} />
+              </div>
             </div>
           )}
         </div>

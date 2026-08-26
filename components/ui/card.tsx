@@ -1,6 +1,9 @@
 import React from "react";
 import Image from "next/image";
 import ClampedDescription from "@/components/ui/clamped-description";
+import StatusBadgePill, {
+  type StatusBadge,
+} from "@/components/ui/status-badge";
 
 interface CardProps {
   readonly image: string;
@@ -10,6 +13,8 @@ interface CardProps {
   readonly tag?: string | null;
   /** Optional right-aligned detail, e.g. a multi-session series summary. */
   readonly meta?: string | null;
+  /** Optional status pill, e.g. a rocket that has not launched yet. */
+  readonly badge?: StatusBadge | null;
   readonly reverse?: boolean;
   readonly vertical?: boolean;
 }
@@ -37,6 +42,22 @@ function SeriesBadge({ label }: { readonly label: string }) {
   );
 }
 
+function shellClasses(isSeries: boolean, badge?: StatusBadge | null) {
+  // A multi-session series gets a warmer border, ring and primary wash so it
+  // reads as distinct in a grid of one-off events.
+  if (isSeries) {
+    return "border-primary/50 hover:border-primary shadow-lg shadow-primary/10 ring-1 ring-primary/20";
+  }
+
+  // A highlighted badge only warms the border. On the rockets page a section
+  // divider already groups these cards, so anything heavier double-signals.
+  if (badge?.tone === "primary") {
+    return "border-primary/30 hover:border-primary/60";
+  }
+
+  return "border-border hover:border-primary/50";
+}
+
 export default function Card({
   image,
   title,
@@ -44,16 +65,13 @@ export default function Card({
   description,
   tag,
   meta,
+  badge,
   reverse = false,
   vertical = false,
 }: CardProps) {
   const imageSrc = image || "/UARC logo.png";
   const isSeries = Boolean(meta);
-  // A multi-session series gets a warmer border, ring and primary wash so it
-  // reads as distinct in a grid of one-off events.
-  const seriesShell = isSeries
-    ? "border-primary/50 hover:border-primary shadow-lg shadow-primary/10 ring-1 ring-primary/20"
-    : "border-border hover:border-primary/50";
+  const seriesShell = shellClasses(isSeries, badge);
   const trimmedDescription = description.trim();
 
   if (vertical) {
@@ -78,13 +96,14 @@ export default function Card({
           }`}
         >
           <div>
-            <div className="flex items-center gap-3 mb-3">
+            <div className="flex flex-wrap items-center gap-3 mb-3">
               <span className="text-xs font-medium text-primary">{date}</span>
               {tag && (
                 <span className="text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 font-medium">
                   {tag}
                 </span>
               )}
+              {badge && <StatusBadgePill badge={badge} />}
               {meta && <SeriesBadge label={meta} />}
             </div>
             <h3 className="text-lg font-semibold text-text-main mb-2 group-hover:text-primary transition-colors duration-200">
@@ -136,13 +155,14 @@ export default function Card({
           isSeries ? "bg-linear-to-br from-primary/8 to-transparent" : ""
         }`}
       >
-        <div className="flex items-center gap-3 mb-3">
+        <div className="flex flex-wrap items-center gap-3 mb-3">
           <span className="text-xs font-medium text-primary">{date}</span>
           {tag && (
             <span className="text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 font-medium">
               {tag}
             </span>
           )}
+          {badge && <StatusBadgePill badge={badge} />}
           {meta && <SeriesBadge label={meta} />}
         </div>
         <h3 className="text-xl font-semibold text-text-main mb-2 group-hover:text-primary transition-colors duration-200">

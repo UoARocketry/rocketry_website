@@ -12,7 +12,7 @@ export const Rockets: CollectionConfig = {
   slug: "rockets",
   admin: {
     useAsTitle: "name",
-    defaultColumns: ["name", "slug", "launchedAt"],
+    defaultColumns: ["name", "slug", "featured", "launchedAt"],
   },
   versions: {
     drafts: true,
@@ -97,7 +97,26 @@ export const Rockets: CollectionConfig = {
       },
     },
     { name: "description", type: "textarea", required: false },
-    { name: "launchedAt", type: "date", required: false },
+    {
+      name: "featured",
+      type: "checkbox",
+      label: "Show on home page",
+      defaultValue: false,
+      index: true,
+      admin: {
+        description:
+          "Tick to feature this rocket in the Featured Rockets section on the home page. Up to 3 are shown, next launch first. If none are ticked the home page falls back to the most recently launched rockets.",
+      },
+    },
+    {
+      name: "launchedAt",
+      type: "date",
+      required: false,
+      admin: {
+        description:
+          "Leave empty while the rocket is still in development. A date in the future marks it as a scheduled launch; a date in the past marks it as launched.",
+      },
+    },
     {
       name: "gallery",
       type: "array",

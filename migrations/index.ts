@@ -11,6 +11,7 @@ import * as migration_20260825_120000_add_event_sessions from "./20260825_120000
 import * as migration_20260825_130000_add_exec_photo_position from "./20260825_130000_add_exec_photo_position";
 import * as migration_20260825_140000_add_site_settings_usage_limits from "./20260825_140000_add_site_settings_usage_limits";
 import * as migration_20260825_150000_add_site_settings_contact_email from "./20260825_150000_add_site_settings_contact_email";
+import * as migration_20260826_120000_add_rocket_featured from "./20260826_120000_add_rocket_featured";
 
 export const migrations = [
   {
@@ -77,5 +78,10 @@ export const migrations = [
     up: migration_20260825_150000_add_site_settings_contact_email.up,
     down: migration_20260825_150000_add_site_settings_contact_email.down,
     name: "20260825_150000_add_site_settings_contact_email",
+  },
+  {
+    up: migration_20260826_120000_add_rocket_featured.up,
+    down: migration_20260826_120000_add_rocket_featured.down,
+    name: "20260826_120000_add_rocket_featured",
   },
 ];

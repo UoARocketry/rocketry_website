@@ -13,6 +13,7 @@ import type {
   WhatWeDo as PayloadWhatWeDo,
 } from "@/payload-types";
 import { getPayloadClient } from "@/lib/payload";
+import { getRocketStatus, sortRockets } from "@/lib/utils";
 import type {
   AboutPayload,
   EventDetail,
@@ -182,6 +183,7 @@ function mapRocket(doc: PayloadRocket): RocketSummary {
     image: doc.image ?? null,
     description: doc.description ?? null,
     launchedAt: doc.launchedAt ?? null,
+    featured: doc.featured ?? false,
   };
 }
 
@@ -359,39 +361,48 @@ const getEventBySlugCached = createCachedByStringArg<EventDetail | null>({
   },
 });
 
+/** How many rockets the home page's featured strip shows at most. */
+const HOME_ROCKET_LIMIT = 3;
+
+async function findPublishedRockets(): Promise<RocketSummary[]> {
+  const payload = await getPayloadClient();
+  const result = await payload.find({
+    collection: "rockets",
+    draft: false,
+    pagination: false,
+    where: PUBLISHED_STATUS_WHERE,
+  });
+
+  // Ordered in JS rather than by the query — see sortRockets for why a
+  // `-launchedAt` sort cannot express the order we want.
+  return sortRockets(result.docs.map((doc) => mapRocket(doc as PayloadRocket)));
+}
+
 export const getRocketSummaries = unstable_cache(
   async (): Promise<RocketSummary[]> => {
-    const payload = await getPayloadClient();
-    const result = await payload.find({
-      collection: "rockets",
-      draft: false,
-      limit: 2,
-      sort: "-launchedAt",
-      where: PUBLISHED_STATUS_WHERE,
-    });
+    const rockets = await findPublishedRockets();
+    const featured = rockets.filter((rocket) => rocket.featured);
 
-    return result.docs.map((doc) => mapRocket(doc as PayloadRocket));
+    if (featured.length > 0) {
+      return featured.slice(0, HOME_ROCKET_LIMIT);
+    }
+
+    // Nothing ticked in the CMS: fall back to finished work rather than the
+    // undated backlog, so the strip still shows something meaningful.
+    const launched = rockets.filter(
+      (rocket) => getRocketStatus(rocket) === "launched",
+    );
+    const fallback = launched.length > 0 ? launched : rockets;
+
+    return fallback.slice(0, HOME_ROCKET_LIMIT);
   },
   ["rocket-summaries"],
   { revalidate: CONTENT_REVALIDATE_SECONDS, tags: ["rockets"] },
 );
 
-export const getAllRockets = unstable_cache(
-  async (): Promise<RocketSummary[]> => {
-    const payload = await getPayloadClient();
-    const result = await payload.find({
-      collection: "rockets",
-      draft: false,
-      pagination: false,
-      sort: "-launchedAt",
-      where: PUBLISHED_STATUS_WHERE,
-    });
-
-    return result.docs.map((doc) => mapRocket(doc as PayloadRocket));
-  },
-  ["all-rockets"],
-  { revalidate: CONTENT_REVALIDATE_SECONDS, tags: ["rockets"] },
-);
+export const getAllRockets = unstable_cache(findPublishedRockets, [
+  "all-rockets",
+], { revalidate: CONTENT_REVALIDATE_SECONDS, tags: ["rockets"] });
 
 export const getEventsOverview = unstable_cache(
   async (): Promise<EventsOverview> => {

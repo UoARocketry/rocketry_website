@@ -2,7 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getRocketBySlug } from "@/lib/site-data";
-import { formatDateLong, formatDateShort } from "@/lib/utils";
+import {
+  ROCKET_STATUS_LABELS,
+  formatDateLong,
+  formatDateShort,
+  getRocketStatus,
+} from "@/lib/utils";
+import StatusBadgePill, {
+  rocketStatusBadge,
+} from "@/components/ui/status-badge";
 import RocketImageCycler from "@/components/ui/rocket-image-cycler";
 
 interface RocketPageProps {
@@ -45,6 +53,10 @@ export default async function RocketPage({ params }: RocketPageProps) {
     notFound();
   }
 
+  const status = getRocketStatus(rocket);
+  const badge = rocketStatusBadge(rocket);
+  const dateLabel = status === "scheduled" ? "Scheduled launch" : "Launched";
+
   return (
     <main className="min-h-screen max-w-7xl mx-auto pb-16">
       <section className="max-w-7xl mx-auto pt-16 pb-8 px-4">
@@ -63,12 +75,15 @@ export default async function RocketPage({ params }: RocketPageProps) {
           {/* Rocket Details */}
           <div className="space-y-6">
             <div>
-              <h1 className="text-5xl font-extrabold mb-4 text-primary">
-                {rocket.name}
-              </h1>
+              <div className="flex flex-wrap items-center gap-4 mb-4">
+                <h1 className="text-5xl font-extrabold text-primary">
+                  {rocket.name}
+                </h1>
+                {badge && <StatusBadgePill badge={badge} />}
+              </div>
               {rocket.launchedAt && (
                 <p className="text-lg text-text-secondary mb-4">
-                  Launched: {formatDateShort(rocket.launchedAt)}
+                  {dateLabel}: {formatDateShort(rocket.launchedAt)}
                 </p>
               )}
             </div>
@@ -90,12 +105,16 @@ export default async function RocketPage({ params }: RocketPageProps) {
                 <div>
                   <p className="text-sm text-text-secondary">Status</p>
                   <p className="font-semibold">
-                    {rocket.launchedAt ? "Launched" : "In Development"}
+                    {ROCKET_STATUS_LABELS[status]}
                   </p>
                 </div>
                 {rocket.launchedAt && (
                   <div>
-                    <p className="text-sm text-text-secondary">Launch Date</p>
+                    <p className="text-sm text-text-secondary">
+                      {status === "scheduled"
+                        ? "Scheduled Launch Date"
+                        : "Launch Date"}
+                    </p>
                     <p className="font-semibold">
                       {formatDateLong(rocket.launchedAt)}
                     </p>

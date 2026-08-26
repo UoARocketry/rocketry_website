@@ -3,7 +3,9 @@ import {
   findNextSessionIndex,
   formatEventCardDate,
   formatEventSessionsLabel,
+  getRocketStatus,
   isEventUpcoming,
+  sortRockets,
 } from "./utils.ts";
 
 const NOW = new Date("2026-06-15T12:00:00.000Z");
@@ -158,5 +160,86 @@ describe("formatEventSessionsLabel", () => {
         sessions: [future(1), { title: "Broken", date: "not-a-date" }],
       }),
     ).toBeNull();
+  });
+});
+
+describe("getRocketStatus", () => {
+  it("treats a missing launch date as still in development", () => {
+    expect(getRocketStatus({})).toBe("in-development");
+    expect(getRocketStatus({ launchedAt: null })).toBe("in-development");
+    expect(getRocketStatus({ launchedAt: "" })).toBe("in-development");
+  });
+
+  it("treats an unparseable launch date as still in development", () => {
+    expect(getRocketStatus({ launchedAt: "not-a-date" })).toBe(
+      "in-development",
+    );
+  });
+
+  it("distinguishes a booked future launch from one that has flown", () => {
+    expect(getRocketStatus({ launchedAt: future(1).date })).toBe("scheduled");
+    expect(getRocketStatus({ launchedAt: past(1).date })).toBe("launched");
+  });
+
+  it("counts a launch happening right now as still scheduled", () => {
+    expect(getRocketStatus({ launchedAt: NOW.toISOString() })).toBe(
+      "scheduled",
+    );
+  });
+});
+
+describe("sortRockets", () => {
+  const rocket = (name: string, launchedAt?: string | null) => ({
+    name,
+    launchedAt: launchedAt ?? null,
+  });
+
+  it("orders scheduled, then in development, then launched", () => {
+    const sorted = sortRockets([
+      rocket("Flown", past(1).date),
+      rocket("Undated"),
+      rocket("Booked", future(1).date),
+    ]);
+
+    expect(sorted.map((r) => r.name)).toEqual(["Booked", "Undated", "Flown"]);
+  });
+
+  it("puts the soonest launch first among scheduled rockets", () => {
+    const sorted = sortRockets([
+      rocket("Later", future(20).date),
+      rocket("Sooner", future(1).date),
+    ]);
+
+    expect(sorted.map((r) => r.name)).toEqual(["Sooner", "Later"]);
+  });
+
+  it("puts the most recent flight first among launched rockets", () => {
+    const sorted = sortRockets([
+      rocket("Older", past(1).date),
+      rocket("Newer", past(10).date),
+    ]);
+
+    expect(sorted.map((r) => r.name)).toEqual(["Newer", "Older"]);
+  });
+
+  it("falls back to name order for undated rockets", () => {
+    const sorted = sortRockets([rocket("Zeta"), rocket("Alpha")]);
+
+    expect(sorted.map((r) => r.name)).toEqual(["Alpha", "Zeta"]);
+  });
+
+  it("does not mutate the input array", () => {
+    const input = [rocket("Flown", past(1).date), rocket("Undated")];
+    sortRockets(input);
+
+    expect(input.map((r) => r.name)).toEqual(["Flown", "Undated"]);
+  });
+
+  it("keeps an undated rocket out of the top slot reserved for launches", () => {
+    // Regression: sort: "-launchedAt" relied on Postgres' DESC default of
+    // NULLS FIRST, which floated every undated rocket above the flown ones.
+    const sorted = sortRockets([rocket("Undated"), rocket("Booked", future(1).date)]);
+
+    expect(sorted[0].name).toBe("Booked");
   });
 });

@@ -4,6 +4,7 @@ import Image from "next/image";
 import Card from "@/components/ui/card";
 import SectionFallback from "@/components/SectionFallback";
 import QuickNavCard from "@/components/QuickNavCard";
+import { rocketStatusBadge } from "@/components/ui/status-badge";
 import {
   getEventsOverview,
   getRocketSummaries,
@@ -134,6 +135,7 @@ export default async function HomePage() {
                         : "TBA"
                     }
                     description={rocket.description ?? ""}
+                    badge={rocketStatusBadge(rocket)}
                     reverse={idx % 2 === 1}
                   />
                 </Link>

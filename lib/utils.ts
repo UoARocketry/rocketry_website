@@ -134,6 +134,85 @@ export function findNextSessionIndex(
   });
 }
 
+export type RocketStatus = "scheduled" | "in-development" | "launched";
+
+type RocketLike = { readonly launchedAt?: string | null };
+type RocketOrderable = RocketLike & { readonly name: string };
+
+export const ROCKET_STATUS_LABELS: Record<RocketStatus, string> = {
+  scheduled: "Scheduled",
+  "in-development": "In Development",
+  launched: "Launched",
+};
+
+/**
+ * A rocket has no status field in the CMS — its state is derived from
+ * `launchedAt` alone. Note the three-way split: a date in the *future* means
+ * the flight is booked but has not happened, which the older
+ * `launchedAt ? "Launched" : "In Development"` check reported as already flown.
+ */
+export function getRocketStatus(
+  rocket: RocketLike,
+  now = Date.now(),
+): RocketStatus {
+  const parsed = rocket.launchedAt ? toValidDate(rocket.launchedAt) : null;
+
+  if (!parsed) {
+    return "in-development";
+  }
+
+  return parsed.getTime() >= now ? "scheduled" : "launched";
+}
+
+const ROCKET_STATUS_RANK: Record<RocketStatus, number> = {
+  scheduled: 0,
+  "in-development": 1,
+  launched: 2,
+};
+
+function compareRockets(
+  a: RocketOrderable,
+  b: RocketOrderable,
+  now: number,
+): number {
+  const statusA = getRocketStatus(a, now);
+  const statusB = getRocketStatus(b, now);
+
+  if (statusA !== statusB) {
+    return ROCKET_STATUS_RANK[statusA] - ROCKET_STATUS_RANK[statusB];
+  }
+
+  const timeA = a.launchedAt ? toValidDate(a.launchedAt)?.getTime() : undefined;
+  const timeB = b.launchedAt ? toValidDate(b.launchedAt)?.getTime() : undefined;
+
+  if (typeof timeA === "number" && typeof timeB === "number") {
+    // The next launch is the most interesting scheduled rocket, but the most
+    // recent flight is the most interesting launched one.
+    return statusA === "scheduled" ? timeA - timeB : timeB - timeA;
+  }
+
+  return a.name.localeCompare(b.name);
+}
+
+/**
+ * Orders rockets the way every list on the site shows them: next launch first,
+ * then undated builds, then flown rockets newest first.
+ *
+ * Sorted here rather than in the Payload query because the Postgres adapter
+ * emits a bare `desc()` with no NULLS clause, and Postgres defaults `DESC` to
+ * NULLS FIRST — so `sort: "-launchedAt"` silently floated every undated rocket
+ * above the flown ones.
+ *
+ * `now` is snapshotted once so a rocket cannot change status partway through
+ * the sort and make the comparator inconsistent.
+ */
+export function sortRockets<T extends RocketOrderable>(
+  rockets: readonly T[],
+): T[] {
+  const now = Date.now();
+  return [...rockets].sort((a, b) => compareRockets(a, b, now));
+}
+
 export function normalizeEventTag(value: string | null | undefined) {
   const normalized = normalizeWhitespace(value ?? "").toLowerCase();
   return normalized || "general";
