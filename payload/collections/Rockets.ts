@@ -6,18 +6,24 @@ import {
   revalidateTags,
 } from "../hooks/revalidation.ts";
 import { createMediaRelationUrlSyncHook } from "../hooks/media-url-sync.ts";
-import { validateUrlOrUpload } from "../fields/validators.ts";
+import { createImagePairFields } from "../fields/image-pair.ts";
+import { createSlugField } from "../fields/slug.ts";
 
 export const Rockets: CollectionConfig = {
   slug: "rockets",
   admin: {
     useAsTitle: "name",
-    defaultColumns: ["name", "slug", "featured", "launchedAt"],
+    defaultColumns: ["name", "featured", "launchedAt", "_status"],
+    group: "Rockets",
+    description:
+      "Every rocket shown on the Rockets page. Leave the launch date empty while one is still in development.",
   },
+  defaultSort: ["_status", "-launchedAt"],
   versions: {
     drafts: true,
     maxPerDoc: 20,
   },
+  trash: true,
   access: {
     read: isPublicRead,
     create: isLoggedIn,
@@ -73,29 +79,14 @@ export const Rockets: CollectionConfig = {
   },
   fields: [
     { name: "name", type: "text", required: true },
-    { name: "slug", type: "text", required: true, unique: true, index: true },
-    {
-      name: "imageMedia",
-      type: "upload",
-      relationTo: "media" as never,
-      required: false,
-      admin: {
-        description:
-          "Upload or select an image. This auto-fills the Rocket image URL.",
-      },
-    },
-    {
-      name: "image",
-      type: "text",
-      // See Events.ts: `required` is the asterisk only; `validate` is the gate.
+    createSlugField({ sourceField: "name", pathPrefix: "/rockets" }),
+    ...createImagePairFields({
+      uploadName: "imageMedia",
+      urlName: "image",
+      label: "Rocket image",
       required: true,
-      validate: (value: unknown, { siblingData }: { siblingData: unknown }) =>
-        validateUrlOrUpload(value, siblingData, "imageMedia", "Rocket image"),
-      admin: {
-        description:
-          "Auto-filled from the upload above whenever a file is selected there (overwrites this field on save). Leave the upload empty to link an external image URL directly instead.",
-      },
-    },
+      uploadDescription: "This is the cover image at the top of the page.",
+    }),
     { name: "description", type: "textarea", required: false },
     {
       name: "featured",
@@ -113,6 +104,7 @@ export const Rockets: CollectionConfig = {
       type: "date",
       required: false,
       admin: {
+        date: { pickerAppearance: "dayAndTime", timeFormat: "HH:mm" },
         description:
           "Leave empty while the rocket is still in development. A date in the future marks it as a scheduled launch; a date in the past marks it as launched.",
       },
@@ -154,6 +146,7 @@ export const Rockets: CollectionConfig = {
       type: "array",
       required: false,
       admin: {
+        initCollapsed: true,
         description:
           "Additional photos shown in the image gallery on the rocket's detail page, after the cover image above.",
       },

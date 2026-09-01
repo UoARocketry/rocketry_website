@@ -142,12 +142,21 @@ export interface UserAuthOperations {
   };
 }
 /**
+ * Who can sign in to this admin. Admins manage accounts; editors can change site content but not accounts.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
 export interface User {
   id: number;
-  name?: string | null;
+  /**
+   * Shown in the account list so it is not just an email.
+   */
+  name: string;
+  /**
+   * Editors can manage all site content. Admins can additionally create, edit and delete accounts. Keep at least two admins so nobody is locked out.
+   */
+  role: 'admin' | 'editor';
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -168,12 +177,17 @@ export interface User {
   collection: 'users';
 }
 /**
+ * Every image used across the site. Deleting one is blocked while a page still uses it.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
  */
 export interface Media {
   id: number;
-  alt?: string | null;
+  /**
+   * Describe the image in a few words, for screen readers and for when the image fails to load. E.g. "Aurora Mk II on the launch rail".
+   */
+  alt: string;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -187,22 +201,30 @@ export interface Media {
   focalY?: number | null;
 }
 /**
+ * Everything listed on the Events page, newest first. Unpublished drafts appear at the top and are not visible on the site.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "events".
  */
 export interface Event {
   id: number;
   title: string;
+  /**
+   * The URL for this page: /events/your-slug. Filled in automatically from the title when you first save. Changing it later breaks any link already shared, so only edit it if you mean to.
+   */
   slug: string;
   /**
-   * Upload or select an image. This auto-fills the Event image URL.
+   * Upload a new image or pick one already in the Media library.
    */
   imageMedia?: (number | null) | Media;
   /**
-   * Auto-filled from the upload above whenever a file is selected there (overwrites this field on save). Leave the upload empty to link an external image URL directly instead.
+   * Only needed if you are linking an image hosted somewhere else instead of uploading one. Choose a file above and this disappears.
    */
-  image: string;
+  image?: string | null;
   description: string;
+  /**
+   * When the event starts.
+   */
   date: string;
   /**
    * Manage the available tags in the Event Tags collection.
@@ -227,35 +249,46 @@ export interface Event {
     | null;
   updatedAt: string;
   createdAt: string;
+  deletedAt?: string | null;
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * The labels events can be filed under. Deleting one simply clears it from any event that used it.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "event-tags".
  */
 export interface EventTag {
   id: number;
   name: string;
+  /**
+   * Position in the filter row, starting at 1. Claim a position that is taken and the others shift down automatically.
+   */
   order: number;
   updatedAt: string;
   createdAt: string;
 }
 /**
+ * Every rocket shown on the Rockets page. Leave the launch date empty while one is still in development.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "rockets".
  */
 export interface Rocket {
   id: number;
   name: string;
+  /**
+   * The URL for this page: /rockets/your-slug. Filled in automatically from the name when you first save. Changing it later breaks any link already shared, so only edit it if you mean to.
+   */
   slug: string;
   /**
-   * Upload or select an image. This auto-fills the Rocket image URL.
+   * Upload a new image or pick one already in the Media library. This is the cover image at the top of the page.
    */
   imageMedia?: (number | null) | Media;
   /**
-   * Auto-filled from the upload above whenever a file is selected there (overwrites this field on save). Leave the upload empty to link an external image URL directly instead.
+   * Only needed if you are linking an image hosted somewhere else instead of uploading one. Choose a file above and this disappears.
    */
-  image: string;
+  image?: string | null;
   description?: string | null;
   /**
    * Tick to feature this rocket in the Featured Rockets section on the home page. Up to 3 are shown, next launch first. If none are ticked the home page falls back to the most recently launched rockets.
@@ -292,9 +325,12 @@ export interface Rocket {
     | null;
   updatedAt: string;
   createdAt: string;
+  deletedAt?: string | null;
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * The committee, grouped by year. Order sets the position within a year and is kept tidy automatically.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "executives".
  */
@@ -304,22 +340,31 @@ export interface Executive {
   role: string;
   bio: string;
   /**
-   * Upload or select a headshot. This auto-fills the Photo URL.
+   * Upload a new image or pick one already in the Media library. Optional. Leave empty and the card shows the exec's initials instead.
    */
   photoMedia?: (number | null) | Media;
   /**
-   * Auto-filled from the upload above whenever a file is selected there (overwrites this field on save). Leave the upload empty to link an external image URL directly instead.
+   * Only needed if you are linking an image hosted somewhere else instead of uploading one. Choose a file above and this disappears.
    */
-  photo: string;
+  photo?: string | null;
   photoPosition?: string | null;
+  /**
+   * The committee year this person served. The About page groups execs by this.
+   */
   year: number;
+  /**
+   * Position within this year, starting at 1. Claim a position that is taken and everyone below shifts down automatically on publish.
+   */
   order: number;
   linkedinUrl?: string | null;
   updatedAt: string;
   createdAt: string;
+  deletedAt?: string | null;
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Organisations shown on the Sponsors page, grouped into the tier you pick.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "sponsors".
  */
@@ -327,13 +372,16 @@ export interface Sponsor {
   id: number;
   name: string;
   /**
-   * Upload or select a logo. This auto-fills the Logo URL field.
+   * Upload a new image or pick one already in the Media library.
    */
   logoMedia?: (number | null) | Media;
   /**
-   * Auto-filled from the upload above whenever a file is selected there (overwrites this field on save). Leave the upload empty to link an external logo URL directly instead.
+   * Only needed if you are linking an image hosted somewhere else instead of uploading one. Choose a file above and this disappears.
    */
-  logo: string;
+  logo?: string | null;
+  /**
+   * The sponsor's own website, linked from their logo.
+   */
   url: string;
   description?: string | null;
   /**
@@ -342,9 +390,12 @@ export interface Sponsor {
   tier: number | SponsorTier;
   updatedAt: string;
   createdAt: string;
+  deletedAt?: string | null;
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * The sections the Sponsors page is split into, in display order. A tier cannot be deleted while sponsors are still in it.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "sponsor-tiers".
  */
@@ -352,11 +403,16 @@ export interface SponsorTier {
   id: number;
   name: string;
   description?: string | null;
+  /**
+   * Position on the Sponsors page, starting at 1. Claim a position that is taken and the others shift down automatically.
+   */
   order: number;
   updatedAt: string;
   createdAt: string;
 }
 /**
+ * The 'What We Do' blocks on the About page, in display order.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "what-we-do".
  */
@@ -365,17 +421,29 @@ export interface WhatWeDo {
   title: string;
   body?: string | null;
   /**
-   * Upload or select an image. This auto-fills the image URL field.
+   * Upload a new image or pick one already in the Media library.
    */
   imageMedia?: (number | null) | Media;
-  image: string;
+  /**
+   * Only needed if you are linking an image hosted somewhere else instead of uploading one. Choose a file above and this disappears.
+   */
+  image?: string | null;
+  /**
+   * Background shade for this block. Alternate between blocks so the page has visible banding.
+   */
   variant?: ('background' | 'surface') | null;
+  /**
+   * Position on the About page, starting at 1. Claim a position that is taken and the others shift down automatically on publish.
+   */
   order: number;
   updatedAt: string;
   createdAt: string;
+  deletedAt?: string | null;
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * The club's story timeline on the About page, in the order it reads.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "journey-items".
  */
@@ -384,17 +452,29 @@ export interface JourneyItem {
   title: string;
   body?: string | null;
   /**
-   * Upload or select an image. This auto-fills the image URL field.
+   * Upload a new image or pick one already in the Media library.
    */
   imageMedia?: (number | null) | Media;
-  image: string;
+  /**
+   * Only needed if you are linking an image hosted somewhere else instead of uploading one. Choose a file above and this disappears.
+   */
+  image?: string | null;
+  /**
+   * Background shade for this block. Alternate between blocks so the page has visible banding.
+   */
   variant?: ('background' | 'surface') | null;
+  /**
+   * Position in the timeline, starting at 1. Claim a position that is taken and the others shift down automatically on publish.
+   */
   order: number;
   updatedAt: string;
   createdAt: string;
+  deletedAt?: string | null;
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * The sub-teams described on the About page, e.g. Structures or Avionics.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "team-roles".
  */
@@ -402,29 +482,51 @@ export interface TeamRole {
   id: number;
   title: string;
   body?: string | null;
+  /**
+   * Short points listed under the description.
+   */
   bullets?:
     | {
         value: string;
         id?: string | null;
       }[]
     | null;
+  /**
+   * Background shade for this block. Alternate between blocks so the page has visible banding.
+   */
   variant?: ('background' | 'surface') | null;
+  /**
+   * Position on the About page, starting at 1. Claim a position that is taken and the others shift down automatically on publish.
+   */
   order: number;
   updatedAt: string;
   createdAt: string;
+  deletedAt?: string | null;
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * The headline numbers on the About page, e.g. '150' / 'Active members'.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "stats".
  */
 export interface Stat {
   id: number;
+  /**
+   * The figure itself, e.g. "150" or "12+".
+   */
   value: string;
+  /**
+   * What the figure counts, e.g. "Active members".
+   */
   label: string;
+  /**
+   * Position in the row of stats, starting at 1. Claim a position that is taken and the others shift down automatically on publish.
+   */
   order: number;
   updatedAt: string;
   createdAt: string;
+  deletedAt?: string | null;
   _status?: ('draft' | 'published') | null;
 }
 /**
@@ -547,6 +649,7 @@ export interface PayloadMigration {
  */
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
+  role?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -607,6 +710,7 @@ export interface EventsSelect<T extends boolean = true> {
       };
   updatedAt?: T;
   createdAt?: T;
+  deletedAt?: T;
   _status?: T;
 }
 /**
@@ -646,6 +750,7 @@ export interface RocketsSelect<T extends boolean = true> {
       };
   updatedAt?: T;
   createdAt?: T;
+  deletedAt?: T;
   _status?: T;
 }
 /**
@@ -664,6 +769,7 @@ export interface ExecutivesSelect<T extends boolean = true> {
   linkedinUrl?: T;
   updatedAt?: T;
   createdAt?: T;
+  deletedAt?: T;
   _status?: T;
 }
 /**
@@ -679,6 +785,7 @@ export interface SponsorsSelect<T extends boolean = true> {
   tier?: T;
   updatedAt?: T;
   createdAt?: T;
+  deletedAt?: T;
   _status?: T;
 }
 /**
@@ -705,6 +812,7 @@ export interface WhatWeDoSelect<T extends boolean = true> {
   order?: T;
   updatedAt?: T;
   createdAt?: T;
+  deletedAt?: T;
   _status?: T;
 }
 /**
@@ -720,6 +828,7 @@ export interface JourneyItemsSelect<T extends boolean = true> {
   order?: T;
   updatedAt?: T;
   createdAt?: T;
+  deletedAt?: T;
   _status?: T;
 }
 /**
@@ -739,6 +848,7 @@ export interface TeamRolesSelect<T extends boolean = true> {
   order?: T;
   updatedAt?: T;
   createdAt?: T;
+  deletedAt?: T;
   _status?: T;
 }
 /**
@@ -751,6 +861,7 @@ export interface StatsSelect<T extends boolean = true> {
   order?: T;
   updatedAt?: T;
   createdAt?: T;
+  deletedAt?: T;
   _status?: T;
 }
 /**
@@ -794,17 +905,17 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
+ * Site-wide links, contact details and dashboard settings. Changes here affect every page.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "site-settings".
  */
 export interface SiteSetting {
   id: number;
-  memberJoinUrl?: string | null;
   /**
-   * Upload or select an executive team image. This auto-fills the URL field.
+   * The 'Join' button target, usually the club's AUSA or sign-up page.
    */
-  execTeamImageMedia?: (number | null) | Media;
-  execTeamImageUrl?: string | null;
+  memberJoinUrl?: string | null;
   /**
    * Invite link shown in the footer. Use a Discord invite set to never expire.
    */
@@ -816,11 +927,19 @@ export interface SiteSetting {
    */
   contactEmail?: string | null;
   /**
-   * Only scales the usage bar on this dashboard — the measured size is always accurate. Update if the Supabase plan changes. Free tier is 500 MB.
+   * Upload a new image or pick one already in the Media library. Optional. The group photo on the About page.
+   */
+  execTeamImageMedia?: (number | null) | Media;
+  /**
+   * Only needed if you are linking an image hosted somewhere else instead of uploading one. Choose a file above and this disappears.
+   */
+  execTeamImageUrl?: string | null;
+  /**
+   * Update if the Supabase plan changes. Free tier is 500 MB.
    */
   databaseLimitMb?: number | null;
   /**
-   * Only scales the usage bar on this dashboard. Free tier is 1024 MB (1 GB).
+   * Free tier is 1024 MB (1 GB).
    */
   storageLimitMb?: number | null;
   _status?: ('draft' | 'published') | null;
@@ -833,12 +952,12 @@ export interface SiteSetting {
  */
 export interface SiteSettingsSelect<T extends boolean = true> {
   memberJoinUrl?: T;
-  execTeamImageMedia?: T;
-  execTeamImageUrl?: T;
   discordUrl?: T;
   instagramUrl?: T;
   linkedinUrl?: T;
   contactEmail?: T;
+  execTeamImageMedia?: T;
+  execTeamImageUrl?: T;
   databaseLimitMb?: T;
   storageLimitMb?: T;
   _status?: T;

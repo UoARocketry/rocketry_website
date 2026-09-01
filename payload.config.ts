@@ -123,6 +123,21 @@ export default buildConfig({
       beforeDashboard: ["/payload/components/StorageUsage.tsx#default"],
     },
   },
+  i18n: {
+    translations: {
+      en: {
+        version: {
+          // Payload's own strings hardcode the plural label and pass no count,
+          // so a single-row selection reads "all Executives". Neutral wording
+          // is the most that can be fixed without replacing the component.
+          aboutToPublishSelection:
+            "You are about to publish the selected {{label}}. Are you sure?",
+          aboutToUnpublishSelection:
+            "You are about to unpublish the selected {{label}}. This hides them from the website but does not delete anything. Are you sure?",
+        },
+      },
+    },
+  },
   ...(resendApiKey
     ? {
         email: resendAdapter({

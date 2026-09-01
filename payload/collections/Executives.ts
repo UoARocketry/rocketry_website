@@ -6,21 +6,27 @@ import {
   revalidateTags,
 } from "../hooks/revalidation.ts";
 import { createMediaRelationUrlSyncHook } from "../hooks/media-url-sync.ts";
-import {
-  validateOptionalUrl,
-  validateUrlOrUpload,
-} from "../fields/validators.ts";
+import { createOrderCollisionHook } from "../hooks/order-collision.ts";
+import { createImagePairFields } from "../fields/image-pair.ts";
+import { validateOptionalUrl } from "../fields/validators.ts";
 
 export const Executives: CollectionConfig = {
   slug: "executives",
   admin: {
     useAsTitle: "name",
-    defaultColumns: ["name", "role", "year", "order"],
+    defaultColumns: ["name", "role", "year", "order", "_status"],
+    group: "People",
+    description:
+      "The committee, grouped by year. Order sets the position within a year and is kept tidy automatically.",
   },
+  // Drafts first so unpublished work is visible rather than buried, then
+  // newest committee year, then position within that year.
+  defaultSort: ["_status", "-year", "order"],
   versions: {
     drafts: true,
     maxPerDoc: 20,
   },
+  trash: true,
   access: {
     read: isPublicRead,
     create: isLoggedIn,
@@ -35,6 +41,7 @@ export const Executives: CollectionConfig = {
       }),
     ],
     afterChange: [
+      createOrderCollisionHook({ scopeField: "year" }),
       ({ doc, previousDoc }) => {
         const year = getNumberField(doc, "year");
         const previousYear = getNumberField(previousDoc, "year");
@@ -71,34 +78,23 @@ export const Executives: CollectionConfig = {
     { name: "name", type: "text", required: true },
     { name: "role", type: "text", required: true },
     { name: "bio", type: "textarea", required: true },
-    {
-      name: "photoMedia",
-      type: "upload",
-      relationTo: "media" as never,
+    ...createImagePairFields({
+      uploadName: "photoMedia",
+      urlName: "photo",
+      label: "Photo",
       required: false,
-      admin: {
-        description:
-          "Upload or select a headshot. This auto-fills the Photo URL.",
-      },
-    },
-    {
-      name: "photo",
-      type: "text",
-      // See Events.ts: `required` is the asterisk only; `validate` is the gate.
-      required: true,
-      validate: (value: unknown, { siblingData }: { siblingData: unknown }) =>
-        validateUrlOrUpload(value, siblingData, "photoMedia", "Photo"),
-      admin: {
-        description:
-          "Auto-filled from the upload above whenever a file is selected there (overwrites this field on save). Leave the upload empty to link an external image URL directly instead.",
-      },
-    },
+      uploadDescription:
+        "Leave empty and the card shows the exec's initials instead.",
+    }),
     {
       name: "photoPosition",
       type: "text",
       required: false,
       defaultValue: "50% 50%",
       admin: {
+        // Framing only makes sense once there is something to frame.
+        condition: (_data, siblingData) =>
+          Boolean((siblingData as Record<string, unknown> | undefined)?.photo),
         components: {
           Field: "/payload/components/PhotoPositionField.tsx#PhotoPositionField",
         },
@@ -110,8 +106,21 @@ export const Executives: CollectionConfig = {
       required: true,
       index: true,
       defaultValue: () => new Date().getFullYear(),
+      admin: {
+        description:
+          "The committee year this person served. The About page groups execs by this.",
+      },
     },
-    { name: "order", type: "number", required: true, defaultValue: 1 },
+    {
+      name: "order",
+      type: "number",
+      required: true,
+      defaultValue: 1,
+      admin: {
+        description:
+          "Position within this year, starting at 1. Claim a position that is taken and everyone below shifts down automatically on publish.",
+      },
+    },
     {
       name: "linkedinUrl",
       type: "text",

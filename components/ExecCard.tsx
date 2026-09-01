@@ -1,6 +1,7 @@
 import React from "react";
 import ImageWithFallback from "@/components/ui/image-with-fallback";
 import type { Exec } from "@/lib/site-data";
+import { toInitials } from "@/lib/initials";
 import { parsePhotoFraming, photoFramingStyle } from "@/lib/photo-position";
 
 type ExecCardModel = {
@@ -24,7 +25,10 @@ export default function ExecCard({
   centered = false,
   className = "",
 }: Props) {
-  const photoSrc = exec.photo || "/UARC logo.png";
+  // No photo is a legitimate state, not a failure, so it gets its own
+  // treatment. ImageWithFallback's "Image unavailable" panel stays reserved for
+  // a URL that was supplied but did not load.
+  const photoSrc = exec.photo?.trim() ? exec.photo : null;
 
   return (
     <div
@@ -35,14 +39,24 @@ export default function ExecCard({
       {/* Photo with hover effect */}
       <div className="relative mb-5 inline-block">
         <div className="relative w-28 h-28 mx-auto rounded-full overflow-hidden border-2 border-border group-hover:border-primary/50 transition-all duration-300">
-          <ImageWithFallback
-            src={photoSrc}
-            alt={exec.name}
-            fill
-            sizes="112px"
-            style={photoFramingStyle(parsePhotoFraming(exec.photoPosition))}
-            className="transition-transform duration-500 group-hover:scale-110"
-          />
+          {photoSrc ? (
+            <ImageWithFallback
+              src={photoSrc}
+              alt={exec.name}
+              fill
+              sizes="112px"
+              style={photoFramingStyle(parsePhotoFraming(exec.photoPosition))}
+              className="transition-transform duration-500 group-hover:scale-110"
+            />
+          ) : (
+            <div
+              className="absolute inset-0 flex items-center justify-center bg-surface text-primary text-2xl font-semibold tracking-wide select-none transition-transform duration-500 group-hover:scale-110"
+              role="img"
+              aria-label={exec.name}
+            >
+              <span aria-hidden="true">{toInitials(exec.name)}</span>
+            </div>
+          )}
           <div className="absolute inset-0 bg-linear-to-t from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         </div>
         {/* Decorative ring */}

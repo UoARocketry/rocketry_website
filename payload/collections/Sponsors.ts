@@ -2,21 +2,24 @@ import type { CollectionConfig } from "payload";
 import { isLoggedIn, isPublicRead } from "../access/policies.ts";
 import { createMediaRelationUrlSyncHook } from "../hooks/media-url-sync.ts";
 import { revalidatePaths, revalidateTags } from "../hooks/revalidation.ts";
-import {
-  validateRequiredUrl,
-  validateUrlOrUpload,
-} from "../fields/validators.ts";
+import { createImagePairFields } from "../fields/image-pair.ts";
+import { validateRequiredUrl } from "../fields/validators.ts";
 
 export const Sponsors: CollectionConfig = {
   slug: "sponsors",
   admin: {
     useAsTitle: "name",
-    defaultColumns: ["name", "tier", "url"],
+    defaultColumns: ["name", "tier", "url", "_status"],
+    group: "Sponsors",
+    description:
+      "Organisations shown on the Sponsors page, grouped into the tier you pick.",
   },
+  defaultSort: ["_status", "name"],
   versions: {
     drafts: true,
     maxPerDoc: 20,
   },
+  trash: true,
   access: {
     read: isPublicRead,
     create: isLoggedIn,
@@ -45,33 +48,18 @@ export const Sponsors: CollectionConfig = {
   },
   fields: [
     { name: "name", type: "text", required: true, unique: true },
-    {
-      name: "logoMedia",
-      type: "upload",
-      relationTo: "media" as never,
-      required: false,
-      admin: {
-        description:
-          "Upload or select a logo. This auto-fills the Logo URL field.",
-      },
-    },
-    {
-      name: "logo",
-      type: "text",
-      // See Events.ts: `required` is the asterisk only; `validate` is the gate.
+    ...createImagePairFields({
+      uploadName: "logoMedia",
+      urlName: "logo",
+      label: "Logo",
       required: true,
-      validate: (value: unknown, { siblingData }: { siblingData: unknown }) =>
-        validateUrlOrUpload(value, siblingData, "logoMedia", "Logo URL"),
-      admin: {
-        description:
-          "Auto-filled from the upload above whenever a file is selected there (overwrites this field on save). Leave the upload empty to link an external logo URL directly instead.",
-      },
-    },
+    }),
     {
       name: "url",
       type: "text",
       required: true,
       validate: (value: unknown) => validateRequiredUrl(value, "Sponsor URL"),
+      admin: { description: "The sponsor's own website, linked from their logo." },
     },
     { name: "description", type: "textarea", required: false },
     {

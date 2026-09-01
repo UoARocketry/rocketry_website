@@ -250,8 +250,8 @@ function mapExec(doc: PayloadExecutive): Exec {
     name: doc.name,
     role: doc.role,
     bio: doc.bio,
-    // Typed non-null, but the column is nullable and rows published before the
-    // image became mandatory may still hold null. Cards fall back to the logo.
+    // Headshots are optional: an exec with no photo renders as an initials
+    // monogram instead. Empty string is the "no photo" signal for ExecCard.
     photo: doc.photo ?? "",
     photoPosition: doc.photoPosition ?? null,
     year: doc.year,

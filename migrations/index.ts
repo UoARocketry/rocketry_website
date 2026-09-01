@@ -13,6 +13,8 @@ import * as migration_20260825_140000_add_site_settings_usage_limits from "./202
 import * as migration_20260825_150000_add_site_settings_contact_email from "./20260825_150000_add_site_settings_contact_email";
 import * as migration_20260826_120000_add_rocket_featured from "./20260826_120000_add_rocket_featured";
 import * as migration_20260826_130000_add_rocket_specs from "./20260826_130000_add_rocket_specs";
+import * as migration_20260901_120000_fix_version_orphans from "./20260901_120000_fix_version_orphans";
+import * as migration_20260901_130000_add_user_roles_and_trash from "./20260901_130000_add_user_roles_and_trash";
 
 export const migrations = [
   {
@@ -89,5 +91,15 @@ export const migrations = [
     up: migration_20260826_130000_add_rocket_specs.up,
     down: migration_20260826_130000_add_rocket_specs.down,
     name: "20260826_130000_add_rocket_specs",
+  },
+  {
+    up: migration_20260901_120000_fix_version_orphans.up,
+    down: migration_20260901_120000_fix_version_orphans.down,
+    name: "20260901_120000_fix_version_orphans",
+  },
+  {
+    up: migration_20260901_130000_add_user_roles_and_trash.up,
+    down: migration_20260901_130000_add_user_roles_and_trash.down,
+    name: "20260901_130000_add_user_roles_and_trash",
   },
 ];

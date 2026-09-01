@@ -6,21 +6,25 @@ import {
   revalidateTags,
 } from "../hooks/revalidation.ts";
 import { createMediaRelationUrlSyncHook } from "../hooks/media-url-sync.ts";
-import {
-  validateOptionalUrl,
-  validateUrlOrUpload,
-} from "../fields/validators.ts";
+import { createImagePairFields } from "../fields/image-pair.ts";
+import { createSlugField } from "../fields/slug.ts";
+import { validateOptionalUrl } from "../fields/validators.ts";
 
 export const Events: CollectionConfig = {
   slug: "events",
   admin: {
     useAsTitle: "title",
-    defaultColumns: ["title", "date", "eventTag"],
+    defaultColumns: ["title", "date", "eventTag", "_status"],
+    group: "Events",
+    description:
+      "Everything listed on the Events page, newest first. Unpublished drafts appear at the top and are not visible on the site.",
   },
+  defaultSort: ["_status", "-date"],
   versions: {
     drafts: true,
     maxPerDoc: 20,
   },
+  trash: true,
   access: {
     read: isPublicRead,
     create: isLoggedIn,
@@ -72,33 +76,23 @@ export const Events: CollectionConfig = {
   },
   fields: [
     { name: "title", type: "text", required: true },
-    { name: "slug", type: "text", required: true, unique: true, index: true },
-    {
-      name: "imageMedia",
-      type: "upload",
-      relationTo: "media" as never,
-      required: false,
-      admin: {
-        description:
-          "Upload or select an image. This auto-fills the Event image URL.",
-      },
-    },
-    {
-      name: "image",
-      type: "text",
-      // `required` only drives the admin's asterisk here: supplying a custom
-      // `validate` replaces Payload's built-in required check entirely, so the
-      // upload-or-URL rule below is what actually gates saving.
+    createSlugField({ sourceField: "title", pathPrefix: "/events" }),
+    ...createImagePairFields({
+      uploadName: "imageMedia",
+      urlName: "image",
+      label: "Event image",
       required: true,
-      validate: (value: unknown, { siblingData }: { siblingData: unknown }) =>
-        validateUrlOrUpload(value, siblingData, "imageMedia", "Event image"),
+    }),
+    { name: "description", type: "textarea", required: true },
+    {
+      name: "date",
+      type: "date",
+      required: true,
       admin: {
-        description:
-          "Auto-filled from the upload above whenever a file is selected there (overwrites this field on save). Leave the upload empty to link an external image URL directly instead.",
+        date: { pickerAppearance: "dayAndTime", timeFormat: "HH:mm" },
+        description: "When the event starts.",
       },
     },
-    { name: "description", type: "textarea", required: true },
-    { name: "date", type: "date", required: true },
     {
       name: "eventTag",
       type: "relationship",
@@ -121,12 +115,20 @@ export const Events: CollectionConfig = {
       required: false,
       labels: { singular: "Session", plural: "Sessions" },
       admin: {
+        initCollapsed: true,
         description:
           "Optional. For a multi-session series (e.g. Level 1 build workshops), add each session in the order they run. Leave empty for a normal one-off event.",
       },
       fields: [
         { name: "title", type: "text", required: true },
-        { name: "date", type: "date", required: true },
+        {
+          name: "date",
+          type: "date",
+          required: true,
+          admin: {
+            date: { pickerAppearance: "dayAndTime", timeFormat: "HH:mm" },
+          },
+        },
         { name: "description", type: "textarea", required: false },
         {
           name: "location",

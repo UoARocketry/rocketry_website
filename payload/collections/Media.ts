@@ -1,7 +1,26 @@
+import { APIError } from "payload";
 import type { CollectionConfig } from "payload";
 import { isLoggedIn, isPublicRead } from "../access/policies.ts";
+import { createReferenceGuardHook } from "../hooks/reference-guard.ts";
 
 const DEFAULT_MEDIA_PREFIX = "media";
+
+/** 8 MB. A backstop only: CompressedUpload already shrinks most images
+ *  client-side, but it runs in the browser and skips GIFs and anything it
+ *  cannot decode, so nothing server-side was enforcing a ceiling. */
+const MAX_UPLOAD_BYTES = 8 * 1024 * 1024;
+
+export function assertWithinSizeLimit(size: unknown): void {
+  if (typeof size === "number" && size > MAX_UPLOAD_BYTES) {
+    const megabytes = (size / (1024 * 1024)).toFixed(1);
+    throw new APIError(
+      `That image is ${megabytes} MB, over the ${MAX_UPLOAD_BYTES / (1024 * 1024)} MB limit. Resize or compress it and try again.`,
+      400,
+      undefined,
+      true,
+    );
+  }
+}
 
 export function resolveMediaPrefix(existingPrefix: unknown): string {
   if (typeof existingPrefix === "string" && existingPrefix.trim().length > 0) {
@@ -13,8 +32,11 @@ export function resolveMediaPrefix(existingPrefix: unknown): string {
 export const Media: CollectionConfig = {
   slug: "media",
   admin: {
-    useAsTitle: "filename",
+    useAsTitle: "alt",
+    defaultColumns: ["alt", "filename", "updatedAt"],
     group: "Assets",
+    description:
+      "Every image used across the site. Deleting one is blocked while a page still uses it.",
     components: {
       edit: {
         Upload: "/payload/components/CompressedUpload.tsx#CompressedUpload",
@@ -23,6 +45,11 @@ export const Media: CollectionConfig = {
   },
   hooks: {
     beforeValidate: [
+      ({ req }) => {
+        // Payload 3.80 exposes no filesize option on `upload`, so the ceiling
+        // has to be enforced here or not at all.
+        assertWithinSizeLimit(req?.file?.size);
+      },
       ({ data }) => {
         if (!data || typeof data !== "object") {
           return data;
@@ -31,6 +58,20 @@ export const Media: CollectionConfig = {
         nextData.prefix = resolveMediaPrefix(nextData.prefix);
         return nextData;
       },
+    ],
+    beforeDelete: [
+      createReferenceGuardHook({
+        subject: "image",
+        checks: [
+          { collection: "events", field: "imageMedia", label: "Events" },
+          { collection: "rockets", field: "imageMedia", label: "Rockets" },
+          { collection: "rockets", field: "gallery.image", label: "Rocket galleries" },
+          { collection: "executives", field: "photoMedia", label: "Executives" },
+          { collection: "sponsors", field: "logoMedia", label: "Sponsors" },
+          { collection: "what-we-do", field: "imageMedia", label: "What We Do" },
+          { collection: "journey-items", field: "imageMedia", label: "Journey Items" },
+        ],
+      }),
     ],
   },
   access: {
@@ -46,7 +87,11 @@ export const Media: CollectionConfig = {
     {
       name: "alt",
       type: "text",
-      required: false,
+      required: true,
+      admin: {
+        description:
+          "Describe the image in a few words, for screen readers and for when the image fails to load. E.g. \"Aurora Mk II on the launch rail\".",
+      },
     },
   ],
 };
