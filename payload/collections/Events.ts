@@ -19,6 +19,12 @@ export const Events: CollectionConfig = {
     description:
       "Everything listed on the Events page, newest first. Unpublished drafts appear at the top and are not visible on the site.",
     preview: createPreviewUrl("events"),
+    components: {
+      edit: {
+        PreviewButton:
+          "/payload/components/LabelledPreviewButton.tsx#LabelledPreviewButton",
+      },
+    },
   },
   defaultSort: ["_status", "-date"],
   versions: {

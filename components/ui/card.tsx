@@ -90,14 +90,19 @@ export default function Card({
   if (vertical) {
     return (
       <div
-        className={`group bg-card rounded-xl border overflow-hidden flex flex-col h-full transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 ${seriesShell}`}
+        className={`group bg-card rounded-xl border overflow-hidden flex flex-col h-full transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 ${seriesShell} ${
+          // Bounding the card's WIDTH, rather than the frame's height, is what
+          // keeps a true 4:5. Capping height alone left the frame as wide as
+          // its column, so on the home page a lone card was 628x448 (1.4:1)
+          // and a portrait poster sat in ~135px of blurred band each side.
+          poster ? "w-full max-w-sm mx-auto" : ""
+        }`}
       >
         {poster ? (
-          // 4:5 sets the shape, max-height stops it running away in a wide
-          // column — unclamped, a half-width card came out 965px tall, taller
-          // than the viewport. Past the cap the frame is simply wider than 4:5
-          // and the blurred backdrop fills the sides.
-          <div className="relative aspect-4/5 max-h-112 overflow-hidden bg-surface">
+          // True 4:5, always. The card's max-width above is what stops this
+          // growing past roughly 480px tall, so no height cap is needed and
+          // the frame never drifts off the poster's own aspect ratio.
+          <div className="relative aspect-4/5 overflow-hidden bg-surface">
             {/* Blurred copy fills whatever the poster does not, so an image
                 that is not exactly 4:5 sits on its own colours rather than a
                 hard letterbox. Same treatment as the event detail hero. */}

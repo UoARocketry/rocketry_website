@@ -18,6 +18,12 @@ export const Rockets: CollectionConfig = {
     description:
       "Every rocket shown on the Rockets page. Leave the launch date empty while one is still in development.",
     preview: createPreviewUrl("rockets"),
+    components: {
+      edit: {
+        PreviewButton:
+          "/payload/components/LabelledPreviewButton.tsx#LabelledPreviewButton",
+      },
+    },
   },
   defaultSort: ["_status", "-launchedAt"],
   versions: {
