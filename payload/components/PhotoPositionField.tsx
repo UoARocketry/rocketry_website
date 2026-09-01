@@ -93,14 +93,22 @@ export const PhotoPositionField: TextFieldClientComponent = (props) => {
 
   const upload = readUploadValue(imageMedia);
   const uploadId = upload.id;
-  const directUrl =
-    upload.url || (typeof imageText === "string" ? imageText : "");
-  const photoUrl =
-    directUrl || (resolved && resolved.id === uploadId ? resolved.url : "");
+  const textUrl = typeof imageText === "string" ? imageText : "";
+  const resolvedUrl =
+    resolved && resolved.id === uploadId ? resolved.url : "";
+
+  // The chosen file wins over the flattened URL field, which is only rewritten
+  // by a beforeChange hook on save. Reading the text field first meant that
+  // picking a new image showed the *previous* one until you saved — and where
+  // the previous URL had rotted, it showed a broken image instead of the file
+  // you had just uploaded. An id with no URL yet resolves to nothing for the
+  // moment it takes to look up, rather than falling back to the stale value.
+  const hasUpload = Boolean(uploadId || upload.url);
+  const photoUrl = hasUpload ? upload.url || resolvedUrl : textUrl;
 
   // Only an id is available when a file was just picked — look up its URL.
   useEffect(() => {
-    if (directUrl || !uploadId) return;
+    if (upload.url || !uploadId) return;
 
     let cancelled = false;
 
@@ -118,7 +126,14 @@ export const PhotoPositionField: TextFieldClientComponent = (props) => {
     return () => {
       cancelled = true;
     };
-  }, [directUrl, uploadId]);
+  }, [upload.url, uploadId]);
+
+  // Keyed by URL rather than a bare boolean so choosing a different file
+  // clears the message without a separate reset effect.
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
+  const hasFailed = Boolean(photoUrl) && failedUrl === photoUrl;
+  /** Framing a picture nobody can see does nothing, so the controls go quiet. */
+  const canFrame = Boolean(photoUrl) && !hasFailed;
 
   const framing = parsePhotoFraming(value);
   const { width, height } = previewSize(aspect);
@@ -135,7 +150,7 @@ export const PhotoPositionField: TextFieldClientComponent = (props) => {
   };
 
   const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!photoUrl) return;
+    if (!canFrame) return;
     dragState.current = {
       startX: event.clientX,
       startY: event.clientY,
@@ -186,9 +201,11 @@ export const PhotoPositionField: TextFieldClientComponent = (props) => {
           opacity: 0.7,
         }}
       >
-        {photoUrl
-          ? `Drag the image to choose which part shows inside the ${frameName}${where}, and zoom in to reframe more tightly. This preview is the shape of the real frame.`
-          : "Upload an image above to position it."}
+        {!photoUrl
+          ? "Upload an image above to position it."
+          : hasFailed
+            ? "The image above could not be loaded, so there is nothing to position yet. It is most likely a link to a file that has been moved or deleted — upload the image again and this preview will appear."
+            : `Drag the image to choose which part shows inside the ${frameName}${where}, and zoom in to reframe more tightly. This preview is the shape of the real frame.`}
       </p>
 
       <div style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
@@ -206,19 +223,39 @@ export const PhotoPositionField: TextFieldClientComponent = (props) => {
             border: "2px solid var(--theme-elevation-150)",
             flexShrink: 0,
             background: "var(--theme-elevation-50)",
-            cursor: photoUrl ? (isDragging ? "grabbing" : "grab") : "default",
+            cursor: canFrame ? (isDragging ? "grabbing" : "grab") : "default",
             touchAction: "none",
           }}
         >
-          {photoUrl && (
-            /* eslint-disable-next-line @next/next/no-img-element */
-            <img
-              src={photoUrl}
-              alt="Image position preview"
-              draggable={false}
-              style={{ ...photoFramingStyle(framing), userSelect: "none" }}
-            />
-          )}
+          {photoUrl &&
+            (hasFailed ? (
+              // A browser's own broken-image glyph reads as a broken editor
+              // rather than a missing file, which is the actual problem.
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "0.5rem",
+                  textAlign: "center",
+                  fontSize: "0.75rem",
+                  opacity: 0.7,
+                }}
+              >
+                Image unavailable
+              </div>
+            ) : (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={photoUrl}
+                alt="Image position preview"
+                draggable={false}
+                onError={() => setFailedUrl(photoUrl)}
+                style={{ ...photoFramingStyle(framing), userSelect: "none" }}
+              />
+            ))}
         </div>
 
         <div style={{ fontSize: "0.85rem" }}>
@@ -234,7 +271,7 @@ export const PhotoPositionField: TextFieldClientComponent = (props) => {
               type="button"
               className="btn btn--style-secondary btn--size-small"
               onClick={() => setZoom(framing.zoom - ZOOM_STEP)}
-              disabled={!photoUrl || framing.zoom <= MIN_ZOOM}
+              disabled={!canFrame || framing.zoom <= MIN_ZOOM}
               aria-label="Zoom out"
               style={{ margin: 0 }}
             >
@@ -249,7 +286,7 @@ export const PhotoPositionField: TextFieldClientComponent = (props) => {
               type="button"
               className="btn btn--style-secondary btn--size-small"
               onClick={() => setZoom(framing.zoom + ZOOM_STEP)}
-              disabled={!photoUrl || framing.zoom >= MAX_ZOOM}
+              disabled={!canFrame || framing.zoom >= MAX_ZOOM}
               aria-label="Zoom in"
               style={{ margin: 0 }}
             >
@@ -265,7 +302,7 @@ export const PhotoPositionField: TextFieldClientComponent = (props) => {
             type="button"
             className="btn btn--style-secondary btn--size-small"
             onClick={() => setValue(formatPhotoFraming(DEFAULT_FRAMING))}
-            disabled={!photoUrl}
+            disabled={!canFrame}
             style={{ margin: 0 }}
           >
             Reset
