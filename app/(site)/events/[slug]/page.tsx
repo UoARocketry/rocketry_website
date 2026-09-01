@@ -122,7 +122,12 @@ export default async function EventPage({ params }: EventPageProps) {
 
   return (
     <main className="min-h-screen max-w-7xl mx-auto pb-16">
-      {isDraft && <DraftBanner returnTo={`/events/${slug}`} />}
+      {isDraft && (
+        <DraftBanner
+          returnTo={`/events/${slug}`}
+          isPublished={event.status === "published"}
+        />
+      )}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: toSafeJsonLd(eventJsonLd) }}

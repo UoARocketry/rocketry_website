@@ -9,6 +9,8 @@ export type RocketSummary = {
   launchedAt?: string | null;
   /** Editor-controlled: show this rocket in the home page's featured strip. */
   featured: boolean;
+  /** Publish state. Only meaningful on the draft-aware preview path. */
+  status?: "draft" | "published" | null;
 };
 
 /** One row of the CMS-managed Details box on a rocket's page. */
@@ -52,6 +54,8 @@ export type EventSummary = {
   signupUrl?: string | null;
   location?: string | null;
   sessions: EventSession[];
+  /** Publish state. Only meaningful on the draft-aware preview path. */
+  status?: "draft" | "published" | null;
 };
 
 export type EventDetail = EventSummary;

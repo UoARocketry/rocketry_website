@@ -59,7 +59,8 @@ export const JourneyItems: CollectionConfig = {
         name: "imagePosition",
         label: "Image position",
         shape: "rect",
-        aspect: 2.4,
+        // Roughly a 410px grid column against the card's 224px image frame.
+        aspect: 1.8,
         appliesTo: "the About page block",
       },
     }),

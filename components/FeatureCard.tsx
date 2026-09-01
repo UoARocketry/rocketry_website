@@ -68,7 +68,9 @@ export default function FeatureCard(props: Props) {
 
       {/* Card image */}
       {image ? (
-        <div className="relative w-full h-42 overflow-hidden">
+        // Taller than the text alone needs, so more of the photo survives the
+        // crop. Width is the grid column's, so this is the only lever.
+        <div className="relative w-full h-56 overflow-hidden">
           <ImageWithFallback
             src={image}
             alt={imageAlt || (typeof title === "string" ? title : "")}
@@ -80,7 +82,9 @@ export default function FeatureCard(props: Props) {
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
         </div>
       ) : showImagePlaceholder ? (
-        <div className="relative w-full h-44 overflow-hidden bg-gradient-to-br from-surface via-background to-surface">
+        // Matches the image frame above so a card with no image is the same
+        // height as its neighbours in the grid.
+        <div className="relative w-full h-56 overflow-hidden bg-gradient-to-br from-surface via-background to-surface">
           <div className="absolute inset-0 bg-gradient-to-t from-black/15 to-transparent" />
         </div>
       ) : null}

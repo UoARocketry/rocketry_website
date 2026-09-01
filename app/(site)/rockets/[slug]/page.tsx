@@ -68,7 +68,12 @@ export default async function RocketPage({ params }: RocketPageProps) {
 
   return (
     <main className="min-h-screen max-w-7xl mx-auto pb-16">
-      {isDraft && <DraftBanner returnTo={`/rockets/${slug}`} />}
+      {isDraft && (
+        <DraftBanner
+          returnTo={`/rockets/${slug}`}
+          isPublished={rocket.status === "published"}
+        />
+      )}
       <section className="max-w-7xl mx-auto pt-16 pb-8 px-4">
         <div className="mb-6">
           <Link

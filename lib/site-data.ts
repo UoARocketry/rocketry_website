@@ -183,6 +183,7 @@ function mapRocket(doc: PayloadRocket): RocketSummary {
     description: doc.description ?? null,
     launchedAt: doc.launchedAt ?? null,
     featured: doc.featured ?? false,
+    status: doc._status ?? null,
   };
 }
 
@@ -253,6 +254,7 @@ function mapEvent(doc: PayloadEvent): EventSummary {
     signupUrl: doc.signupUrl ?? null,
     location: doc.location ?? null,
     sessions,
+    status: doc._status ?? null,
   };
 }
 
