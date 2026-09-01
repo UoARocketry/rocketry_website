@@ -93,7 +93,11 @@ export default function Card({
         className={`group bg-card rounded-xl border overflow-hidden flex flex-col h-full transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 ${seriesShell}`}
       >
         {poster ? (
-          <div className="relative aspect-4/5 overflow-hidden bg-surface">
+          // 4:5 sets the shape, max-height stops it running away in a wide
+          // column — unclamped, a half-width card came out 965px tall, taller
+          // than the viewport. Past the cap the frame is simply wider than 4:5
+          // and the blurred backdrop fills the sides.
+          <div className="relative aspect-4/5 max-h-112 overflow-hidden bg-surface">
             {/* Blurred copy fills whatever the poster does not, so an image
                 that is not exactly 4:5 sits on its own colours rather than a
                 hard letterbox. Same treatment as the event detail hero. */}
@@ -109,9 +113,13 @@ export default function Card({
               src={imageSrc}
               alt={title}
               fill
-              sizes="(max-width: 640px) 100vw, 50vw"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               className="relative object-contain transition-transform duration-500 group-hover:scale-105"
             />
+            {/* The hover wash. Dropping this was what made these cards feel
+                dead on hover: the card still lifts, but on a frame this large
+                a 4px lift is invisible, so the overlay is the signal. */}
+            <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </div>
         ) : (
           <div className="relative overflow-hidden">

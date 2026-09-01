@@ -41,7 +41,7 @@ export default function EventHeroImage({ src, alt }: EventHeroImageProps) {
           width={1200}
           height={1500}
           sizes="(max-width: 1024px) 100vw, 50vw"
-          className="relative w-full h-[26rem] sm:h-[32rem] lg:h-[38rem] max-h-[75vh] object-contain"
+          className="relative w-full h-104 sm:h-128 lg:h-152 max-h-[75vh] object-contain"
         />
       </button>
 

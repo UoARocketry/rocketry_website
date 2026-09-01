@@ -113,7 +113,9 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
               }
             />
           ) : (
-            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
+            // Three across on large screens: a 4:5 poster in a half-width
+            // column made each card taller than the viewport.
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
               {filteredUpcoming.map((event: EventLocal) => (
                 <Link
                   key={event.id}
@@ -154,7 +156,9 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
               description="Past events will appear here."
             />
           ) : (
-            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
+            // Three across on large screens: a 4:5 poster in a half-width
+            // column made each card taller than the viewport.
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
               {filteredPast.map((event: EventLocal) => (
                 <Link
                   key={event.id}

@@ -1,5 +1,6 @@
 import type { CollectionConfig } from "payload";
 import {
+  ADMIN_ROLE,
   EDITOR_ROLE,
   USER_ROLE_OPTIONS,
   isAdmin,
@@ -19,6 +20,15 @@ export const Users: CollectionConfig = {
     group: "Admin",
     description:
       "Who can sign in to this admin. Admins manage accounts; editors can change site content but not accounts.",
+    // Access control already limited an editor to their own row, but the
+    // collection still appeared in the nav, which reads as a hole. Hiding it
+    // matches the expectation that accounts are admin-only.
+    //
+    // Read access stays `isAdminOrSelf` rather than `isAdmin` on purpose: the
+    // /admin/account page loads the signed-in user's own document, so an
+    // admin-only read would stop an editor changing their own password.
+    hidden: ({ user }) =>
+      (user as { role?: unknown } | null | undefined)?.role !== ADMIN_ROLE,
   },
   access: {
     // Editors can reach their own record so they can change their password,
