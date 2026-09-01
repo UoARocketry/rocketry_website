@@ -13,6 +13,7 @@ import {
   type RocketSummary,
 } from "@/lib/site-data";
 import { PLACEHOLDER_IMAGE } from "@/lib/constants";
+import { formatDateShort } from "@/lib/utils";
 
 export default async function HomePage() {
   let featuredRockets: RocketSummary[] = [];
@@ -133,7 +134,7 @@ export default async function HomePage() {
                     title={rocket.name}
                     date={
                       rocket.launchedAt
-                        ? new Date(rocket.launchedAt).toLocaleDateString()
+                        ? formatDateShort(rocket.launchedAt)
                         : "TBA"
                     }
                     description={rocket.description ?? ""}
@@ -213,7 +214,7 @@ export default async function HomePage() {
                   <Card
                     image={event.image ?? PLACEHOLDER_IMAGE}
                     title={event.title}
-                    date={new Date(event.date).toLocaleDateString()}
+                    date={formatDateShort(event.date)}
                     tag={event.eventTag ?? "General"}
                     description={event.description ?? ""}
                     vertical

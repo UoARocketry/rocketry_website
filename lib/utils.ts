@@ -1,3 +1,13 @@
+/**
+ * Pinned, and every date on the site must go through these helpers rather than
+ * calling `toLocaleDateString()` bare.
+ *
+ * Without an explicit locale the runtime's own is used, which differs between
+ * the Vercel server (en-US) and a visitor's browser (en-NZ here). The two
+ * render different strings for the same date, React sees the server HTML and
+ * the client render disagree, and hydration fails with error #418 — but only
+ * for visitors whose locale is not en-US, which makes it look browser-specific.
+ */
 const DEFAULT_LOCALE = "en-US";
 
 const normalizeWhitespace = (value: string) =>
