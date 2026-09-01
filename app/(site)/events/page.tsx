@@ -128,6 +128,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
                     meta={formatEventSessionsLabel(event)}
                     description={event.description ?? ""}
                     vertical
+                    poster
                   />
                 </Link>
               ))}
@@ -168,6 +169,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
                     meta={formatEventSessionsLabel(event)}
                     description={event.description ?? ""}
                     vertical
+                    poster
                   />
                 </Link>
               ))}

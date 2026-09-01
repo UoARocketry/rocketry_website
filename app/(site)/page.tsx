@@ -217,6 +217,7 @@ export default async function HomePage() {
                     tag={event.eventTag ?? "General"}
                     description={event.description ?? ""}
                     vertical
+                    poster
                   />
                 </Link>
               ))}

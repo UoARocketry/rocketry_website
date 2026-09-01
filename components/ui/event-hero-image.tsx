@@ -31,13 +31,17 @@ export default function EventHeroImage({ src, alt }: EventHeroImageProps) {
           sizes="(max-width: 1024px) 100vw, 50vw"
           className="absolute inset-0 h-full w-full scale-110 object-cover opacity-30 blur-2xl"
         />
+        {/* Taller than a landscape hero needs, because event artwork is
+            reused from Instagram and is usually a 4:5 portrait poster whose
+            date, time and location are text inside the image. At h-96 that
+            text was too small to read. Capped so it still fits on screen. */}
         <ImageWithFallback
           src={src}
           alt={alt}
           width={1200}
-          height={900}
+          height={1500}
           sizes="(max-width: 1024px) 100vw, 50vw"
-          className="relative w-full h-96 object-contain"
+          className="relative w-full h-[26rem] sm:h-[32rem] lg:h-[38rem] max-h-[75vh] object-contain"
         />
       </button>
 

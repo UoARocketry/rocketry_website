@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import ImageWithFallback from "@/components/ui/image-with-fallback";
 import ClampedDescription from "@/components/ui/clamped-description";
 import StatusBadgePill, {
@@ -17,6 +18,17 @@ interface CardProps {
   readonly badge?: StatusBadge | null;
   readonly reverse?: boolean;
   readonly vertical?: boolean;
+  /**
+   * Treat the image as a poster rather than a photo: show it whole in a 4:5
+   * portrait frame instead of cropping it to a landscape strip.
+   *
+   * Event artwork is reused from the club's Instagram posts, where the poster
+   * *is* the content — the title, date, time and location are all rendered
+   * into the image. Cropping one to a short landscape band cuts that text off
+   * entirely. Photos, like rockets, still crop, because a crop of a photo
+   * loses nothing that matters.
+   */
+  readonly poster?: boolean;
 }
 
 /** Marks a card as part of a series — a stacked-layers glyph beside the count. */
@@ -68,6 +80,7 @@ export default function Card({
   badge,
   reverse = false,
   vertical = false,
+  poster = false,
 }: CardProps) {
   const imageSrc = image || "/UARC logo.png";
   const isSeries = Boolean(meta);
@@ -79,17 +92,40 @@ export default function Card({
       <div
         className={`group bg-card rounded-xl border overflow-hidden flex flex-col h-full transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 ${seriesShell}`}
       >
-        <div className="relative overflow-hidden">
-          <ImageWithFallback
-            src={imageSrc}
-            alt={title}
-            width={1200}
-            height={600}
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-          <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        </div>
+        {poster ? (
+          <div className="relative aspect-4/5 overflow-hidden bg-surface">
+            {/* Blurred copy fills whatever the poster does not, so an image
+                that is not exactly 4:5 sits on its own colours rather than a
+                hard letterbox. Same treatment as the event detail hero. */}
+            <Image
+              src={imageSrc}
+              alt=""
+              aria-hidden="true"
+              fill
+              sizes="(max-width: 640px) 100vw, 50vw"
+              className="scale-110 object-cover opacity-30 blur-2xl"
+            />
+            <ImageWithFallback
+              src={imageSrc}
+              alt={title}
+              fill
+              sizes="(max-width: 640px) 100vw, 50vw"
+              className="relative object-contain transition-transform duration-500 group-hover:scale-105"
+            />
+          </div>
+        ) : (
+          <div className="relative overflow-hidden">
+            <ImageWithFallback
+              src={imageSrc}
+              alt={title}
+              width={1200}
+              height={600}
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          </div>
+        )}
         <div
           className={`flex-1 p-6 flex flex-col justify-between ${
             isSeries ? "bg-linear-to-br from-primary/8 to-transparent" : ""
