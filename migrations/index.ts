@@ -23,6 +23,12 @@ import * as migration_20260902_140000_add_event_signup_type from "./20260902_140
 import * as migration_20260902_150000_add_rocket_launch_video from "./20260902_150000_add_rocket_launch_video";
 import * as migration_20260902_160000_add_session_extra_dates from "./20260902_160000_add_session_extra_dates";
 
+import * as migration_20260902_170000_add_media_used_in from "./20260902_170000_add_media_used_in";
+
+import * as migration_20260902_180000_rocket_videos_array from "./20260902_180000_rocket_videos_array";
+
+import * as migration_20260902_190000_add_extra_date_locations from "./20260902_190000_add_extra_date_locations";
+
 export const migrations = [
   {
     up: migration_20260331_044531_initial.up,
@@ -143,5 +149,20 @@ export const migrations = [
     up: migration_20260902_160000_add_session_extra_dates.up,
     down: migration_20260902_160000_add_session_extra_dates.down,
     name: "20260902_160000_add_session_extra_dates",
+  },
+  {
+    up: migration_20260902_170000_add_media_used_in.up,
+    down: migration_20260902_170000_add_media_used_in.down,
+    name: "20260902_170000_add_media_used_in",
+  },
+  {
+    up: migration_20260902_180000_rocket_videos_array.up,
+    down: migration_20260902_180000_rocket_videos_array.down,
+    name: "20260902_180000_rocket_videos_array",
+  },
+  {
+    up: migration_20260902_190000_add_extra_date_locations.up,
+    down: migration_20260902_190000_add_extra_date_locations.down,
+    name: "20260902_190000_add_extra_date_locations",
   },
 ];

@@ -188,7 +188,6 @@ function mapRocket(doc: PayloadRocket): RocketSummary {
     imagePosition: doc.imagePosition ?? null,
     description: doc.description ?? null,
     launchedAt: doc.launchedAt ?? null,
-    launchVideoUrl: doc.launchVideoUrl ?? null,
     featured: doc.featured ?? false,
     status: doc._status ?? null,
   };
@@ -215,10 +214,18 @@ function mapRocketDetail(doc: PayloadRocket): RocketDetail {
     }))
     .filter((spec) => spec.label.length > 0 && spec.value.length > 0);
 
+  const videos = (doc.videos ?? [])
+    .map((video) => ({
+      label: video.label?.trim() ?? "",
+      url: video.url?.trim() ?? "",
+    }))
+    .filter((video) => video.label.length > 0 && video.url.length > 0);
+
   return {
     ...mapRocket(doc),
     images,
     specs,
+    videos,
   };
 }
 
@@ -236,6 +243,7 @@ function mapEvent(doc: PayloadEvent): EventSummary {
           date?: string | null;
           startTime?: string | null;
           endTime?: string | null;
+          location?: string | null;
         }[]
       | null
       | undefined,
@@ -248,6 +256,7 @@ function mapEvent(doc: PayloadEvent): EventSummary {
           date: extra.date ? normalizeDayOnlyDate(extra.date) : "",
           startTime: normalizeEventDate(extra.startTime) || null,
           endTime: normalizeEventDate(extra.endTime) || null,
+          location: extra.location ?? null,
         }))
         .filter((extra) => extra.date.length > 0),
     );

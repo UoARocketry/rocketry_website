@@ -6,6 +6,10 @@ import {
   revalidateTags,
 } from "../hooks/revalidation.ts";
 import { createMediaRelationUrlSyncHook } from "../hooks/media-url-sync.ts";
+import {
+  createMediaUsageDeleteHook,
+  createMediaUsageHook,
+} from "../hooks/media-usage.ts";
 import { createOrderCollisionHook } from "../hooks/order-collision.ts";
 import { createImagePairFields } from "../fields/image-pair.ts";
 import { urlFieldHooks, validateOptionalUrl } from "../fields/validators.ts";
@@ -41,6 +45,7 @@ export const Executives: CollectionConfig = {
       }),
     ],
     afterChange: [
+      createMediaUsageHook(["photoMedia"]),
       createOrderCollisionHook({ scopeField: "year" }),
       ({ doc, previousDoc }) => {
         const year = getNumberField(doc, "year");
@@ -60,6 +65,7 @@ export const Executives: CollectionConfig = {
       },
     ],
     afterDelete: [
+      createMediaUsageDeleteHook(["photoMedia"]),
       ({ doc }) => {
         const year = getNumberField(doc, "year");
 

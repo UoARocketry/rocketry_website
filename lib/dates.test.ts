@@ -141,9 +141,49 @@ describe("formatEventWhen", () => {
     expect(when.dateLabel).toBe("September 3 & 4, 2026");
     expect(when.timeLabel).toBeNull();
     expect(when.schedule).toEqual([
-      { day: "September 3", time: "12:00 PM – 3:00 PM" },
-      { day: "September 4", time: "9:00 AM – 10:00 AM" },
+      { day: "September 3", time: "12:00 PM – 3:00 PM", location: null },
+      { day: "September 4", time: "9:00 AM – 10:00 AM", location: null },
     ]);
+  });
+
+  it("states one shared location once rather than against every day", () => {
+    const when = formatEventWhen({
+      date: SEP_3_NOON,
+      endTime: SEP_3_3PM,
+      location: "Engineering Block 401",
+      extraDates: [{ date: SEP_4 }],
+    });
+
+    expect(when.locationLabel).toBe("Engineering Block 401, both days");
+    expect(when.schedule).toEqual([]);
+  });
+
+  it("lists the days out when only the room changes", () => {
+    const when = formatEventWhen({
+      date: SEP_3_NOON,
+      endTime: SEP_3_3PM,
+      location: "Engineering Block 401",
+      extraDates: [{ date: SEP_4, location: "W&D Rooms 405-122" }],
+    });
+
+    // The hours still agree, so they stay on their own line and the list
+    // carries only the half that differs.
+    expect(when.timeLabel).toBe("12:00 PM – 3:00 PM, both days");
+    expect(when.locationLabel).toBeNull();
+    expect(when.schedule).toEqual([
+      { day: "September 3", time: "", location: "Engineering Block 401" },
+      { day: "September 4", time: "", location: "W&D Rooms 405-122" },
+    ]);
+  });
+
+  it("falls back to the event's location for a day that names none", () => {
+    const when = formatEventWhen({
+      date: SEP_3_NOON,
+      location: "Engineering Block 401",
+      extraDates: [{ date: SEP_4 }],
+    });
+
+    expect(when.locationLabel).toBe("Engineering Block 401, both days");
   });
 
   it("repeats the month when days straddle one", () => {
@@ -173,6 +213,28 @@ describe("formatEventWhen", () => {
     });
 
     expect(when.dateLabel).toBe("September 3, 4 & 5, 2026");
+  });
+
+  it("shows a day once when an extra day repeats the first one", () => {
+    // Entering the same day twice produced "September 19 & 19". Whatever the
+    // editor meant, printing a day twice is never right.
+    const when = formatEventWhen({
+      date: SEP_3_NOON,
+      endTime: SEP_3_3PM,
+      extraDates: [{ date: "2026-09-03T00:00:00.000Z" }],
+    });
+
+    expect(when.dateLabel).toBe("Thursday, September 3, 2026");
+    expect(when.timeLabel).toBe("12:00 PM – 3:00 PM");
+  });
+
+  it("collapses a repeat but keeps the genuinely different days", () => {
+    const when = formatEventWhen({
+      date: SEP_3_NOON,
+      extraDates: [{ date: "2026-09-03T00:00:00.000Z" }, { date: SEP_4 }],
+    });
+
+    expect(when.dateLabel).toBe("September 3 & 4, 2026");
   });
 
   it("ignores an extra day whose date never got filled in", () => {

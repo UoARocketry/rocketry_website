@@ -185,6 +185,12 @@ export interface User {
 export interface Media {
   id: number;
   /**
+   * Filled in automatically. Filter the list by this to find every image used in one part of the site, or leave the filter empty to find images nothing uses.
+   */
+  usedIn?:
+    | ('events' | 'rockets' | 'executives' | 'sponsors' | 'what-we-do' | 'journey-items' | 'site-settings')[]
+    | null;
+  /**
    * Describe the image in a few words, for screen readers and for when the image fails to load. E.g. "Aurora Mk II on the launch rail".
    */
   alt: string;
@@ -244,6 +250,10 @@ export interface Event {
          */
         startTime?: string | null;
         endTime?: string | null;
+        /**
+         * Optional. Only if this day is somewhere else. Leave empty to use the event's location.
+         */
+        location?: string | null;
         id?: string | null;
       }[]
     | null;
@@ -289,6 +299,10 @@ export interface Event {
                */
               startTime?: string | null;
               endTime?: string | null;
+              /**
+               * Optional. Only if this day is somewhere else. Leave empty to use the session's location.
+               */
+              location?: string | null;
               id?: string | null;
             }[]
           | null;
@@ -345,9 +359,18 @@ export interface Rocket {
   imagePosition?: string | null;
   description?: string | null;
   /**
-   * Optional. A YouTube, Instagram or Drive link to the launch footage. Shown as a 'Watch the launch' button on the rocket's page. Leave empty and no button appears.
+   * Optional. YouTube, Instagram or Drive links to footage of this rocket. Each one becomes a button on the rocket's page, in this order. Leave empty and no buttons appear.
    */
-  launchVideoUrl?: string | null;
+  videos?:
+    | {
+        /**
+         * What the button should say, e.g. "Launch", "Onboard camera", "Recovery".
+         */
+        label: string;
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * Tick to feature this rocket in the Featured Rockets section on the home page. Up to 3 are shown, next launch first. If none are ticked the home page falls back to the most recently launched rockets.
    */
@@ -727,6 +750,7 @@ export interface UsersSelect<T extends boolean = true> {
  * via the `definition` "media_select".
  */
 export interface MediaSelect<T extends boolean = true> {
+  usedIn?: T;
   alt?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -758,6 +782,7 @@ export interface EventsSelect<T extends boolean = true> {
         date?: T;
         startTime?: T;
         endTime?: T;
+        location?: T;
         id?: T;
       };
   eventTag?: T;
@@ -777,6 +802,7 @@ export interface EventsSelect<T extends boolean = true> {
               date?: T;
               startTime?: T;
               endTime?: T;
+              location?: T;
               id?: T;
             };
         description?: T;
@@ -809,7 +835,13 @@ export interface RocketsSelect<T extends boolean = true> {
   image?: T;
   imagePosition?: T;
   description?: T;
-  launchVideoUrl?: T;
+  videos?:
+    | T
+    | {
+        label?: T;
+        url?: T;
+        id?: T;
+      };
   featured?: T;
   launchedAt?: T;
   specs?:

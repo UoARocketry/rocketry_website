@@ -105,20 +105,23 @@ type SessionLike = {
   readonly title?: string;
   readonly date: string;
   readonly endTime?: string | null;
+  readonly location?: string | null;
   /** A session can span days, exactly as the event itself can. */
   readonly extraDates?: readonly ExtraDateLike[];
 };
 
-/** One further day of a multi-day event, with optional per-day hours. */
+/** One further day, with optional hours and location of its own. */
 type ExtraDateLike = {
   readonly date: string;
   readonly startTime?: string | null;
   readonly endTime?: string | null;
+  readonly location?: string | null;
 };
 
 type EventLike = {
   readonly date: string;
   readonly endTime?: string | null;
+  readonly location?: string | null;
   readonly sessions?: readonly SessionLike[];
   readonly extraDates?: readonly ExtraDateLike[];
 };
@@ -215,8 +218,10 @@ export type EventWhen = {
   dateLabel: string;
   /** Hours shared by every day, or null when they differ. */
   timeLabel: string | null;
-  /** Per-day hours, only when the days do not share a time window. */
-  schedule: { day: string; time: string }[];
+  /** Where every day is held, or null when they differ or none was given. */
+  locationLabel: string | null;
+  /** Per-day detail, only when the days do not all share hours and place. */
+  schedule: { day: string; time: string; location: string | null }[];
 };
 
 /**
@@ -232,32 +237,66 @@ export function formatEventWhen(
 ): EventWhen {
   const startTime = event.date;
   const endTime = event.endTime ?? null;
+  const baseLocation = event.location ?? null;
 
-  const days = [
-    { date: toValidDate(event.date), start: startTime, end: endTime },
+  type Day = {
+    date: Date;
+    start: string;
+    end: string | null;
+    location: string | null;
+  };
+
+  const days: Day[] = [
+    {
+      date: toValidDate(event.date),
+      start: startTime,
+      end: endTime,
+      location: baseLocation,
+    },
     ...(event.extraDates ?? []).map((extra) => ({
       date: extra.date ? toValidDate(extra.date) : null,
-      // A blank per-day time means "same hours as the first day".
+      // A blank per-day value means "same as the first day".
       start: extra.startTime ?? startTime,
       end: extra.endTime ?? endTime,
+      location: extra.location ?? baseLocation,
     })),
   ]
+    .filter((day): day is Day => day.date !== null)
+    .sort((a, b) => a.date.getTime() - b.date.getTime())
+    // Two rows landing on one calendar day rendered as "September 19 & 19".
+    // Whatever the editor intended, a day printed twice is never right, and
+    // the first entry wins because it is the one carrying the event's own time.
     .filter(
-      (day): day is { date: Date; start: string; end: string | null } =>
-        day.date !== null,
-    )
-    .sort((a, b) => a.date.getTime() - b.date.getTime());
+      (day, index, all) =>
+        index ===
+        all.findIndex(
+          (other) =>
+            other.date.toLocaleDateString(locale, {
+              timeZone: DEFAULT_TIME_ZONE,
+            }) ===
+            day.date.toLocaleDateString(locale, {
+              timeZone: DEFAULT_TIME_ZONE,
+            }),
+        ),
+    );
 
   if (days.length === 0) {
-    return { dateLabel: "", timeLabel: null, schedule: [] };
+    return {
+      dateLabel: "",
+      timeLabel: null,
+      locationLabel: null,
+      schedule: [],
+    };
   }
 
   const times = days.map((day) => formatTimeRange(day.start, day.end, locale));
+  const locations = days.map((day) => day.location?.trim() || "");
 
   if (days.length === 1) {
     return {
       dateLabel: formatDateWithWeekday(days[0].date, locale),
       timeLabel: times[0] || null,
+      locationLabel: locations[0] || null,
       schedule: [],
     };
   }
@@ -266,13 +305,18 @@ export function formatEventWhen(
   const sameYear = parts.every((part) => part.year === parts[0].year);
   const dateLabel = formatDayList(parts, sameYear);
 
-  const shared = times.every((time) => time === times[0]);
+  const everyDay = days.length === 2 ? "both days" : "all days";
+  const sameTimes = times.every((time) => time === times[0]);
+  const samePlaces = locations.every((place) => place === locations[0]);
 
-  if (shared) {
+  // One line can only speak for every day when every day agrees. As soon as
+  // either the hours or the room differ, the days have to be listed out.
+  if (sameTimes && samePlaces) {
     return {
       dateLabel,
-      timeLabel: times[0]
-        ? `${times[0]}, ${days.length === 2 ? "both days" : "all days"}`
+      timeLabel: times[0] ? `${times[0]}, ${everyDay}` : null,
+      locationLabel: locations[0]
+        ? `${locations[0]}, ${everyDay}`
         : null,
       schedule: [],
     };
@@ -280,10 +324,15 @@ export function formatEventWhen(
 
   return {
     dateLabel,
-    timeLabel: null,
+    // The half that still agrees is worth stating once rather than repeating
+    // it against every day in the list.
+    timeLabel: sameTimes && times[0] ? `${times[0]}, ${everyDay}` : null,
+    locationLabel:
+      samePlaces && locations[0] ? `${locations[0]}, ${everyDay}` : null,
     schedule: parts.map((part, index) => ({
       day: `${part.month} ${part.day}`,
-      time: times[index],
+      time: sameTimes ? "" : times[index],
+      location: samePlaces ? null : locations[index] || null,
     })),
   };
 }

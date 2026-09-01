@@ -2,6 +2,7 @@ import { APIError } from "payload";
 import type { CollectionConfig } from "payload";
 import { isLoggedIn, isPublicRead } from "../access/policies.ts";
 import { createReferenceGuardHook } from "../hooks/reference-guard.ts";
+import { MEDIA_USAGE_OPTIONS } from "../hooks/media-usage.ts";
 
 const DEFAULT_MEDIA_PREFIX = "media";
 
@@ -69,7 +70,7 @@ export const Media: CollectionConfig = {
   slug: "media",
   admin: {
     useAsTitle: "alt",
-    defaultColumns: ["alt", "filename", "updatedAt"],
+    defaultColumns: ["alt", "usedIn", "filename", "updatedAt"],
     group: "Assets",
     description:
       "Every image used across the site. Deleting one is blocked while a page still uses it.",
@@ -121,6 +122,21 @@ export const Media: CollectionConfig = {
     mimeTypes: ["image/*"],
   },
   fields: [
+    {
+      name: "usedIn",
+      type: "select",
+      hasMany: true,
+      required: false,
+      label: "Used in",
+      options: MEDIA_USAGE_OPTIONS,
+      admin: {
+        // Maintained by hooks on every collection that references an image, so
+        // typing here would only be overwritten on the next save.
+        readOnly: true,
+        description:
+          "Filled in automatically. Filter the list by this to find every image used in one part of the site, or leave the filter empty to find images nothing uses.",
+      },
+    },
     {
       name: "alt",
       type: "text",

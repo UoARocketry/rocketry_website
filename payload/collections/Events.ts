@@ -6,6 +6,10 @@ import {
   revalidateTags,
 } from "../hooks/revalidation.ts";
 import { createMediaRelationUrlSyncHook } from "../hooks/media-url-sync.ts";
+import {
+  createMediaUsageDeleteHook,
+  createMediaUsageHook,
+} from "../hooks/media-usage.ts";
 import { createImagePairFields } from "../fields/image-pair.ts";
 import { createPreviewUrl, createSlugField } from "../fields/slug.ts";
 import { urlFieldHooks, validateOptionalUrl } from "../fields/validators.ts";
@@ -46,6 +50,7 @@ export const Events: CollectionConfig = {
       }),
     ],
     afterChange: [
+      createMediaUsageHook(["imageMedia"]),
       ({ doc, previousDoc }) => {
         const currentSlug = getStringField(doc, "slug");
         const previousSlug = getStringField(previousDoc, "slug");
@@ -69,6 +74,7 @@ export const Events: CollectionConfig = {
       },
     ],
     afterDelete: [
+      createMediaUsageDeleteHook(["imageMedia"]),
       ({ doc }) => {
         const deletedSlug = getStringField(doc, "slug");
 
@@ -151,6 +157,15 @@ export const Events: CollectionConfig = {
           required: false,
           admin: {
             date: { pickerAppearance: "timeOnly", timeFormat: "HH:mm" },
+          },
+        },
+        {
+          name: "location",
+          type: "text",
+          required: false,
+          admin: {
+            description:
+              "Optional. Only if this day is somewhere else. Leave empty to use the event's location.",
           },
         },
       ],
@@ -293,6 +308,15 @@ export const Events: CollectionConfig = {
               required: false,
               admin: {
                 date: { pickerAppearance: "timeOnly", timeFormat: "HH:mm" },
+              },
+            },
+            {
+              name: "location",
+              type: "text",
+              required: false,
+              admin: {
+                description:
+                  "Optional. Only if this day is somewhere else. Leave empty to use the session's location.",
               },
             },
           ],

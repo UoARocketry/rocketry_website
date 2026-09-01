@@ -14,6 +14,9 @@ import {
 } from "@/lib/site-data";
 import { formatDateShort } from "@/lib/utils";
 
+/** Matches the three featured rockets above it, so the page stays balanced. */
+const HOME_EVENT_LIMIT = 2;
+
 export default async function HomePage() {
   let featuredRockets: RocketSummary[] = [];
   let latestEvents: EventSummary[] = [];
@@ -27,7 +30,7 @@ export default async function HomePage() {
     ]);
 
     featuredRockets = rockets;
-    latestEvents = events.upcoming.slice(0, 4);
+    latestEvents = events.upcoming.slice(0, HOME_EVENT_LIMIT);
     joinUrl = settings.memberJoinUrl;
   } catch (error) {
     console.error("[app/home] Failed to load homepage data:", error);
@@ -200,9 +203,13 @@ export default async function HomePage() {
                 // `sm:grid-cols-1` alongside `sm:grid-cols-2` does not override
                 // it, since equal-specificity Tailwind classes are resolved by
                 // stylesheet order, not class-attribute order.
+                // Two posters are capped at 24rem each, so a full-width grid
+                // centres each one in a column far wider than the card and the
+                // pair drift apart. Bounding the grid to exactly two cards plus
+                // the gap sits them side by side instead.
                 latestEvents.length === 1
-                  ? "grid gap-6 grid-cols-1 sm:max-w-[calc(50%-0.75rem)] sm:mx-auto"
-                  : "grid gap-6 grid-cols-1 sm:grid-cols-2"
+                  ? "grid gap-6 grid-cols-1 sm:max-w-sm sm:mx-auto"
+                  : "grid gap-6 grid-cols-1 sm:grid-cols-2 sm:max-w-[49.5rem] sm:mx-auto"
               }
             >
               {latestEvents.map((event) => (

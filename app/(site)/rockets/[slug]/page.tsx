@@ -109,26 +109,31 @@ export default async function RocketPage({ params }: RocketPageProps) {
               </p>
             </div>
 
-            {rocket.launchVideoUrl && (
-              <div>
-                <a
-                  href={rocket.launchVideoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-bold transition-all duration-200 hover:bg-primary-dark hover:shadow-lg hover:shadow-primary/20"
-                  style={{ color: "#ffffff" }}
-                  aria-label={`Watch the launch of ${rocket.name} (opens in a new tab)`}
-                >
-                  <svg
-                    className="h-5 w-5"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    aria-hidden="true"
+            {rocket.videos.length > 0 && (
+              // Wraps rather than scrolls: a rocket with three videos should
+              // stack them on a phone, not hide the third off-screen.
+              <div className="flex flex-wrap gap-3">
+                {rocket.videos.map((video) => (
+                  <a
+                    key={video.url}
+                    href={video.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-bold transition-all duration-200 hover:bg-primary-dark hover:shadow-lg hover:shadow-primary/20"
+                    style={{ color: "#ffffff" }}
+                    aria-label={`${video.label} video for ${rocket.name} (opens in a new tab)`}
                   >
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                  Watch the launch
-                </a>
+                    <svg
+                      className="h-5 w-5"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                    {video.label}
+                  </a>
+                ))}
               </div>
             )}
 

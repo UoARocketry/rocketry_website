@@ -6,9 +6,13 @@ import {
   revalidateTags,
 } from "../hooks/revalidation.ts";
 import { createMediaRelationUrlSyncHook } from "../hooks/media-url-sync.ts";
+import {
+  createMediaUsageDeleteHook,
+  createMediaUsageHook,
+} from "../hooks/media-usage.ts";
 import { createImagePairFields } from "../fields/image-pair.ts";
 import { createPreviewUrl, createSlugField } from "../fields/slug.ts";
-import { urlFieldHooks, validateOptionalUrl } from "../fields/validators.ts";
+import { urlFieldHooks, validateRequiredUrl } from "../fields/validators.ts";
 
 export const Rockets: CollectionConfig = {
   slug: "rockets",
@@ -46,6 +50,7 @@ export const Rockets: CollectionConfig = {
       }),
     ],
     afterChange: [
+      createMediaUsageHook(["imageMedia", "gallery"]),
       ({ doc, previousDoc }) => {
         const currentSlug = getStringField(doc, "slug");
         const previousSlug = getStringField(previousDoc, "slug");
@@ -69,6 +74,7 @@ export const Rockets: CollectionConfig = {
       },
     ],
     afterDelete: [
+      createMediaUsageDeleteHook(["imageMedia", "gallery"]),
       ({ doc }) => {
         const deletedSlug = getStringField(doc, "slug");
 
@@ -109,17 +115,36 @@ export const Rockets: CollectionConfig = {
     }),
     { name: "description", type: "textarea", required: false },
     {
-      name: "launchVideoUrl",
-      type: "text",
-      label: "Launch video URL",
+      name: "videos",
+      type: "array",
+      label: "Videos",
       required: false,
+      labels: { singular: "Video", plural: "Videos" },
       admin: {
+        initCollapsed: true,
         description:
-          "Optional. A YouTube, Instagram or Drive link to the launch footage. Shown as a 'Watch the launch' button on the rocket's page. Leave empty and no button appears.",
+          "Optional. YouTube, Instagram or Drive links to footage of this rocket. Each one becomes a button on the rocket's page, in this order. Leave empty and no buttons appear.",
       },
-      hooks: urlFieldHooks,
-      validate: (value: unknown) =>
-        validateOptionalUrl(value, "Launch video URL"),
+      fields: [
+        {
+          name: "label",
+          type: "text",
+          required: true,
+          admin: {
+            description:
+              'What the button should say, e.g. "Launch", "Onboard camera", "Recovery".',
+          },
+        },
+        {
+          name: "url",
+          type: "text",
+          label: "Video URL",
+          required: true,
+          hooks: urlFieldHooks,
+          validate: (value: unknown) =>
+            validateRequiredUrl(value, "Video URL"),
+        },
+      ],
     },
     {
       name: "featured",

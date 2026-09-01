@@ -178,17 +178,27 @@ export default async function EventPage({ params }: EventPageProps) {
                         {when.timeLabel}
                       </p>
                     )}
-                    {/* Only reached when the days do not share their hours,
-                        which is the one case a single line cannot state. */}
+                    {when.locationLabel && (
+                      <p className="text-text-secondary leading-relaxed">
+                        <span className="text-primary font-semibold">
+                          Location:
+                        </span>{" "}
+                        {when.locationLabel}
+                      </p>
+                    )}
+                    {/* Only reached when the days disagree on their hours or
+                        their room, which is what a single line cannot state. */}
                     {when.schedule.length > 0 && (
                       <div className="text-text-secondary leading-relaxed">
                         <span className="text-primary font-semibold">
-                          Times:
+                          Each day:
                         </span>
                         <ul className="mt-1 space-y-1">
                           {when.schedule.map((entry) => (
                             <li key={entry.day}>
-                              {entry.day}: {entry.time}
+                              {entry.day}
+                              {entry.time ? `, ${entry.time}` : ""}
+                              {entry.location ? ` — ${entry.location}` : ""}
                             </li>
                           ))}
                         </ul>
@@ -196,10 +206,16 @@ export default async function EventPage({ params }: EventPageProps) {
                     )}
                   </>
                 )}
-                <p className="text-text-secondary leading-relaxed">
-                  <span className="text-primary font-semibold">Location:</span>{" "}
-                  {event.location}
-                </p>
+                {/* A series states its location per session below, and an
+                    empty location used to render a bare "Location:" label. */}
+                {hasSessions && event.location && (
+                  <p className="text-text-secondary leading-relaxed">
+                    <span className="text-primary font-semibold">
+                      Location:
+                    </span>{" "}
+                    {event.location}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -317,20 +333,47 @@ export default async function EventPage({ params }: EventPageProps) {
                       </span>
                     </summary>
                     <div className="px-5 pb-5 pl-15 space-y-1">
-                      {/* Only when the session's days do not share their hours,
-                          which the single summary line cannot express. */}
+                      {/* Only when the session's days disagree on their hours
+                          or their room, which the summary line cannot say. */}
                       {sessionWhen.schedule.length > 0 && (
                         <ul className="mb-2 space-y-1 text-sm text-text-secondary">
                           {sessionWhen.schedule.map((entry) => (
                             <li key={entry.day}>
-                              {entry.day}: {entry.time}
+                              {entry.day}
+                              {entry.time ? `, ${entry.time}` : ""}
+                              {entry.location ? ` — ${entry.location}` : ""}
                             </li>
                           ))}
                         </ul>
                       )}
+                      {/* A pin and a label, because a bare room code sitting
+                          above the description read as part of it. */}
                       {sessionLocation && (
-                        <p className="text-sm text-text-secondary">
-                          {sessionLocation}
+                        <p className="flex items-start gap-2 text-sm text-text-secondary">
+                          <svg
+                            className="mt-0.5 h-4 w-4 shrink-0 text-primary"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                            />
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                            />
+                          </svg>
+                          <span>
+                            <span className="sr-only">Location: </span>
+                            {sessionLocation}
+                          </span>
                         </p>
                       )}
                       {session.description ? (

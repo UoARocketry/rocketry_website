@@ -2,6 +2,7 @@ import type { GlobalConfig } from "payload";
 import { revalidatePath } from "next/cache.js";
 import { isLoggedIn, isPublicRead } from "../access/policies.ts";
 import { createMediaRelationUrlSyncHook } from "../hooks/media-url-sync.ts";
+import { refreshMediaUsageFor } from "../hooks/media-usage.ts";
 import { createImagePairFields } from "../fields/image-pair.ts";
 import { revalidatePaths, revalidateTags } from "../hooks/revalidation.ts";
 import { urlFieldHooks, validateOptionalUrl } from "../fields/validators.ts";
@@ -26,6 +27,13 @@ export const SiteSettings: GlobalConfig = {
       }),
     ],
     afterChange: [
+      // The one image held by a global rather than a collection.
+      async ({ doc, previousDoc, req }) => {
+        await refreshMediaUsageFor(req.payload, [
+          (doc as Record<string, unknown>)?.execTeamImageMedia,
+          (previousDoc as Record<string, unknown>)?.execTeamImageMedia,
+        ]);
+      },
       () => {
         revalidateTags(["settings"]);
         revalidatePath("/", "layout");

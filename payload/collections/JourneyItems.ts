@@ -2,6 +2,10 @@ import type { CollectionConfig } from "payload";
 import { isLoggedIn, isPublicRead } from "../access/policies.ts";
 import { BACKGROUND_SURFACE_OPTIONS } from "../fields/options.ts";
 import { createMediaRelationUrlSyncHook } from "../hooks/media-url-sync.ts";
+import {
+  createMediaUsageDeleteHook,
+  createMediaUsageHook,
+} from "../hooks/media-usage.ts";
 import { createImagePairFields } from "../fields/image-pair.ts";
 import { createOrderCollisionHook } from "../hooks/order-collision.ts";
 import { revalidateAboutContent } from "../hooks/revalidation.ts";
@@ -36,12 +40,14 @@ export const JourneyItems: CollectionConfig = {
       }),
     ],
     afterChange: [
+      createMediaUsageHook(["imageMedia"]),
       createOrderCollisionHook(),
       () => {
         revalidateAboutContent();
       },
     ],
     afterDelete: [
+      createMediaUsageDeleteHook(["imageMedia"]),
       () => {
         revalidateAboutContent();
       },

@@ -8,7 +8,6 @@ export type RocketSummary = {
   description?: string | null;
   launchedAt?: string | null;
   /** Optional link to launch footage, shown as a button on the rocket's page. */
-  launchVideoUrl?: string | null;
   /** Editor-controlled: show this rocket in the home page's featured strip. */
   featured: boolean;
   /** Publish state. Only meaningful on the draft-aware preview path. */
@@ -21,9 +20,16 @@ export type RocketSpec = {
   value: string;
 };
 
+/** A labelled link to footage of the rocket, shown as a button on its page. */
+export type RocketVideo = {
+  label: string;
+  url: string;
+};
+
 export type RocketDetail = RocketSummary & {
   images: string[];
   specs: RocketSpec[];
+  videos: RocketVideo[];
 };
 
 export type EventSession = {
@@ -42,6 +48,8 @@ export type EventExtraDate = {
   date: string;
   startTime?: string | null;
   endTime?: string | null;
+  /** Overrides the event or session location for this day only. */
+  location?: string | null;
 };
 
 export type EventSummary = {

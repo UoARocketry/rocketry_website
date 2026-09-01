@@ -1,6 +1,10 @@
 import type { CollectionConfig } from "payload";
 import { isLoggedIn, isPublicRead } from "../access/policies.ts";
 import { createMediaRelationUrlSyncHook } from "../hooks/media-url-sync.ts";
+import {
+  createMediaUsageDeleteHook,
+  createMediaUsageHook,
+} from "../hooks/media-usage.ts";
 import { revalidatePaths, revalidateTags } from "../hooks/revalidation.ts";
 import { createImagePairFields } from "../fields/image-pair.ts";
 import { urlFieldHooks, validateRequiredUrl } from "../fields/validators.ts";
@@ -34,12 +38,14 @@ export const Sponsors: CollectionConfig = {
       }),
     ],
     afterChange: [
+      createMediaUsageHook(["logoMedia"]),
       () => {
         revalidateTags(["sponsors"]);
         revalidatePaths(["/sponsors"]);
       },
     ],
     afterDelete: [
+      createMediaUsageDeleteHook(["logoMedia"]),
       () => {
         revalidateTags(["sponsors"]);
         revalidatePaths(["/sponsors"]);
