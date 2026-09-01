@@ -1,4 +1,9 @@
-import type { CollectionAfterChangeHook, Where } from "payload";
+import type {
+  BasePayload,
+  CollectionAfterChangeHook,
+  PayloadRequest,
+  Where,
+} from "payload";
 
 export type OrderedRow = {
   id: number | string;
@@ -57,6 +62,69 @@ export function resolveOrder(
   });
 
   return changed;
+}
+
+/**
+ * Copies a shifted row's new `order` onto its latest version row.
+ *
+ * `payload.db.updateOne` writes the main table only, which is what the public
+ * site reads, so the site was always correct. The admin list view is
+ * draft-aware and reads the latest version instead, so without this the list
+ * showed a shifted document's old position — the admin quietly disagreeing
+ * with the site, which invites someone to "fix" numbers that are already right.
+ *
+ * Patching the latest version also stops a pending draft from reverting the
+ * reorder the moment it is published. Only `order` is touched; every other
+ * field on that version is left exactly as it was.
+ */
+async function syncLatestVersionOrder({
+  payload,
+  slug,
+  parentId,
+  order,
+  req,
+}: {
+  payload: BasePayload;
+  slug: string;
+  parentId: number | string;
+  order: number;
+  req: PayloadRequest;
+}): Promise<void> {
+  const found = await payload.db.findVersions({
+    collection: slug as never,
+    where: { parent: { equals: parentId }, latest: { equals: true } },
+    limit: 1,
+    req,
+  });
+
+  const latest = found.docs?.[0] as
+    | {
+        id: number | string;
+        parent: number | string;
+        latest?: boolean;
+        createdAt: string;
+        updatedAt: string;
+        version: Record<string, unknown>;
+      }
+    | undefined;
+
+  if (!latest?.version) {
+    return;
+  }
+
+  await payload.db.updateVersion({
+    collection: slug as never,
+    id: latest.id,
+    versionData: {
+      createdAt: latest.createdAt,
+      latest: latest.latest,
+      parent: latest.parent,
+      updatedAt: latest.updatedAt,
+      version: { ...latest.version, order },
+    },
+    req,
+    returning: false,
+  });
 }
 
 type OrderCollisionOptions = {
@@ -148,6 +216,16 @@ export function createOrderCollisionHook(
           req,
           returning: false,
         });
+
+        if (hasDrafts) {
+          await syncLatestVersionOrder({
+            payload,
+            slug,
+            parentId: change.id,
+            order: change.order,
+            req,
+          });
+        }
       }
     } catch (err) {
       // Deliberately non-fatal: the document itself saved correctly, and
