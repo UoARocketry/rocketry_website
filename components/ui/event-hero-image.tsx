@@ -3,15 +3,30 @@
 import { useState } from "react";
 import Image from "next/image";
 import ImageWithFallback from "@/components/ui/image-with-fallback";
+import ImagePlaceholder from "@/components/ui/image-placeholder";
 import ImageLightbox from "@/components/ui/image-lightbox";
 
 interface EventHeroImageProps {
-  readonly src: string;
+  /** Absent or empty renders the themed placeholder, with no zoom affordance. */
+  readonly src?: string | null;
   readonly alt: string;
 }
 
+const FRAME_HEIGHT = "h-104 sm:h-128 lg:h-152 max-h-[75vh]";
+
 export default function EventHeroImage({ src, alt }: EventHeroImageProps) {
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+
+  // No image means nothing to enlarge, so the button and its zoom cursor would
+  // be an affordance that leads nowhere.
+  if (!src) {
+    return (
+      <ImagePlaceholder
+        className={`relative w-full rounded-lg border border-border shadow-lg ${FRAME_HEIGHT}`}
+        label={`${alt}: no image yet`}
+      />
+    );
+  }
 
   return (
     <div className="relative">
@@ -41,7 +56,7 @@ export default function EventHeroImage({ src, alt }: EventHeroImageProps) {
           width={1200}
           height={1500}
           sizes="(max-width: 1024px) 100vw, 50vw"
-          className="relative w-full h-104 sm:h-128 lg:h-152 max-h-[75vh] object-contain"
+          className={`relative w-full object-contain ${FRAME_HEIGHT}`}
         />
       </button>
 

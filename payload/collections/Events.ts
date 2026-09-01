@@ -88,7 +88,9 @@ export const Events: CollectionConfig = {
       uploadName: "imageMedia",
       urlName: "image",
       label: "Event image",
-      required: true,
+      required: false,
+      uploadDescription:
+        "Usually the Instagram poster. Leave empty and the card shows a plain UARC panel instead.",
     }),
     { name: "description", type: "textarea", required: true },
     {
@@ -163,10 +165,64 @@ export const Events: CollectionConfig = {
       },
     },
     {
+      name: "signupType",
+      type: "select",
+      label: "Signup",
+      required: false,
+      defaultValue: "none",
+      options: [
+        { label: "No signup", value: "none" },
+        { label: "Link to a signup page", value: "link" },
+        { label: "Instructions in plain text", value: "text" },
+      ],
+      admin: {
+        description:
+          "How people sign up. Choose 'plain text' when there is no link to give, e.g. when the form only lives in the Instagram bio.",
+      },
+    },
+    {
       name: "signupUrl",
       type: "text",
+      label: "Signup URL",
       required: false,
-      validate: (value: unknown) => validateOptionalUrl(value, "Signup URL"),
+      admin: {
+        condition: (_data, siblingData) =>
+          (siblingData as Record<string, unknown> | undefined)?.signupType ===
+          "link",
+        description:
+          "Shown as a Sign Up button on the event page, for upcoming events only.",
+      },
+      validate: (value: unknown, { siblingData }: { siblingData: unknown }) => {
+        const type = (siblingData as Record<string, unknown> | undefined)
+          ?.signupType;
+        // Only demanded when this is the chosen option: a URL left behind from
+        // a previous choice must not block saving.
+        if (type === "link" && !(typeof value === "string" && value.trim())) {
+          return "Add the signup link, or change Signup to another option.";
+        }
+        return validateOptionalUrl(value, "Signup URL");
+      },
+    },
+    {
+      name: "signupNote",
+      type: "text",
+      label: "Signup text",
+      required: false,
+      admin: {
+        condition: (_data, siblingData) =>
+          (siblingData as Record<string, unknown> | undefined)?.signupType ===
+          "text",
+        description:
+          'Shown in place of the button, e.g. "Sign up link in our Instagram bio".',
+      },
+      validate: (value: unknown, { siblingData }: { siblingData: unknown }) => {
+        const type = (siblingData as Record<string, unknown> | undefined)
+          ?.signupType;
+        if (type === "text" && !(typeof value === "string" && value.trim())) {
+          return "Add the signup text, or change Signup to another option.";
+        }
+        return true;
+      },
     },
     { name: "location", type: "text", required: false },
     {

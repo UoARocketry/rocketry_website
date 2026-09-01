@@ -91,8 +91,9 @@ export const Rockets: CollectionConfig = {
       uploadName: "imageMedia",
       urlName: "image",
       label: "Rocket image",
-      required: true,
-      uploadDescription: "This is the cover image at the top of the page.",
+      required: false,
+      uploadDescription:
+        "The cover image at the top of the rocket's page. Leave empty and both the card and the page show a plain UARC panel instead.",
       framing: {
         name: "imagePosition",
         label: "Image position on cards",

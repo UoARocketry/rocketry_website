@@ -12,7 +12,6 @@ import {
   normalizeEventTag,
   normalizeEventTagParam,
 } from "@/lib/utils";
-import { PLACEHOLDER_IMAGE } from "@/lib/constants";
 
 type EventLocal = EventSummary;
 
@@ -123,7 +122,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
                   className="block"
                 >
                   <Card
-                    image={event.image ?? PLACEHOLDER_IMAGE}
+                    image={event.image}
                     title={event.title}
                     date={formatEventCardDate(event)}
                     tag={formatEventTagLabel(event.eventTag)}
@@ -166,7 +165,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
                   className="block"
                 >
                   <Card
-                    image={event.image ?? PLACEHOLDER_IMAGE}
+                    image={event.image}
                     title={event.title}
                     date={formatEventCardDate(event)}
                     tag={formatEventTagLabel(event.eventTag)}

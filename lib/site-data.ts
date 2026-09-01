@@ -251,7 +251,12 @@ function mapEvent(doc: PayloadEvent): EventSummary {
     endTime: normalizeEventDate(doc.endTime) || null,
     extraDates,
     eventTag,
+    // Documents saved before the signup selector existed carry a URL with no
+    // type. Inferring the type keeps their Sign Up button rather than making
+    // the render depend on the backfill having run.
+    signupType: doc.signupType ?? (doc.signupUrl ? "link" : "none"),
     signupUrl: doc.signupUrl ?? null,
+    signupNote: doc.signupNote ?? null,
     location: doc.location ?? null,
     sessions,
     status: doc._status ?? null,

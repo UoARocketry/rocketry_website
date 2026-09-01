@@ -12,7 +12,6 @@ import {
   isEventUpcoming,
   toSafeJsonLd,
 } from "@/lib/utils";
-import { PLACEHOLDER_IMAGE } from "@/lib/constants";
 import DraftBanner from "@/components/ui/draft-banner";
 import EventHeroImage from "@/components/ui/event-hero-image";
 
@@ -144,7 +143,7 @@ export default async function EventPage({ params }: EventPageProps) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           {/* Event Image */}
           <EventHeroImage
-            src={event.image ?? PLACEHOLDER_IMAGE}
+            src={event.image}
             alt={event.title}
           />
 
@@ -210,20 +209,35 @@ export default async function EventPage({ params }: EventPageProps) {
               {event.description}
             </p>
 
-            {isEventUpcoming(event) && event.signupUrl && (
-              <div className="mt-8">
-                <a
-                  href={event.signupUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="button bg-primary px-6 py-3 font-bold hover:bg-primary-dark transition-all duration-200"
-                  style={{ color: "#ffffff" }}
-                  aria-label={`Sign up for ${event.title}`}
-                >
-                  Sign Up
-                </a>
-              </div>
-            )}
+            {/* Signup only makes sense while the event is still to run. Some
+                events have no link to give, only an instruction, so the text
+                variant is styled as a panel rather than a dead button. */}
+            {isEventUpcoming(event) &&
+              event.signupType === "link" &&
+              event.signupUrl && (
+                <div className="mt-8">
+                  <a
+                    href={event.signupUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="button bg-primary px-6 py-3 font-bold hover:bg-primary-dark transition-all duration-200"
+                    style={{ color: "#ffffff" }}
+                    aria-label={`Sign up for ${event.title}`}
+                  >
+                    Sign Up
+                  </a>
+                </div>
+              )}
+
+            {isEventUpcoming(event) &&
+              event.signupType === "text" &&
+              event.signupNote && (
+                <div className="mt-8 rounded-lg border border-primary/30 bg-primary/10 px-5 py-4">
+                  <p className="text-sm font-medium text-primary">
+                    {event.signupNote}
+                  </p>
+                </div>
+              )}
           </div>
         </div>
       </section>

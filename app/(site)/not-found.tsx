@@ -35,7 +35,8 @@ export default function NotFound() {
               className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark px-6 py-3 rounded-lg font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-primary/20"
               style={{ color: "#ffffff" }}
             >
-              Back to Home
+              {/* Leads the label rather than trailing it: a backwards action
+                  reads left, the same way the "Back to all Events" links do. */}
               <svg
                 className="w-4 h-4"
                 fill="none"
@@ -47,9 +48,10 @@ export default function NotFound() {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="M17 8l4 4m0 0l-4 4m4-4H3"
+                  d="M7 16l-4-4m0 0l4-4m-4 4h18"
                 />
               </svg>
+              Back to Home
             </Link>
             <Link
               href="/events"

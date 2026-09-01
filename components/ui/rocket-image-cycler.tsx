@@ -3,13 +3,16 @@
 import { useState } from "react";
 import Image from "next/image";
 import ImageWithFallback from "@/components/ui/image-with-fallback";
-import { PLACEHOLDER_IMAGE } from "@/lib/constants";
+import ImagePlaceholder from "@/components/ui/image-placeholder";
 import ImageLightbox from "@/components/ui/image-lightbox";
 
 interface RocketImageCyclerProps {
+  /** Empty renders the themed placeholder, with no zoom affordance. */
   readonly images: readonly string[];
   readonly alt: string;
 }
+
+const FRAME_HEIGHT = "h-104 sm:h-128 lg:h-152 max-h-[75vh]";
 
 export default function RocketImageCycler({
   images,
@@ -18,13 +21,23 @@ export default function RocketImageCycler({
   const [index, setIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
-  const gallery = images.length > 0 ? images : [PLACEHOLDER_IMAGE];
-  const hasMultiple = gallery.length > 1;
-  const current = gallery[index] ?? PLACEHOLDER_IMAGE;
+  const hasMultiple = images.length > 1;
+  const current = images[index] ?? images[0] ?? "";
 
   const goTo = (next: number) => {
-    setIndex((next + gallery.length) % gallery.length);
+    setIndex((next + images.length) % images.length);
   };
+
+  // No image means nothing to enlarge, so the button and its zoom cursor would
+  // be an affordance that leads nowhere.
+  if (!current) {
+    return (
+      <ImagePlaceholder
+        className={`relative w-full rounded-lg border border-border shadow-lg ${FRAME_HEIGHT}`}
+        label={`${alt}: no image yet`}
+      />
+    );
+  }
 
   return (
     <div className="relative">
@@ -56,13 +69,13 @@ export default function RocketImageCycler({
           width={1200}
           height={1500}
           sizes="(max-width: 1024px) 100vw, 50vw"
-          className="relative w-full h-104 sm:h-128 lg:h-152 max-h-[75vh] object-contain"
+          className={`relative w-full object-contain ${FRAME_HEIGHT}`}
         />
       </button>
 
       {isLightboxOpen && (
         <ImageLightbox
-          images={gallery}
+          images={images}
           index={index}
           alt={alt}
           onClose={() => setIsLightboxOpen(false)}
@@ -117,12 +130,12 @@ export default function RocketImageCycler({
           </button>
 
           <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-2">
-            {gallery.map((image, i) => (
+            {images.map((image, i) => (
               <button
                 key={`${image}-${i}`}
                 type="button"
                 onClick={() => goTo(i)}
-                aria-label={`Show image ${i + 1} of ${gallery.length}`}
+                aria-label={`Show image ${i + 1} of ${images.length}`}
                 aria-current={i === index}
                 className={`h-2.5 rounded-full transition-all duration-200 cursor-pointer ${
                   i === index

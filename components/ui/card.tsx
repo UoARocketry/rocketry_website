@@ -1,6 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import ImageWithFallback from "@/components/ui/image-with-fallback";
+import ImagePlaceholder from "@/components/ui/image-placeholder";
 import {
   parsePhotoFraming,
   photoFramingStyle,
@@ -11,7 +12,8 @@ import StatusBadgePill, {
 } from "@/components/ui/status-badge";
 
 interface CardProps {
-  readonly image: string;
+  /** Absent or empty renders the themed placeholder instead. */
+  readonly image?: string | null;
   /**
    * Editor-chosen focus and zoom for the crop, from the CMS. Ignored in
    * `poster` mode, where the whole image is shown and there is nothing to
@@ -93,7 +95,8 @@ export default function Card({
   vertical = false,
   poster = false,
 }: CardProps) {
-  const imageSrc = image || "/UARC logo.png";
+  const imageSrc = image ?? "";
+  const hasImage = imageSrc.length > 0;
   const isSeries = Boolean(meta);
   const seriesShell = shellClasses(isSeries, badge);
   const trimmedDescription = description.trim();
@@ -115,24 +118,30 @@ export default function Card({
           // growing past roughly 480px tall, so no height cap is needed and
           // the frame never drifts off the poster's own aspect ratio.
           <div className="relative aspect-4/5 overflow-hidden bg-surface">
-            {/* Blurred copy fills whatever the poster does not, so an image
-                that is not exactly 4:5 sits on its own colours rather than a
-                hard letterbox. Same treatment as the event detail hero. */}
-            <Image
-              src={imageSrc}
-              alt=""
-              aria-hidden="true"
-              fill
-              sizes="(max-width: 640px) 100vw, 50vw"
-              className="scale-110 object-cover opacity-30 blur-2xl"
-            />
-            <ImageWithFallback
-              src={imageSrc}
-              alt={title}
-              fill
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              className="relative object-contain transition-transform duration-500 group-hover:scale-105"
-            />
+            {hasImage ? (
+              <>
+                {/* Blurred copy fills whatever the poster does not, so an image
+                    that is not exactly 4:5 sits on its own colours rather than a
+                    hard letterbox. Same treatment as the event detail hero. */}
+                <Image
+                  src={imageSrc}
+                  alt=""
+                  aria-hidden="true"
+                  fill
+                  sizes="(max-width: 640px) 100vw, 50vw"
+                  className="scale-110 object-cover opacity-30 blur-2xl"
+                />
+                <ImageWithFallback
+                  src={imageSrc}
+                  alt={title}
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  className="relative object-contain transition-transform duration-500 group-hover:scale-105"
+                />
+              </>
+            ) : (
+              <ImagePlaceholder className="absolute inset-0" />
+            )}
             {/* The hover wash. Dropping this was what made these cards feel
                 dead on hover: the card still lifts, but on a frame this large
                 a 4px lift is invisible, so the overlay is the signal. */}
@@ -142,14 +151,18 @@ export default function Card({
           // The height moves to the wrapper because a framed image is
           // positioned absolutely, so it can no longer give the box its height.
           <div className="relative h-48 overflow-hidden">
-            <ImageWithFallback
-              src={imageSrc}
-              alt={title}
-              fill
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              style={framing}
-              className="transition-transform duration-500 group-hover:scale-105"
-            />
+            {hasImage ? (
+              <ImageWithFallback
+                src={imageSrc}
+                alt={title}
+                fill
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                style={framing}
+                className="transition-transform duration-500 group-hover:scale-105"
+              />
+            ) : (
+              <ImagePlaceholder className="absolute inset-0" />
+            )}
             <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </div>
         )}
@@ -207,14 +220,18 @@ export default function Card({
       }`}
     >
       <div className="relative overflow-hidden h-56 md:h-full md:w-1/2">
-        <ImageWithFallback
-          src={imageSrc}
-          alt={title}
-          fill
-          sizes="(max-width: 768px) 100vw, 50vw"
-          style={framing}
-          className="transition-transform duration-500 group-hover:scale-105"
-        />
+        {hasImage ? (
+          <ImageWithFallback
+            src={imageSrc}
+            alt={title}
+            fill
+            sizes="(max-width: 768px) 100vw, 50vw"
+            style={framing}
+            className="transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <ImagePlaceholder className="absolute inset-0" />
+        )}
         <div className="absolute inset-0 bg-linear-to-r from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       </div>
       <div

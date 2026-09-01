@@ -12,7 +12,6 @@ import {
   type EventSummary,
   type RocketSummary,
 } from "@/lib/site-data";
-import { PLACEHOLDER_IMAGE } from "@/lib/constants";
 import { formatDateShort } from "@/lib/utils";
 
 export default async function HomePage() {
@@ -130,7 +129,7 @@ export default async function HomePage() {
                   className="block"
                 >
                   <Card
-                    image={rocket.image ?? PLACEHOLDER_IMAGE}
+                    image={rocket.image}
                     imagePosition={rocket.imagePosition}
                     title={rocket.name}
                     date={
@@ -213,7 +212,7 @@ export default async function HomePage() {
                   className="block"
                 >
                   <Card
-                    image={event.image ?? PLACEHOLDER_IMAGE}
+                    image={event.image}
                     title={event.title}
                     date={formatDateShort(event.date)}
                     tag={event.eventTag ?? "General"}

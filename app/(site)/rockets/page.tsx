@@ -9,7 +9,6 @@ import {
 } from "@/lib/site-data";
 import { formatDateShort, getRocketStatus } from "@/lib/utils";
 import { rocketStatusBadge } from "@/components/ui/status-badge";
-import { PLACEHOLDER_IMAGE } from "@/lib/constants";
 
 type RocketItem = RocketSummary;
 
@@ -100,7 +99,7 @@ function RocketCards({ rockets }: { readonly rockets: readonly RocketItem[] }) {
       {rockets.map((rocket, idx) => (
         <Link key={rocket.id} href={`/rockets/${rocket.slug}`} className="block">
           <Card
-            image={rocket.image ?? PLACEHOLDER_IMAGE}
+            image={rocket.image}
             imagePosition={rocket.imagePosition}
             title={rocket.name}
             date={

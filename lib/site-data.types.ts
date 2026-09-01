@@ -51,7 +51,10 @@ export type EventSummary = {
   endTime?: string | null;
   extraDates: EventExtraDate[];
   eventTag?: string | null;
+  /** How people sign up: a link, a sentence, or nothing. */
+  signupType: "none" | "link" | "text";
   signupUrl?: string | null;
+  signupNote?: string | null;
   location?: string | null;
   sessions: EventSession[];
   /** Publish state. Only meaningful on the draft-aware preview path. */

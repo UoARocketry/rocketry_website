@@ -214,7 +214,7 @@ export interface Event {
    */
   slug: string;
   /**
-   * Upload a new image or pick one already in the Media library.
+   * Upload a new image or pick one already in the Media library. Optional. Usually the Instagram poster. Leave empty and the card shows a plain UARC panel instead.
    */
   imageMedia?: (number | null) | Media;
   /**
@@ -251,7 +251,18 @@ export interface Event {
    * Manage the available tags in the Event Tags collection.
    */
   eventTag?: (number | null) | EventTag;
+  /**
+   * How people sign up. Choose 'plain text' when there is no link to give, e.g. when the form only lives in the Instagram bio.
+   */
+  signupType?: ('none' | 'link' | 'text') | null;
+  /**
+   * Shown as a Sign Up button on the event page, for upcoming events only.
+   */
   signupUrl?: string | null;
+  /**
+   * Shown in place of the button, e.g. "Sign up link in our Instagram bio".
+   */
+  signupNote?: string | null;
   location?: string | null;
   /**
    * Optional. For a multi-session series (e.g. Level 1 build workshops), add each session in the order they run. Leave empty for a normal one-off event.
@@ -307,7 +318,7 @@ export interface Rocket {
    */
   slug: string;
   /**
-   * Upload a new image or pick one already in the Media library. This is the cover image at the top of the page.
+   * Upload a new image or pick one already in the Media library. Optional. The cover image at the top of the rocket's page. Leave empty and both the card and the page show a plain UARC panel instead.
    */
   imageMedia?: (number | null) | Media;
   /**
@@ -729,7 +740,9 @@ export interface EventsSelect<T extends boolean = true> {
         id?: T;
       };
   eventTag?: T;
+  signupType?: T;
   signupUrl?: T;
+  signupNote?: T;
   location?: T;
   sessions?:
     | T
