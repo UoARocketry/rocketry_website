@@ -55,6 +55,13 @@ export const JourneyItems: CollectionConfig = {
       urlName: "image",
       label: "Image",
       required: true,
+      framing: {
+        name: "imagePosition",
+        label: "Image position",
+        shape: "rect",
+        aspect: 2.4,
+        appliesTo: "the About page block",
+      },
     }),
     {
       name: "variant",

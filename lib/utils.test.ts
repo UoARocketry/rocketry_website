@@ -66,6 +66,36 @@ describe("isEventUpcoming", () => {
   it("returns false for an unparseable event date", () => {
     expect(isEventUpcoming({ date: "not-a-date" })).toBe(false);
   });
+
+  it("stays upcoming while a later day of a multi-day event is still to come", () => {
+    expect(
+      isEventUpcoming({
+        date: past(1).date,
+        extraDates: [{ date: future(1).date }],
+      }),
+    ).toBe(true);
+  });
+
+  it("keeps the final day upcoming until that day is over", () => {
+    // Extra days are stored by a day-only picker, so the value is midnight.
+    // Read literally that makes an event stale from the moment its last day
+    // begins, which is precisely when people are still looking it up.
+    expect(
+      isEventUpcoming({
+        date: past(1).date,
+        extraDates: [{ date: new Date(NOW).toISOString() }],
+      }),
+    ).toBe(true);
+  });
+
+  it("is past once the last day has fully run", () => {
+    expect(
+      isEventUpcoming({
+        date: past(10).date,
+        extraDates: [{ date: past(2).date }],
+      }),
+    ).toBe(false);
+  });
 });
 
 describe("findNextSessionIndex", () => {
@@ -83,10 +113,15 @@ describe("findNextSessionIndex", () => {
 });
 
 describe("formatEventCardDate", () => {
-  // Asserts which session was picked without hard-coding a formatted date,
-  // which would otherwise depend on the machine's timezone.
+  // Asserts which session was picked without hard-coding a formatted date.
+  // The timezone is pinned to the one the site renders in, so this says the
+  // same thing on a New Zealand laptop and on a UTC build machine.
   const expectDate = (actual: string, source: string) => {
-    expect(actual).toBe(new Date(source).toLocaleDateString("en-US"));
+    expect(actual).toBe(
+      new Date(source).toLocaleDateString("en-US", {
+        timeZone: "Pacific/Auckland",
+      }),
+    );
   };
 
   it("falls back to the event date when there are no sessions", () => {
@@ -118,6 +153,26 @@ describe("formatEventCardDate", () => {
       formatEventCardDate({
         date: past(1).date,
         sessions: [future(8), future(1)],
+      }),
+      future(1).date,
+    );
+  });
+
+  it("shows the next day still to run of a multi-day event", () => {
+    expectDate(
+      formatEventCardDate({
+        date: past(1).date,
+        extraDates: [{ date: future(1).date }],
+      }),
+      future(1).date,
+    );
+  });
+
+  it("shows the first day of a multi-day event that has not started", () => {
+    expectDate(
+      formatEventCardDate({
+        date: future(1).date,
+        extraDates: [{ date: future(8).date }],
       }),
       future(1).date,
     );

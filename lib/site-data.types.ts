@@ -3,6 +3,8 @@ export type RocketSummary = {
   name: string;
   slug: string;
   image?: string | null;
+  /** Editor-chosen focus and zoom for the card crop. See lib/photo-position. */
+  imagePosition?: string | null;
   description?: string | null;
   launchedAt?: string | null;
   /** Editor-controlled: show this rocket in the home page's featured strip. */
@@ -23,8 +25,17 @@ export type RocketDetail = RocketSummary & {
 export type EventSession = {
   title: string;
   date: string;
+  /** Only the clock part is used. Null when the session has no stated finish. */
+  endTime?: string | null;
   description?: string | null;
   location?: string | null;
+};
+
+/** A further day the same event runs on, with optional hours of its own. */
+export type EventExtraDate = {
+  date: string;
+  startTime?: string | null;
+  endTime?: string | null;
 };
 
 export type EventSummary = {
@@ -34,6 +45,9 @@ export type EventSummary = {
   image?: string | null;
   description?: string | null;
   date: string;
+  /** Only the clock part is used. Null when the event has no stated finish. */
+  endTime?: string | null;
+  extraDates: EventExtraDate[];
   eventTag?: string | null;
   signupUrl?: string | null;
   location?: string | null;
@@ -55,6 +69,8 @@ export type Exec = {
 
 export type Feature = {
   image?: string | null;
+  /** Editor-chosen focus and zoom for the card crop. See lib/photo-position. */
+  imagePosition?: string | null;
   title: string;
   body?: string | null;
   variant?: "background" | "surface" | null;

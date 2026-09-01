@@ -93,6 +93,17 @@ export const Rockets: CollectionConfig = {
       label: "Rocket image",
       required: true,
       uploadDescription: "This is the cover image at the top of the page.",
+      framing: {
+        name: "imagePosition",
+        label: "Image position on cards",
+        shape: "rect",
+        aspect: 1.5,
+        // The rocket's own page shows this image whole, so framing only ever
+        // affects the cards. Their frame is a little wider on a phone than the
+        // preview, which is why this positions a focus point rather than
+        // cutting a fixed rectangle.
+        appliesTo: "the rocket cards",
+      },
     }),
     { name: "description", type: "textarea", required: false },
     {

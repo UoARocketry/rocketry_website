@@ -13,12 +13,38 @@ import {
   photoFramingStyle,
 } from "../../lib/photo-position.ts";
 
-const PREVIEW_SIZE = 180;
+/** Longest edge of the preview box. The short edge follows `aspect`. */
+const PREVIEW_EXTENT = 200;
 const ZOOM_STEP = 0.25;
+
+/**
+ * Supplied per field via `clientProps` in `createImagePairFields`, so one
+ * component serves the circular exec headshot and the landscape card frames.
+ * Defaults describe the exec photo, which was the original caller.
+ */
+type FramingProps = {
+  uploadField?: string;
+  urlField?: string;
+  shape?: "circle" | "rect";
+  aspect?: number;
+  appliesTo?: string;
+};
 
 function clampPercent(value: number): number {
   if (!Number.isFinite(value)) return 50;
   return Math.min(100, Math.max(0, value));
+}
+
+/**
+ * Preview box matching the site frame's shape. A frame wider than it is tall
+ * is capped on width, a taller one on height, so no shape overruns the field.
+ */
+function previewSize(aspect: number): { width: number; height: number } {
+  const safeAspect = Number.isFinite(aspect) && aspect > 0 ? aspect : 1;
+
+  return safeAspect >= 1
+    ? { width: PREVIEW_EXTENT, height: Math.round(PREVIEW_EXTENT / safeAspect) }
+    : { width: Math.round(PREVIEW_EXTENT * safeAspect), height: PREVIEW_EXTENT };
 }
 
 /**
@@ -41,14 +67,23 @@ function readUploadValue(value: unknown): { url?: string; id?: string } {
   return {};
 }
 
-export const PhotoPositionField: TextFieldClientComponent = ({ path }) => {
+export const PhotoPositionField: TextFieldClientComponent = (props) => {
+  const { path, field } = props;
+  const {
+    uploadField = "photoMedia",
+    urlField = "photo",
+    shape = "circle",
+    aspect = 1,
+    appliesTo,
+  } = props as unknown as FramingProps;
+
   const { value, setValue } = useField<string>({ path });
 
-  // The sibling `photo` text field is only filled in by a server-side
-  // beforeChange hook, so it stays empty in the form until after a successful
-  // save. Read the upload relation as well so the preview works immediately.
-  const photoText = useFormFields(([fields]) => fields?.photo?.value);
-  const photoMedia = useFormFields(([fields]) => fields?.photoMedia?.value);
+  // The sibling URL field is only filled in by a server-side beforeChange
+  // hook, so it stays empty in the form until after a successful save. Read
+  // the upload relation as well so the preview works immediately.
+  const imageText = useFormFields(([fields]) => fields?.[urlField]?.value);
+  const imageMedia = useFormFields(([fields]) => fields?.[uploadField]?.value);
 
   // Keyed by id so a stale result from a previously selected file is never
   // shown, without needing to clear state synchronously during a render.
@@ -56,10 +91,10 @@ export const PhotoPositionField: TextFieldClientComponent = ({ path }) => {
     null,
   );
 
-  const upload = readUploadValue(photoMedia);
+  const upload = readUploadValue(imageMedia);
   const uploadId = upload.id;
   const directUrl =
-    upload.url || (typeof photoText === "string" ? photoText : "");
+    upload.url || (typeof imageText === "string" ? imageText : "");
   const photoUrl =
     directUrl || (resolved && resolved.id === uploadId ? resolved.url : "");
 
@@ -86,6 +121,7 @@ export const PhotoPositionField: TextFieldClientComponent = ({ path }) => {
   }, [directUrl, uploadId]);
 
   const framing = parsePhotoFraming(value);
+  const { width, height } = previewSize(aspect);
   const [isDragging, setIsDragging] = useState(false);
   const dragState = useRef<{
     startX: number;
@@ -115,9 +151,10 @@ export const PhotoPositionField: TextFieldClientComponent = ({ path }) => {
     if (!drag) return;
 
     // Dragging right reveals more of the image's left side, so the focus
-    // percentage moves the opposite way to the pointer.
-    const deltaX = ((event.clientX - drag.startX) / PREVIEW_SIZE) * 100;
-    const deltaY = ((event.clientY - drag.startY) / PREVIEW_SIZE) * 100;
+    // percentage moves the opposite way to the pointer. Each axis is scaled by
+    // its own edge, or dragging feels wrong on a frame that is not square.
+    const deltaX = ((event.clientX - drag.startX) / width) * 100;
+    const deltaY = ((event.clientY - drag.startY) / height) * 100;
 
     commit({
       x: clampPercent(drag.originX - deltaX),
@@ -133,9 +170,14 @@ export const PhotoPositionField: TextFieldClientComponent = ({ path }) => {
   const setZoom = (next: number) =>
     commit({ zoom: Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, next)) });
 
+  const frameName = shape === "circle" ? "circular crop" : "frame";
+  const where = appliesTo ? ` on ${appliesTo}` : "";
+  const labelText =
+    typeof field?.label === "string" ? field.label : "Image position";
+
   return (
     <div className="field-type" style={{ marginBottom: "1.5rem" }}>
-      <label className="field-label">Photo position</label>
+      <label className="field-label">{labelText}</label>
       <p
         style={{
           marginTop: 0,
@@ -145,8 +187,8 @@ export const PhotoPositionField: TextFieldClientComponent = ({ path }) => {
         }}
       >
         {photoUrl
-          ? "Drag the photo to choose which part shows inside the circular crop on the site, and zoom in to reframe more tightly. This preview matches the website exactly."
-          : "Upload a photo above to position it."}
+          ? `Drag the image to choose which part shows inside the ${frameName}${where}, and zoom in to reframe more tightly. This preview is the shape of the real frame.`
+          : "Upload an image above to position it."}
       </p>
 
       <div style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
@@ -157,9 +199,9 @@ export const PhotoPositionField: TextFieldClientComponent = ({ path }) => {
           onPointerLeave={handlePointerUp}
           style={{
             position: "relative",
-            width: PREVIEW_SIZE,
-            height: PREVIEW_SIZE,
-            borderRadius: "50%",
+            width,
+            height,
+            borderRadius: shape === "circle" ? "50%" : "0.25rem",
             overflow: "hidden",
             border: "2px solid var(--theme-elevation-150)",
             flexShrink: 0,
@@ -172,7 +214,7 @@ export const PhotoPositionField: TextFieldClientComponent = ({ path }) => {
             /* eslint-disable-next-line @next/next/no-img-element */
             <img
               src={photoUrl}
-              alt="Photo position preview"
+              alt="Image position preview"
               draggable={false}
               style={{ ...photoFramingStyle(framing), userSelect: "none" }}
             />

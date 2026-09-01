@@ -131,6 +131,7 @@ export default async function HomePage() {
                 >
                   <Card
                     image={rocket.image ?? PLACEHOLDER_IMAGE}
+                    imagePosition={rocket.imagePosition}
                     title={rocket.name}
                     date={
                       rocket.launchedAt

@@ -85,21 +85,14 @@ export const Executives: CollectionConfig = {
       required: false,
       uploadDescription:
         "Leave empty and the card shows the exec's initials instead.",
-    }),
-    {
-      name: "photoPosition",
-      type: "text",
-      required: false,
-      defaultValue: "50% 50%",
-      admin: {
-        // Framing only makes sense once there is something to frame.
-        condition: (_data, siblingData) =>
-          Boolean((siblingData as Record<string, unknown> | undefined)?.photo),
-        components: {
-          Field: "/payload/components/PhotoPositionField.tsx#PhotoPositionField",
-        },
+      framing: {
+        name: "photoPosition",
+        label: "Photo position",
+        shape: "circle",
+        aspect: 1,
+        appliesTo: "the exec cards",
       },
-    },
+    }),
     {
       name: "year",
       type: "number",

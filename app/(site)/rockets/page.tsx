@@ -101,6 +101,7 @@ function RocketCards({ rockets }: { readonly rockets: readonly RocketItem[] }) {
         <Link key={rocket.id} href={`/rockets/${rocket.slug}`} className="block">
           <Card
             image={rocket.image ?? PLACEHOLDER_IMAGE}
+            imagePosition={rocket.imagePosition}
             title={rocket.name}
             date={
               rocket.launchedAt ? formatDateShort(rocket.launchedAt) : "TBA"

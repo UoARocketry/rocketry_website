@@ -13,7 +13,7 @@ import type {
   WhatWeDo as PayloadWhatWeDo,
 } from "@/payload-types";
 import { getPayloadClient } from "@/lib/payload";
-import { getRocketStatus, sortRockets } from "@/lib/utils";
+import { getRocketStatus, isEventUpcoming, sortRockets } from "@/lib/utils";
 import type {
   AboutPayload,
   EventDetail,
@@ -86,29 +86,27 @@ function partitionEventsByDate(events: EventSummary[]): EventsOverview {
       parseDateValue(event.date)?.getTime() ?? Number.MIN_SAFE_INTEGER;
     const sessionTimestamps = getSessionTimestamps(event);
 
-    // One-off events keep the original behaviour: a single date decides
-    // everything.
+    // Whether an event has finished is decided in one place, so a series, a
+    // two-day event and a one-off cannot drift apart. Only the sort key
+    // differs between them.
+    const isUpcoming = isEventUpcoming(event);
+
+    // A one-off or a multi-day event sorts by its first day.
     if (sessionTimestamps.length === 0) {
-      return {
-        event,
-        timestamp: baseTimestamp,
-        isUpcoming: baseTimestamp >= now,
-      };
+      return { event, timestamp: baseTimestamp, isUpcoming };
     }
 
-    // A series stays "upcoming" until its final session has passed, so a
-    // term-long workshop doesn't drop into the archive after week one.
     const futureSessions = sessionTimestamps.filter(
       (timestamp) => timestamp >= now,
     );
-    const isUpcoming = futureSessions.length > 0;
 
     return {
       event,
       // Sort upcoming series by their next session, finished ones by their last.
-      timestamp: isUpcoming
-        ? Math.min(...futureSessions)
-        : Math.max(...sessionTimestamps),
+      timestamp:
+        futureSessions.length > 0
+          ? Math.min(...futureSessions)
+          : Math.max(...sessionTimestamps),
       isUpcoming,
     };
   });
@@ -181,6 +179,7 @@ function mapRocket(doc: PayloadRocket): RocketSummary {
     name: doc.name,
     slug: doc.slug,
     image: doc.image ?? null,
+    imagePosition: doc.imagePosition ?? null,
     description: doc.description ?? null,
     launchedAt: doc.launchedAt ?? null,
     featured: doc.featured ?? false,
@@ -225,10 +224,21 @@ function mapEvent(doc: PayloadEvent): EventSummary {
     .map((session) => ({
       title: session.title,
       date: normalizeEventDate(session.date),
+      endTime: normalizeEventDate(session.endTime) || null,
       description: session.description ?? null,
       location: session.location ?? null,
     }))
     .filter((session) => session.date.length > 0);
+
+  // A row with no date is an editor part-way through adding one; it would
+  // otherwise render as a stray entry in the date list.
+  const extraDates = (doc.extraDates ?? [])
+    .map((extra) => ({
+      date: normalizeEventDate(extra.date),
+      startTime: normalizeEventDate(extra.startTime) || null,
+      endTime: normalizeEventDate(extra.endTime) || null,
+    }))
+    .filter((extra) => extra.date.length > 0);
 
   return {
     id: doc.id,
@@ -237,6 +247,8 @@ function mapEvent(doc: PayloadEvent): EventSummary {
     image: doc.image ?? null,
     description: doc.description ?? null,
     date: normalizeEventDate(doc.date),
+    endTime: normalizeEventDate(doc.endTime) || null,
+    extraDates,
     eventTag,
     signupUrl: doc.signupUrl ?? null,
     location: doc.location ?? null,
@@ -264,6 +276,7 @@ function mapFeature(doc: PayloadWhatWeDo | PayloadJourneyItem): Feature {
     title: doc.title,
     body: doc.body ?? null,
     image: doc.image ?? null,
+    imagePosition: doc.imagePosition ?? null,
     variant: doc.variant ?? null,
   };
 }

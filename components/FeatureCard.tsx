@@ -1,8 +1,11 @@
 import React from "react";
 import ImageWithFallback from "@/components/ui/image-with-fallback";
+import { parsePhotoFraming, photoFramingStyle } from "@/lib/photo-position";
 
 type BaseProps = {
   image?: string;
+  /** Editor-chosen focus and zoom for the crop. Centred when absent. */
+  imagePosition?: string | null;
   imageAlt?: string;
   title?: React.ReactNode;
   subtitle?: React.ReactNode;
@@ -40,6 +43,7 @@ type Props = DivProps | AnchorProps | ButtonProps;
 export default function FeatureCard(props: Props) {
   const {
     image,
+    imagePosition,
     imageAlt = "",
     title,
     subtitle,
@@ -69,7 +73,8 @@ export default function FeatureCard(props: Props) {
             src={image}
             alt={imageAlt || (typeof title === "string" ? title : "")}
             fill
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            style={photoFramingStyle(parsePhotoFraming(imagePosition))}
+            className="transition-transform duration-500 group-hover:scale-105"
             sizes="(max-width: 768px) 100vw, 33vw"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />

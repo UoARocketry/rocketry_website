@@ -1,6 +1,10 @@
 import React from "react";
 import Image from "next/image";
 import ImageWithFallback from "@/components/ui/image-with-fallback";
+import {
+  parsePhotoFraming,
+  photoFramingStyle,
+} from "@/lib/photo-position";
 import ClampedDescription from "@/components/ui/clamped-description";
 import StatusBadgePill, {
   type StatusBadge,
@@ -8,6 +12,12 @@ import StatusBadgePill, {
 
 interface CardProps {
   readonly image: string;
+  /**
+   * Editor-chosen focus and zoom for the crop, from the CMS. Ignored in
+   * `poster` mode, where the whole image is shown and there is nothing to
+   * frame. Falls back to a centred crop when absent.
+   */
+  readonly imagePosition?: string | null;
   readonly title: string;
   readonly date: string;
   readonly description: string;
@@ -72,6 +82,7 @@ function shellClasses(isSeries: boolean, badge?: StatusBadge | null) {
 
 export default function Card({
   image,
+  imagePosition,
   title,
   date,
   description,
@@ -86,6 +97,7 @@ export default function Card({
   const isSeries = Boolean(meta);
   const seriesShell = shellClasses(isSeries, badge);
   const trimmedDescription = description.trim();
+  const framing = photoFramingStyle(parsePhotoFraming(imagePosition));
 
   if (vertical) {
     return (
@@ -127,14 +139,16 @@ export default function Card({
             <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </div>
         ) : (
-          <div className="relative overflow-hidden">
+          // The height moves to the wrapper because a framed image is
+          // positioned absolutely, so it can no longer give the box its height.
+          <div className="relative h-48 overflow-hidden">
             <ImageWithFallback
               src={imageSrc}
               alt={title}
-              width={1200}
-              height={600}
+              fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-105"
+              style={framing}
+              className="transition-transform duration-500 group-hover:scale-105"
             />
             <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </div>
@@ -183,19 +197,23 @@ export default function Card({
 
   return (
     <div
-      className={`group bg-card rounded-xl border overflow-hidden flex h-80 md:h-72 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 ${seriesShell} ${
+      // Taller than a text-led card needs to be, because this layout carries
+      // rocket photos, which are usually portrait. At the old h-72 a 2:3 photo
+      // showed as a thin horizontal band whatever you framed it on.
+      className={`group bg-card rounded-xl border overflow-hidden flex h-88 md:h-96 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 ${seriesShell} ${
         reverse
           ? "flex-col-reverse md:flex-row-reverse"
           : "flex-col md:flex-row"
       }`}
     >
-      <div className="relative overflow-hidden h-48 md:h-full md:w-1/2">
+      <div className="relative overflow-hidden h-56 md:h-full md:w-1/2">
         <ImageWithFallback
           src={imageSrc}
           alt={title}
           fill
           sizes="(max-width: 768px) 100vw, 50vw"
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          style={framing}
+          className="transition-transform duration-500 group-hover:scale-105"
         />
         <div className="absolute inset-0 bg-linear-to-r from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       </div>

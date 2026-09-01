@@ -18,22 +18,22 @@ export default function SponsorCard({
       {/* Subtle gradient overlay on hover */}
       <div className="absolute inset-0 bg-linear-to-b from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-      <div className="relative z-10 flex flex-col items-center">
-        <div className="bg-white rounded-lg p-4 mb-4 transition-transform duration-300 group-hover:scale-105">
-          <ImageWithFallback
-            src={logoSrc}
-            alt={sponsor.name}
-            width={160}
-            height={60}
-            className="object-contain"
-            style={{
-              maxHeight: 60,
-              maxWidth: 160,
-            }}
-            // The logo is sized by its own intrinsic dimensions under a max,
-            // so the failure panel has nothing to inherit and needs a box.
-            fallbackClassName="h-[60px] w-[160px]"
-          />
+      <div className="relative z-10 flex w-full flex-col items-center">
+        {/* A fixed plate rather than one that shrinks to the logo. Sponsor
+            artwork ranges from near-square badges to wordmarks close to 3:1,
+            and sizing the plate to each one left every card in the grid with
+            its logo on a different baseline. The logo is contained, never
+            cropped, so a wide one fits by width and a tall one by height. */}
+        <div className="w-full bg-white rounded-lg p-4 mb-4 transition-transform duration-300 group-hover:scale-105">
+          <div className="relative h-16 w-full">
+            <ImageWithFallback
+              src={logoSrc}
+              alt={sponsor.name}
+              fill
+              sizes="(max-width: 640px) 90vw, 280px"
+              className="object-contain"
+            />
+          </div>
         </div>
         <h3 className="text-base font-semibold text-text-main mb-1 text-center group-hover:text-primary transition-colors duration-200">
           {sponsor.name}

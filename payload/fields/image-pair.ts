@@ -1,6 +1,24 @@
 import type { Field } from "payload";
 import { validateOptionalUrl, validateUrlOrUpload } from "./validators.ts";
 
+/**
+ * Adds a drag-to-position, zoom-to-reframe control for images the site crops
+ * to fill a frame. Only worth asking for where the frame actually crops — on a
+ * `object-contain` frame the whole image is shown and framing does nothing.
+ */
+export type ImageFramingOptions = {
+  /** Name of the text field holding the framing value, e.g. "imagePosition". */
+  name: string;
+  /** Shape of the admin preview, matching how the site frames this image. */
+  shape: "circle" | "rect";
+  /** Width ÷ height of the site's frame, used to size the preview box. */
+  aspect: number;
+  /** Overrides the default "Image position" label. */
+  label?: string;
+  /** Names where this framing applies, e.g. "the rocket cards". */
+  appliesTo?: string;
+};
+
 type ImagePairOptions = {
   /** Name of the `upload` relation field, e.g. "photoMedia". */
   uploadName: string;
@@ -12,6 +30,8 @@ type ImagePairOptions = {
   required: boolean;
   /** Extra guidance appended to the upload field's description. */
   uploadDescription?: string;
+  /** Omit entirely for an image the site never crops. */
+  framing?: ImageFramingOptions;
 };
 
 /**
@@ -32,10 +52,49 @@ export function createImagePairFields({
   label,
   required,
   uploadDescription,
+  framing,
 }: ImagePairOptions): Field[] {
   const baseDescription = `Upload a new image or pick one already in the Media library.${
     required ? "" : " Optional."
   }`;
+
+  const framingFields: Field[] = framing
+    ? [
+        {
+          name: framing.name,
+          type: "text",
+          label: framing.label ?? "Image position",
+          required: false,
+          // Anything already in the database keeps the centred crop it has
+          // been rendering with, so adding the control moves nothing.
+          defaultValue: "50% 50%",
+          admin: {
+            // The URL field is only filled in by the beforeChange hook, so a
+            // just-picked file has the relation set and the URL still empty.
+            // Checking both keeps the control visible before the first save.
+            condition: (_data, siblingData) => {
+              const siblings = siblingData as
+                | Record<string, unknown>
+                | undefined;
+              return Boolean(siblings?.[urlName] || siblings?.[uploadName]);
+            },
+            components: {
+              Field: {
+                path: "/payload/components/PhotoPositionField.tsx",
+                exportName: "PhotoPositionField",
+                clientProps: {
+                  uploadField: uploadName,
+                  urlField: urlName,
+                  shape: framing.shape,
+                  aspect: framing.aspect,
+                  appliesTo: framing.appliesTo,
+                },
+              },
+            },
+          },
+        },
+      ]
+    : [];
 
   return [
     {
@@ -68,5 +127,6 @@ export function createImagePairFields({
             validateUrlOrUpload(value, siblingData, uploadName, label)
         : (value: unknown) => validateOptionalUrl(value, `${label} URL`),
     },
+    ...framingFields,
   ];
 }

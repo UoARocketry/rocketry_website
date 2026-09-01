@@ -223,9 +223,30 @@ export interface Event {
   image?: string | null;
   description: string;
   /**
-   * When the event starts.
+   * When the event starts. For an event running over more than one day, this is the first day.
    */
   date: string;
+  /**
+   * Optional. When the event finishes that day. Leave empty and the page shows a start time only.
+   */
+  endTime?: string | null;
+  /**
+   * Optional. For one event that runs across more than one day, e.g. an open day on both the Saturday and the Sunday. Add each further day here and the page reads 'September 3 & 4'. For a workshop series with different content each week, use Sessions below instead.
+   */
+  extraDates?:
+    | {
+        /**
+         * The further day this event also runs on.
+         */
+        date: string;
+        /**
+         * Leave empty to run the same hours as the first day. Fill both in only if this day differs.
+         */
+        startTime?: string | null;
+        endTime?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * Manage the available tags in the Event Tags collection.
    */
@@ -239,6 +260,10 @@ export interface Event {
     | {
         title: string;
         date: string;
+        /**
+         * Optional. When this session finishes.
+         */
+        endTime?: string | null;
         description?: string | null;
         /**
          * Optional. Falls back to the event location above if left empty.
@@ -289,6 +314,7 @@ export interface Rocket {
    * Only needed if you are linking an image hosted somewhere else instead of uploading one. Choose a file above and this disappears.
    */
   image?: string | null;
+  imagePosition?: string | null;
   description?: string | null;
   /**
    * Tick to feature this rocket in the Featured Rockets section on the home page. Up to 3 are shown, next launch first. If none are ticked the home page falls back to the most recently launched rockets.
@@ -423,6 +449,7 @@ export interface WhatWeDo {
    * Only needed if you are linking an image hosted somewhere else instead of uploading one. Choose a file above and this disappears.
    */
   image?: string | null;
+  imagePosition?: string | null;
   /**
    * Background shade for this block. Alternate between blocks so the page has visible banding.
    */
@@ -454,6 +481,7 @@ export interface JourneyItem {
    * Only needed if you are linking an image hosted somewhere else instead of uploading one. Choose a file above and this disappears.
    */
   image?: string | null;
+  imagePosition?: string | null;
   /**
    * Background shade for this block. Alternate between blocks so the page has visible banding.
    */
@@ -691,6 +719,15 @@ export interface EventsSelect<T extends boolean = true> {
   image?: T;
   description?: T;
   date?: T;
+  endTime?: T;
+  extraDates?:
+    | T
+    | {
+        date?: T;
+        startTime?: T;
+        endTime?: T;
+        id?: T;
+      };
   eventTag?: T;
   signupUrl?: T;
   location?: T;
@@ -699,6 +736,7 @@ export interface EventsSelect<T extends boolean = true> {
     | {
         title?: T;
         date?: T;
+        endTime?: T;
         description?: T;
         location?: T;
         id?: T;
@@ -727,6 +765,7 @@ export interface RocketsSelect<T extends boolean = true> {
   slug?: T;
   imageMedia?: T;
   image?: T;
+  imagePosition?: T;
   description?: T;
   featured?: T;
   launchedAt?: T;
@@ -798,6 +837,7 @@ export interface WhatWeDoSelect<T extends boolean = true> {
   body?: T;
   imageMedia?: T;
   image?: T;
+  imagePosition?: T;
   variant?: T;
   order?: T;
   updatedAt?: T;
@@ -814,6 +854,7 @@ export interface JourneyItemsSelect<T extends boolean = true> {
   body?: T;
   imageMedia?: T;
   image?: T;
+  imagePosition?: T;
   variant?: T;
   order?: T;
   updatedAt?: T;

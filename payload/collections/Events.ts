@@ -97,8 +97,61 @@ export const Events: CollectionConfig = {
       required: true,
       admin: {
         date: { pickerAppearance: "dayAndTime", timeFormat: "HH:mm" },
-        description: "When the event starts.",
+        description:
+          "When the event starts. For an event running over more than one day, this is the first day.",
       },
+    },
+    {
+      name: "endTime",
+      type: "date",
+      required: false,
+      label: "End time",
+      admin: {
+        date: { pickerAppearance: "timeOnly", timeFormat: "HH:mm" },
+        description:
+          "Optional. When the event finishes that day. Leave empty and the page shows a start time only.",
+      },
+    },
+    {
+      name: "extraDates",
+      type: "array",
+      required: false,
+      label: "Extra days",
+      labels: { singular: "Extra day", plural: "Extra days" },
+      admin: {
+        initCollapsed: true,
+        description:
+          "Optional. For one event that runs across more than one day, e.g. an open day on both the Saturday and the Sunday. Add each further day here and the page reads 'September 3 & 4'. For a workshop series with different content each week, use Sessions below instead.",
+      },
+      fields: [
+        {
+          name: "date",
+          type: "date",
+          required: true,
+          admin: {
+            date: { pickerAppearance: "dayOnly" },
+            description: "The further day this event also runs on.",
+          },
+        },
+        {
+          name: "startTime",
+          type: "date",
+          required: false,
+          admin: {
+            date: { pickerAppearance: "timeOnly", timeFormat: "HH:mm" },
+            description:
+              "Leave empty to run the same hours as the first day. Fill both in only if this day differs.",
+          },
+        },
+        {
+          name: "endTime",
+          type: "date",
+          required: false,
+          admin: {
+            date: { pickerAppearance: "timeOnly", timeFormat: "HH:mm" },
+          },
+        },
+      ],
     },
     {
       name: "eventTag",
@@ -134,6 +187,16 @@ export const Events: CollectionConfig = {
           required: true,
           admin: {
             date: { pickerAppearance: "dayAndTime", timeFormat: "HH:mm" },
+          },
+        },
+        {
+          name: "endTime",
+          type: "date",
+          required: false,
+          label: "End time",
+          admin: {
+            date: { pickerAppearance: "timeOnly", timeFormat: "HH:mm" },
+            description: "Optional. When this session finishes.",
           },
         },
         { name: "description", type: "textarea", required: false },

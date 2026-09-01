@@ -46,13 +46,17 @@ export default function RocketImageCycler({
           sizes="(max-width: 1024px) 100vw, 50vw"
           className="absolute inset-0 h-full w-full scale-110 object-cover opacity-30 blur-2xl"
         />
+        {/* Taller than a landscape hero needs, because rocket photos are
+            usually portrait — at h-96 a 2:3 photo rendered barely 256px wide.
+            Capped against the viewport so it still fits on screen. Same
+            treatment as the event hero. */}
         <ImageWithFallback
           src={current}
           alt={alt}
           width={1200}
-          height={900}
+          height={1500}
           sizes="(max-width: 1024px) 100vw, 50vw"
-          className="relative w-full h-96 object-contain"
+          className="relative w-full h-104 sm:h-128 lg:h-152 max-h-[75vh] object-contain"
         />
       </button>
 

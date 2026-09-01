@@ -7,6 +7,8 @@ import {
   findNextSessionIndex,
   formatDateLong,
   formatDateWithTime,
+  formatEventWhen,
+  formatTimeOfDay,
   isEventUpcoming,
   toSafeJsonLd,
 } from "@/lib/utils";
@@ -72,6 +74,16 @@ export default async function EventPage({ params }: EventPageProps) {
   const seriesStart = hasSessions ? sessions[0].date : event.date;
   const seriesEnd = hasSessions ? sessions[sessions.length - 1].date : null;
 
+  const when = formatEventWhen(event);
+
+  // Only a further day is a date that can stand as an end date. An end *time*
+  // is stored as a clock reading on an unrelated day, so publishing it here
+  // would put a wrong instant into search results.
+  const lastExtraDay =
+    event.extraDates.length > 0
+      ? event.extraDates[event.extraDates.length - 1].date
+      : null;
+
   const toPlace = (name: string | null | undefined) =>
     name ? { "@type": "Place", name, address: name } : undefined;
 
@@ -87,7 +99,7 @@ export default async function EventPage({ params }: EventPageProps) {
     name: event.title,
     description: event.description ?? undefined,
     startDate: seriesStart,
-    endDate: seriesEnd ?? undefined,
+    endDate: seriesEnd ?? lastExtraDay ?? undefined,
     eventStatus: "https://schema.org/EventScheduledStatus",
     eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
     location: toPlace(event.location),
@@ -143,16 +155,45 @@ export default async function EventPage({ params }: EventPageProps) {
                 </span>
               </div>
               <div className="space-y-2 mb-4 text-sm sm:text-base">
-                <p className="text-text-secondary leading-relaxed">
-                  <span className="text-primary font-semibold">
-                    {hasSessions ? "Runs:" : "Date:"}
-                  </span>{" "}
-                  {hasSessions
-                    ? `${formatDateLong(seriesStart)} – ${formatDateLong(
-                        seriesEnd ?? seriesStart,
-                      )} (${sessions.length} sessions)`
-                    : formatDateWithTime(event.date)}
-                </p>
+                {hasSessions ? (
+                  <p className="text-text-secondary leading-relaxed">
+                    <span className="text-primary font-semibold">Runs:</span>{" "}
+                    {`${formatDateLong(seriesStart)} – ${formatDateLong(
+                      seriesEnd ?? seriesStart,
+                    )} (${sessions.length} sessions)`}
+                  </p>
+                ) : (
+                  <>
+                    <p className="text-text-secondary leading-relaxed">
+                      <span className="text-primary font-semibold">Date:</span>{" "}
+                      {when.dateLabel}
+                    </p>
+                    {when.timeLabel && (
+                      <p className="text-text-secondary leading-relaxed">
+                        <span className="text-primary font-semibold">
+                          Time:
+                        </span>{" "}
+                        {when.timeLabel}
+                      </p>
+                    )}
+                    {/* Only reached when the days do not share their hours,
+                        which is the one case a single line cannot state. */}
+                    {when.schedule.length > 0 && (
+                      <div className="text-text-secondary leading-relaxed">
+                        <span className="text-primary font-semibold">
+                          Times:
+                        </span>
+                        <ul className="mt-1 space-y-1">
+                          {when.schedule.map((entry) => (
+                            <li key={entry.day}>
+                              {entry.day}: {entry.time}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </>
+                )}
                 <p className="text-text-secondary leading-relaxed">
                   <span className="text-primary font-semibold">Location:</span>{" "}
                   {event.location}
@@ -234,6 +275,9 @@ export default async function EventPage({ params }: EventPageProps) {
                       <span className="ml-auto flex items-center gap-3">
                         <span className="text-sm text-text-secondary">
                           {formatDateWithTime(session.date)}
+                          {session.endTime
+                            ? ` – ${formatTimeOfDay(session.endTime)}`
+                            : ""}
                         </span>
                         <svg
                           className="h-4 w-4 shrink-0 text-text-muted transition-transform duration-200 group-open:rotate-90"

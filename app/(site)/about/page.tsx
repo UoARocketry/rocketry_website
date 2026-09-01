@@ -123,6 +123,7 @@ export default async function AboutPage() {
                 <FeatureCard
                   key={w.title}
                   image={w.image ?? undefined}
+                  imagePosition={w.imagePosition}
                   imageAlt={w.title}
                   title={w.title}
                   centered={true}
@@ -159,6 +160,7 @@ export default async function AboutPage() {
                 <FeatureCard
                   key={j.title}
                   image={j.image ?? undefined}
+                  imagePosition={j.imagePosition}
                   imageAlt={j.title}
                   title={j.title}
                   showImagePlaceholder={true}
