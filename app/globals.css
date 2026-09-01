@@ -1,5 +1,22 @@
 @import "tailwindcss";
 
+/*
+ * Tailwind 4 compiles `hover:` and `group-hover:` inside `@media (hover: hover)`
+ * so hover styles cannot stick after a tap on touch devices.
+ *
+ * That breaks a large class of real users: on a Windows laptop with a
+ * touchscreen, Chrome reports the primary pointer as coarse, the media query
+ * fails, and every hover effect on the site silently does nothing — even
+ * though the person is using a mouse and `:hover` matches. Firefox reports
+ * hover-capable on the same hardware, which is what made it look
+ * browser-specific.
+ *
+ * Restoring the plain `&:hover` variant. Our hover styles are decorative
+ * (a lift, an image zoom, a gradient wash), so a state lingering after a tap
+ * is a far smaller cost than hover being dead on touchscreen laptops.
+ */
+@custom-variant hover (&:hover);
+
 @theme inline {
   /* Background colors for alternating sections - more contrast */
   --color-background: #0a0a0a;
