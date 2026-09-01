@@ -617,6 +617,45 @@ export async function getRocketBySlug(
   return getRocketBySlugCached(slug);
 }
 
+/**
+ * Draft-aware loaders used only by the admin preview flow.
+ *
+ * Deliberately NOT wrapped in `unstable_cache`, and deliberately not filtered
+ * by `_status`. Caching these would put unpublished content into the shared
+ * public cache, where the next anonymous visitor could be served it. They
+ * always hit the database, and are only ever reached when Next's draft mode
+ * cookie is set, which `/preview` only issues to an authenticated Payload user.
+ */
+export async function getRocketBySlugDraft(
+  slug: string,
+): Promise<RocketDetail | null> {
+  const payload = await getPayloadClient();
+  const result = await payload.find({
+    collection: "rockets",
+    draft: true,
+    limit: 1,
+    where: { slug: { equals: slug } },
+  });
+
+  const doc = result.docs[0];
+  return doc ? mapRocketDetail(doc as PayloadRocket) : null;
+}
+
+export async function getEventBySlugDraft(
+  slug: string,
+): Promise<EventDetail | null> {
+  const payload = await getPayloadClient();
+  const result = await payload.find({
+    collection: "events",
+    draft: true,
+    limit: 1,
+    where: { slug: { equals: slug } },
+  });
+
+  const doc = result.docs[0];
+  return doc ? mapEvent(doc as PayloadEvent) : null;
+}
+
 export async function getEventBySlug(
   slug: string,
 ): Promise<EventDetail | null> {

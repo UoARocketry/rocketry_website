@@ -7,7 +7,7 @@ import {
 } from "../hooks/revalidation.ts";
 import { createMediaRelationUrlSyncHook } from "../hooks/media-url-sync.ts";
 import { createImagePairFields } from "../fields/image-pair.ts";
-import { createSlugField } from "../fields/slug.ts";
+import { createPreviewUrl, createSlugField } from "../fields/slug.ts";
 import { validateOptionalUrl } from "../fields/validators.ts";
 
 export const Events: CollectionConfig = {
@@ -18,6 +18,7 @@ export const Events: CollectionConfig = {
     group: "Events",
     description:
       "Everything listed on the Events page, newest first. Unpublished drafts appear at the top and are not visible on the site.",
+    preview: createPreviewUrl("events"),
   },
   defaultSort: ["_status", "-date"],
   versions: {

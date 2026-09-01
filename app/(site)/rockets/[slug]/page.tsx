@@ -1,22 +1,36 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
-import { getRocketBySlug } from "@/lib/site-data";
+import { getRocketBySlug, getRocketBySlugDraft } from "@/lib/site-data";
 import { formatDateShort, getRocketStatus } from "@/lib/utils";
 import StatusBadgePill, {
   rocketStatusBadge,
 } from "@/components/ui/status-badge";
+import DraftBanner from "@/components/ui/draft-banner";
 import RocketImageCycler from "@/components/ui/rocket-image-cycler";
 
 interface RocketPageProps {
   readonly params: Promise<{ slug: string }>;
 }
 
+/**
+ * Draft mode is only ever set by `/preview`, which requires a signed-in Payload
+ * user. Everyone else takes the cached published path.
+ */
+async function loadRocket(slug: string) {
+  const { isEnabled } = await draftMode();
+
+  return isEnabled
+    ? { rocket: await getRocketBySlugDraft(slug), isDraft: true }
+    : { rocket: await getRocketBySlug(slug), isDraft: false };
+}
+
 export async function generateMetadata({
   params,
 }: RocketPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const rocket = await getRocketBySlug(slug);
+  const { rocket } = await loadRocket(slug);
 
   if (!rocket) {
     return {};
@@ -42,7 +56,7 @@ export async function generateMetadata({
 
 export default async function RocketPage({ params }: RocketPageProps) {
   const { slug } = await params;
-  const rocket = await getRocketBySlug(slug);
+  const { rocket, isDraft } = await loadRocket(slug);
 
   if (!rocket) {
     notFound();
@@ -54,6 +68,7 @@ export default async function RocketPage({ params }: RocketPageProps) {
 
   return (
     <main className="min-h-screen max-w-7xl mx-auto pb-16">
+      {isDraft && <DraftBanner returnTo={`/rockets/${slug}`} />}
       <section className="max-w-7xl mx-auto pt-16 pb-8 px-4">
         <div className="mb-6">
           <Link

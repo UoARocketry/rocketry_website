@@ -7,7 +7,7 @@ import {
 } from "../hooks/revalidation.ts";
 import { createMediaRelationUrlSyncHook } from "../hooks/media-url-sync.ts";
 import { createImagePairFields } from "../fields/image-pair.ts";
-import { createSlugField } from "../fields/slug.ts";
+import { createPreviewUrl, createSlugField } from "../fields/slug.ts";
 
 export const Rockets: CollectionConfig = {
   slug: "rockets",
@@ -17,6 +17,7 @@ export const Rockets: CollectionConfig = {
     group: "Rockets",
     description:
       "Every rocket shown on the Rockets page. Leave the launch date empty while one is still in development.",
+    preview: createPreviewUrl("rockets"),
   },
   defaultSort: ["_status", "-launchedAt"],
   versions: {

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
-import { getEventBySlug } from "@/lib/site-data";
+import { getEventBySlug, getEventBySlugDraft } from "@/lib/site-data";
 import {
   findNextSessionIndex,
   formatDateLong,
@@ -10,17 +11,30 @@ import {
   toSafeJsonLd,
 } from "@/lib/utils";
 import { PLACEHOLDER_IMAGE } from "@/lib/constants";
+import DraftBanner from "@/components/ui/draft-banner";
 import EventHeroImage from "@/components/ui/event-hero-image";
 
 interface EventPageProps {
   readonly params: Promise<{ slug: string }>;
 }
 
+/**
+ * Draft mode is only ever set by `/preview`, which requires a signed-in Payload
+ * user. Everyone else takes the cached published path.
+ */
+async function loadEvent(slug: string) {
+  const { isEnabled } = await draftMode();
+
+  return isEnabled
+    ? { event: await getEventBySlugDraft(slug), isDraft: true }
+    : { event: await getEventBySlug(slug), isDraft: false };
+}
+
 export async function generateMetadata({
   params,
 }: EventPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const event = await getEventBySlug(slug);
+  const { event } = await loadEvent(slug);
 
   if (!event) {
     return {};
@@ -46,7 +60,7 @@ export async function generateMetadata({
 
 export default async function EventPage({ params }: EventPageProps) {
   const { slug } = await params;
-  const event = await getEventBySlug(slug);
+  const { event, isDraft } = await loadEvent(slug);
 
   if (!event) {
     notFound();
@@ -96,6 +110,7 @@ export default async function EventPage({ params }: EventPageProps) {
 
   return (
     <main className="min-h-screen max-w-7xl mx-auto pb-16">
+      {isDraft && <DraftBanner returnTo={`/events/${slug}`} />}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: toSafeJsonLd(eventJsonLd) }}

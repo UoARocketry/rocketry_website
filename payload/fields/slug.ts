@@ -1,4 +1,22 @@
-import type { Field } from "payload";
+import type { Field, GeneratePreviewURL } from "payload";
+
+/**
+ * Builds the "Preview" button target for a slug-addressed collection.
+ *
+ * Points at `/preview`, which checks the Payload session before turning on
+ * Next's draft mode, so the button cannot be used to expose drafts to anyone
+ * who is not signed in to the admin.
+ */
+export function createPreviewUrl(collection: string): GeneratePreviewURL {
+  return (doc) => {
+    const slug = typeof doc?.slug === "string" ? doc.slug : "";
+    if (!slug) {
+      return null;
+    }
+
+    return `/preview?collection=${collection}&slug=${encodeURIComponent(slug)}`;
+  };
+}
 
 /**
  * Converts a human title into the URL segment used by `/events/<slug>` and
