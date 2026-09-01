@@ -182,6 +182,7 @@ function mapRocket(doc: PayloadRocket): RocketSummary {
     imagePosition: doc.imagePosition ?? null,
     description: doc.description ?? null,
     launchedAt: doc.launchedAt ?? null,
+    launchVideoUrl: doc.launchVideoUrl ?? null,
     featured: doc.featured ?? false,
     status: doc._status ?? null,
   };

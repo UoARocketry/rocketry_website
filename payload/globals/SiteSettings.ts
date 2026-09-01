@@ -4,7 +4,7 @@ import { isLoggedIn, isPublicRead } from "../access/policies.ts";
 import { createMediaRelationUrlSyncHook } from "../hooks/media-url-sync.ts";
 import { createImagePairFields } from "../fields/image-pair.ts";
 import { revalidatePaths, revalidateTags } from "../hooks/revalidation.ts";
-import { validateOptionalUrl } from "../fields/validators.ts";
+import { urlFieldHooks, validateOptionalUrl } from "../fields/validators.ts";
 
 export const SiteSettings: GlobalConfig = {
   slug: "site-settings",
@@ -50,6 +50,7 @@ export const SiteSettings: GlobalConfig = {
               name: "memberJoinUrl",
               type: "text",
               required: false,
+              hooks: urlFieldHooks,
               validate: (value: unknown) =>
                 validateOptionalUrl(value, "Member join URL"),
               admin: {
@@ -61,6 +62,7 @@ export const SiteSettings: GlobalConfig = {
               name: "discordUrl",
               type: "text",
               required: false,
+              hooks: urlFieldHooks,
               validate: (value: unknown) =>
                 validateOptionalUrl(value, "Discord URL"),
               admin: {
@@ -72,6 +74,7 @@ export const SiteSettings: GlobalConfig = {
               name: "instagramUrl",
               type: "text",
               required: false,
+              hooks: urlFieldHooks,
               validate: (value: unknown) =>
                 validateOptionalUrl(value, "Instagram URL"),
             },
@@ -79,6 +82,7 @@ export const SiteSettings: GlobalConfig = {
               name: "linkedinUrl",
               type: "text",
               required: false,
+              hooks: urlFieldHooks,
               validate: (value: unknown) =>
                 validateOptionalUrl(value, "LinkedIn URL"),
             },

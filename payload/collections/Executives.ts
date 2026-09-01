@@ -8,7 +8,7 @@ import {
 import { createMediaRelationUrlSyncHook } from "../hooks/media-url-sync.ts";
 import { createOrderCollisionHook } from "../hooks/order-collision.ts";
 import { createImagePairFields } from "../fields/image-pair.ts";
-import { validateOptionalUrl } from "../fields/validators.ts";
+import { urlFieldHooks, validateOptionalUrl } from "../fields/validators.ts";
 
 export const Executives: CollectionConfig = {
   slug: "executives",
@@ -118,6 +118,7 @@ export const Executives: CollectionConfig = {
       name: "linkedinUrl",
       type: "text",
       required: false,
+      hooks: urlFieldHooks,
       validate: (value: unknown) => validateOptionalUrl(value, "LinkedIn URL"),
     },
   ],

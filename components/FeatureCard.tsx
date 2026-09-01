@@ -97,7 +97,7 @@ export default function FeatureCard(props: Props) {
         )}
         {subtitle && <p className="text-text-secondary mb-3">{subtitle}</p>}
         {children && (
-          <div className="text-text-secondary text-sm leading-relaxed">
+          <div className="whitespace-pre-line text-text-secondary text-sm leading-relaxed">
             {children}
           </div>
         )}

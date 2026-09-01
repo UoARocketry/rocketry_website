@@ -257,7 +257,7 @@ export default async function AboutPage() {
                   title={t.title}
                   variant={t.variant as "surface" | "background"}
                 >
-                  <p className="mb-4">{t.body}</p>
+                  <p className="mb-4 whitespace-pre-line">{t.body}</p>
                   {t.bullets && (
                     <ul className="text-text-secondary text-sm space-y-2">
                       {t.bullets.map((b, i) => (

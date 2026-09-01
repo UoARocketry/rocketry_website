@@ -1,5 +1,9 @@
 import type { Field } from "payload";
-import { validateOptionalUrl, validateUrlOrUpload } from "./validators.ts";
+import {
+  urlFieldHooks,
+  validateOptionalUrl,
+  validateUrlOrUpload,
+} from "./validators.ts";
 
 /**
  * Adds a drag-to-position, zoom-to-reframe control for images the site crops
@@ -122,6 +126,7 @@ export function createImagePairFields({
           !(siblingData as Record<string, unknown> | undefined)?.[uploadName],
         description: `Only needed if you are linking an image hosted somewhere else instead of uploading one. Choose a file above and this disappears.`,
       },
+      hooks: urlFieldHooks,
       validate: required
         ? (value: unknown, { siblingData }: { siblingData: unknown }) =>
             validateUrlOrUpload(value, siblingData, uploadName, label)

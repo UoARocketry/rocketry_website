@@ -70,7 +70,7 @@ export default function ExecCard({
         <p className="text-primary text-sm font-medium mb-3">{exec.role}</p>
       )}
       {exec.bio && (
-        <p className="text-text-secondary text-sm leading-relaxed">
+        <p className="whitespace-pre-line text-text-secondary text-sm leading-relaxed">
           {exec.bio}
         </p>
       )}

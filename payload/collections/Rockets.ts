@@ -8,6 +8,7 @@ import {
 import { createMediaRelationUrlSyncHook } from "../hooks/media-url-sync.ts";
 import { createImagePairFields } from "../fields/image-pair.ts";
 import { createPreviewUrl, createSlugField } from "../fields/slug.ts";
+import { urlFieldHooks, validateOptionalUrl } from "../fields/validators.ts";
 
 export const Rockets: CollectionConfig = {
   slug: "rockets",
@@ -107,6 +108,19 @@ export const Rockets: CollectionConfig = {
       },
     }),
     { name: "description", type: "textarea", required: false },
+    {
+      name: "launchVideoUrl",
+      type: "text",
+      label: "Launch video URL",
+      required: false,
+      admin: {
+        description:
+          "Optional. A YouTube, Instagram or Drive link to the launch footage. Shown as a 'Watch the launch' button on the rocket's page. Leave empty and no button appears.",
+      },
+      hooks: urlFieldHooks,
+      validate: (value: unknown) =>
+        validateOptionalUrl(value, "Launch video URL"),
+    },
     {
       name: "featured",
       type: "checkbox",

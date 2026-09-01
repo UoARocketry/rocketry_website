@@ -8,7 +8,7 @@ import {
 import { createMediaRelationUrlSyncHook } from "../hooks/media-url-sync.ts";
 import { createImagePairFields } from "../fields/image-pair.ts";
 import { createPreviewUrl, createSlugField } from "../fields/slug.ts";
-import { validateOptionalUrl } from "../fields/validators.ts";
+import { urlFieldHooks, validateOptionalUrl } from "../fields/validators.ts";
 
 export const Events: CollectionConfig = {
   slug: "events",
@@ -192,6 +192,7 @@ export const Events: CollectionConfig = {
         description:
           "Shown as a Sign Up button on the event page, for upcoming events only.",
       },
+      hooks: urlFieldHooks,
       validate: (value: unknown, { siblingData }: { siblingData: unknown }) => {
         const type = (siblingData as Record<string, unknown> | undefined)
           ?.signupType;

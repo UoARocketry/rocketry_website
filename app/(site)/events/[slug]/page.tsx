@@ -205,7 +205,7 @@ export default async function EventPage({ params }: EventPageProps) {
               </div>
             </div>
 
-            <p className="text-lg text-text-main leading-relaxed">
+            <p className="whitespace-pre-line text-lg text-text-main leading-relaxed">
               {event.description}
             </p>
 
@@ -321,7 +321,7 @@ export default async function EventPage({ params }: EventPageProps) {
                         </p>
                       )}
                       {session.description ? (
-                        <p className="text-sm text-text-secondary leading-relaxed">
+                        <p className="whitespace-pre-line text-sm text-text-secondary leading-relaxed">
                           {session.description}
                         </p>
                       ) : (

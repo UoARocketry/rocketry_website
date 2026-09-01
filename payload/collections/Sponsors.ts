@@ -3,7 +3,7 @@ import { isLoggedIn, isPublicRead } from "../access/policies.ts";
 import { createMediaRelationUrlSyncHook } from "../hooks/media-url-sync.ts";
 import { revalidatePaths, revalidateTags } from "../hooks/revalidation.ts";
 import { createImagePairFields } from "../fields/image-pair.ts";
-import { validateRequiredUrl } from "../fields/validators.ts";
+import { urlFieldHooks, validateRequiredUrl } from "../fields/validators.ts";
 
 export const Sponsors: CollectionConfig = {
   slug: "sponsors",
@@ -58,6 +58,7 @@ export const Sponsors: CollectionConfig = {
       name: "url",
       type: "text",
       required: true,
+      hooks: urlFieldHooks,
       validate: (value: unknown) => validateRequiredUrl(value, "Sponsor URL"),
       admin: { description: "The sponsor's own website, linked from their logo." },
     },

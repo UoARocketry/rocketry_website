@@ -328,6 +328,10 @@ export interface Rocket {
   imagePosition?: string | null;
   description?: string | null;
   /**
+   * Optional. A YouTube, Instagram or Drive link to the launch footage. Shown as a 'Watch the launch' button on the rocket's page. Leave empty and no button appears.
+   */
+  launchVideoUrl?: string | null;
+  /**
    * Tick to feature this rocket in the Featured Rockets section on the home page. Up to 3 are shown, next launch first. If none are ticked the home page falls back to the most recently launched rockets.
    */
   featured?: boolean | null;
@@ -780,6 +784,7 @@ export interface RocketsSelect<T extends boolean = true> {
   image?: T;
   imagePosition?: T;
   description?: T;
+  launchVideoUrl?: T;
   featured?: T;
   launchedAt?: T;
   specs?:

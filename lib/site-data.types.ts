@@ -7,6 +7,8 @@ export type RocketSummary = {
   imagePosition?: string | null;
   description?: string | null;
   launchedAt?: string | null;
+  /** Optional link to launch footage, shown as a button on the rocket's page. */
+  launchVideoUrl?: string | null;
   /** Editor-controlled: show this rocket in the home page's featured strip. */
   featured: boolean;
   /** Publish state. Only meaningful on the draft-aware preview path. */
