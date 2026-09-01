@@ -4,6 +4,7 @@ import {
   formatDateShort,
   formatDateWithTime,
   formatEventWhen,
+  normalizeDayOnlyDate,
 } from "./utils.ts";
 
 /**
@@ -46,17 +47,54 @@ describe("date formatting on a UTC server", () => {
   });
 });
 
+describe("normalizeDayOnlyDate", () => {
+  /*
+   * Payload's day-only picker has no timezone to record, so it anchors the
+   * date at noon UTC. Read in Auckland that lands on the *following* calendar
+   * day, which is how "the 20th" was saving as "the 21st". Normalising to
+   * midnight UTC puts it at midday in Auckland, so every reader downstream can
+   * keep using the site's pinned timezone and still get the right day.
+   */
+  it("keeps a day-only date on its own day when read in Auckland", () => {
+    const normalized = normalizeDayOnlyDate("2026-09-19T12:00:00.000Z");
+
+    expect(
+      new Date(normalized).toLocaleDateString("en-US", {
+        timeZone: "Pacific/Auckland",
+      }),
+    ).toBe("9/19/2026");
+  });
+
+  it("keeps it on the same day when read in UTC too", () => {
+    const normalized = normalizeDayOnlyDate("2026-09-19T12:00:00.000Z");
+
+    expect(
+      new Date(normalized).toLocaleDateString("en-US", { timeZone: "UTC" }),
+    ).toBe("9/19/2026");
+  });
+
+  it("survives a date that has already been normalised", () => {
+    const once = normalizeDayOnlyDate("2026-09-19T12:00:00.000Z");
+    expect(normalizeDayOnlyDate(once)).toBe(once);
+  });
+
+  it("returns an empty string for anything unparseable", () => {
+    expect(normalizeDayOnlyDate("not-a-date")).toBe("");
+    expect(normalizeDayOnlyDate("")).toBe("");
+  });
+});
+
 /*
  * Instants below are UTC, annotated with the Auckland wall-clock time an
- * editor would have typed to produce them. Extra days are stored by the
- * day-only picker as midnight, hence the T12:00Z values in September.
+ * editor would have typed to produce them. Day-only values appear in their
+ * normalised form (midnight UTC), which is what the CMS mapper hands over.
  */
 const SEP_3_NOON = "2026-09-03T00:00:00.000Z";
 const SEP_3_3PM = "2026-09-03T03:00:00.000Z";
-const SEP_4 = "2026-09-03T12:00:00.000Z";
+const SEP_4 = "2026-09-04T00:00:00.000Z";
 const SEP_4_9AM = "2026-09-03T21:00:00.000Z";
 const SEP_4_10AM = "2026-09-03T22:00:00.000Z";
-const SEP_5 = "2026-09-04T12:00:00.000Z";
+const SEP_5 = "2026-09-05T00:00:00.000Z";
 
 describe("formatEventWhen", () => {
   it("puts the weekday on a one-day event, which has room for it", () => {
@@ -112,7 +150,7 @@ describe("formatEventWhen", () => {
     const when = formatEventWhen({
       // Noon on 30 September, then 1 October.
       date: "2026-09-29T23:00:00.000Z",
-      extraDates: [{ date: "2026-09-30T11:00:00.000Z" }],
+      extraDates: [{ date: "2026-10-01T00:00:00.000Z" }],
     });
 
     expect(when.dateLabel).toBe("September 30 & October 1, 2026");
@@ -122,7 +160,7 @@ describe("formatEventWhen", () => {
     const when = formatEventWhen({
       // Noon on 31 December 2026, then 1 January 2027.
       date: "2026-12-30T23:00:00.000Z",
-      extraDates: [{ date: "2026-12-31T11:00:00.000Z" }],
+      extraDates: [{ date: "2027-01-01T00:00:00.000Z" }],
     });
 
     expect(when.dateLabel).toBe("December 31, 2026 & January 1, 2027");

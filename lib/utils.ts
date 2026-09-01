@@ -31,6 +31,32 @@ function toValidDate(value: string | Date): Date | null {
 
 export const ALL_EVENTS_TAG = "all";
 
+/**
+ * Re-anchors a date that carries no time of day.
+ *
+ * Payload's day-only picker has no timezone to record, so it stores the chosen
+ * date at noon UTC. Read back in Auckland that is already the *following*
+ * calendar day, which is why picking the 20th displayed the 21st. Everything
+ * else on the site is a real instant and must be read in Auckland, so rather
+ * than thread a timezone through every formatter, a day-only value is moved to
+ * midnight UTC — midday in Auckland, and therefore the same calendar day in
+ * both zones.
+ *
+ * Idempotent, so a value that has already been through here is unchanged.
+ */
+export function normalizeDayOnlyDate(value: string | Date): string {
+  const parsed = toValidDate(value);
+  if (!parsed) return "";
+
+  return new Date(
+    Date.UTC(
+      parsed.getUTCFullYear(),
+      parsed.getUTCMonth(),
+      parsed.getUTCDate(),
+    ),
+  ).toISOString();
+}
+
 export function toSafeJsonLd(data: unknown): string {
   // JSON.stringify doesn't escape "<", so a literal "</script>" inside a
   // string field (e.g. an admin-entered title) would break out of the

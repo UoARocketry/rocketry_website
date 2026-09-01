@@ -16,6 +16,7 @@ import { getPayloadClient } from "@/lib/payload";
 import {
   getRocketStatus,
   isEventUpcoming,
+  normalizeDayOnlyDate,
   sortByDate,
   sortRockets,
 } from "@/lib/utils";
@@ -242,7 +243,9 @@ function mapEvent(doc: PayloadEvent): EventSummary {
     sortByDate(
       (rows ?? [])
         .map((extra) => ({
-          date: normalizeEventDate(extra.date),
+          // Day-only, so it needs re-anchoring before anything reads it in the
+          // site's timezone. The times beside it are real instants and do not.
+          date: extra.date ? normalizeDayOnlyDate(extra.date) : "",
           startTime: normalizeEventDate(extra.startTime) || null,
           endTime: normalizeEventDate(extra.endTime) || null,
         }))
