@@ -265,7 +265,7 @@ export interface Event {
   signupNote?: string | null;
   location?: string | null;
   /**
-   * Optional. For a multi-session series (e.g. Level 1 build workshops), add each session in the order they run. Leave empty for a normal one-off event.
+   * Optional. For a multi-session series (e.g. Level 1 build workshops), add each session. The site puts them in date order for you, so it does not matter what order you add them in. Leave empty for a normal one-off event.
    */
   sessions?:
     | {
@@ -275,6 +275,23 @@ export interface Event {
          * Optional. When this session finishes.
          */
         endTime?: string | null;
+        /**
+         * Optional. For a session that runs across more than one day, e.g. a build workshop held on both the Saturday and the Sunday. It still counts as one session.
+         */
+        extraDates?:
+          | {
+              /**
+               * The further day this session also runs on.
+               */
+              date: string;
+              /**
+               * Leave empty to run the same hours as the session's first day.
+               */
+              startTime?: string | null;
+              endTime?: string | null;
+              id?: string | null;
+            }[]
+          | null;
         description?: string | null;
         /**
          * Optional. Falls back to the event location above if left empty.
@@ -754,6 +771,14 @@ export interface EventsSelect<T extends boolean = true> {
         title?: T;
         date?: T;
         endTime?: T;
+        extraDates?:
+          | T
+          | {
+              date?: T;
+              startTime?: T;
+              endTime?: T;
+              id?: T;
+            };
         description?: T;
         location?: T;
         id?: T;

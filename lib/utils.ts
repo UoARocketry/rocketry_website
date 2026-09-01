@@ -79,6 +79,8 @@ type SessionLike = {
   readonly title?: string;
   readonly date: string;
   readonly endTime?: string | null;
+  /** A session can span days, exactly as the event itself can. */
+  readonly extraDates?: readonly ExtraDateLike[];
 };
 
 /** One further day of a multi-day event, with optional per-day hours. */
@@ -270,21 +272,59 @@ function formatDateWithWeekday(date: Date, locale: string): string {
   });
 }
 
-function getSortedSessionTimestamps(
-  sessions: readonly SessionLike[],
-): number[] {
-  return sessions
-    .map((session) => toValidDate(session.date)?.getTime())
-    .filter((timestamp): timestamp is number => typeof timestamp === "number")
-    .sort((a, b) => a - b);
-}
-
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-function getExtraDateTimestamps(event: EventLike): number[] {
-  return (event.extraDates ?? [])
+function getExtraDateTimestamps(
+  source: { readonly extraDates?: readonly ExtraDateLike[] } | undefined,
+): number[] {
+  return (source?.extraDates ?? [])
     .map((extra) => toValidDate(extra.date)?.getTime())
     .filter((timestamp): timestamp is number => typeof timestamp === "number");
+}
+
+/**
+ * Puts dated entries in chronological order without mutating the input.
+ *
+ * Entries whose date will not parse keep their position rather than being
+ * dropped, so a half-filled row in the CMS stays visible to whoever has to
+ * fix it instead of silently disappearing from the page.
+ */
+export function sortByDate<T extends { readonly date: string }>(
+  items: readonly T[],
+): T[] {
+  return [...items].sort((a, b) => {
+    const left = toValidDate(a.date)?.getTime();
+    const right = toValidDate(b.date)?.getTime();
+
+    if (typeof left !== "number" || typeof right !== "number") return 0;
+    return left - right;
+  });
+}
+
+/**
+ * When a session starts and when its last day is over.
+ *
+ * A session is no longer a single instant: like the event itself it can run
+ * across several days, so "has it finished" has to look at its final day
+ * rather than its start. Extra days come from a day-only picker, hence the
+ * same "runs until the next midnight" rule the event uses.
+ */
+type SessionSpan = { start: number; end: number };
+
+function getSessionSpans(sessions: readonly SessionLike[]): SessionSpan[] {
+  return sessions
+    .map((session) => {
+      const start = toValidDate(session.date)?.getTime();
+      if (typeof start !== "number") return null;
+
+      const extras = getExtraDateTimestamps(session).map(
+        (timestamp) => timestamp + DAY_MS,
+      );
+
+      return { start, end: Math.max(start, ...extras) };
+    })
+    .filter((span): span is SessionSpan => span !== null)
+    .sort((a, b) => a.start - b.start);
 }
 
 /**
@@ -294,15 +334,19 @@ function getExtraDateTimestamps(event: EventLike): number[] {
  * own date rather than adding to it. A plain multi-day event instead lists its
  * first day as `date` and the rest as extra days.
  */
-function getOccurrenceTimestamps(event: EventLike): number[] {
-  const sessions = getSortedSessionTimestamps(event.sessions ?? []);
+function getOccurrenceSpans(event: EventLike): SessionSpan[] {
+  const sessions = getSessionSpans(event.sessions ?? []);
   if (sessions.length > 0) return sessions;
 
   const start = toValidDate(event.date)?.getTime();
 
-  return [...(typeof start === "number" ? [start] : []), ...getExtraDateTimestamps(event)].sort(
-    (a, b) => a - b,
-  );
+  return [
+    ...(typeof start === "number" ? [{ start, end: start }] : []),
+    ...getExtraDateTimestamps(event).map((timestamp) => ({
+      start: timestamp,
+      end: timestamp + DAY_MS,
+    })),
+  ].sort((a, b) => a.start - b.start);
 }
 
 /**
@@ -314,18 +358,18 @@ export function formatEventCardDate(
   event: EventLike,
   locale = DEFAULT_LOCALE,
 ): string {
-  const timestamps = getOccurrenceTimestamps(event);
+  const spans = getOccurrenceSpans(event);
 
-  if (timestamps.length === 0) {
+  if (spans.length === 0) {
     return formatDateShort(event.date, locale);
   }
 
   const now = Date.now();
-  const nextTimestamp =
-    timestamps.find((timestamp) => timestamp >= now) ??
-    timestamps[timestamps.length - 1];
+  // Selected on when it finishes, so a session part-way through its run is
+  // still "next", but shown by when it starts, which is the date on the poster.
+  const next = spans.find((span) => span.end >= now) ?? spans[spans.length - 1];
 
-  return formatDateShort(new Date(nextTimestamp), locale);
+  return formatDateShort(new Date(next.start), locale);
 }
 
 /**
@@ -337,27 +381,31 @@ export function formatEventCardDate(
  * it. Once finished it reports the total instead.
  */
 export function formatEventSessionsLabel(event: EventLike): string | null {
-  const timestamps = getSortedSessionTimestamps(event.sessions ?? []);
+  const spans = getSessionSpans(event.sessions ?? []);
 
-  if (timestamps.length < 2) {
+  if (spans.length < 2) {
     return null;
   }
 
   const now = Date.now();
-  const remaining = timestamps.filter((timestamp) => timestamp >= now).length;
+  // A session spanning two days is one session, so this counts sessions still
+  // to finish rather than days still to run.
+  const remaining = spans.filter((span) => span.end >= now).length;
 
   return remaining > 0
-    ? `Sessions: ${remaining} of ${timestamps.length} left`
-    : `Sessions: ${timestamps.length} total`;
+    ? `Sessions: ${remaining} of ${spans.length} left`
+    : `Sessions: ${spans.length} total`;
 }
 
 /** True while any part of the event (or series) is still in the future. */
 export function isEventUpcoming(event: EventLike): boolean {
-  const sessions = getSortedSessionTimestamps(event.sessions ?? []);
+  const sessions = getSessionSpans(event.sessions ?? []);
   const now = Date.now();
 
   if (sessions.length > 0) {
-    return sessions[sessions.length - 1] >= now;
+    // Spans are ordered by when they start, and the one starting last is not
+    // necessarily the one finishing last.
+    return Math.max(...sessions.map((span) => span.end)) >= now;
   }
 
   const start = toValidDate(event.date)?.getTime();
@@ -374,14 +422,27 @@ export function isEventUpcoming(event: EventLike): boolean {
   return ends.length > 0 && Math.max(...ends) >= now;
 }
 
-/** Index of the next session still to run, or -1 when the series has finished. */
+/**
+ * Index of the next session still to run, or -1 when the series has finished.
+ *
+ * Keyed on when a session *finishes*, so a two-day session that started
+ * yesterday and runs again tomorrow is still the one coming up rather than
+ * being marked complete on its opening day.
+ */
 export function findNextSessionIndex(
   sessions: readonly SessionLike[],
 ): number {
   const now = Date.now();
+
   return sessions.findIndex((session) => {
-    const parsed = toValidDate(session.date);
-    return parsed ? parsed.getTime() >= now : false;
+    const start = toValidDate(session.date)?.getTime();
+    if (typeof start !== "number") return false;
+
+    const extras = getExtraDateTimestamps(session).map(
+      (timestamp) => timestamp + DAY_MS,
+    );
+
+    return Math.max(start, ...extras) >= now;
   });
 }
 

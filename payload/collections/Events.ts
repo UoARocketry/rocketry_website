@@ -234,7 +234,7 @@ export const Events: CollectionConfig = {
       admin: {
         initCollapsed: true,
         description:
-          "Optional. For a multi-session series (e.g. Level 1 build workshops), add each session in the order they run. Leave empty for a normal one-off event.",
+          "Optional. For a multi-session series (e.g. Level 1 build workshops), add each session. The site puts them in date order for you, so it does not matter what order you add them in. Leave empty for a normal one-off event.",
       },
       fields: [
         { name: "title", type: "text", required: true },
@@ -255,6 +255,47 @@ export const Events: CollectionConfig = {
             date: { pickerAppearance: "timeOnly", timeFormat: "HH:mm" },
             description: "Optional. When this session finishes.",
           },
+        },
+        {
+          name: "extraDates",
+          type: "array",
+          required: false,
+          label: "Extra days",
+          labels: { singular: "Extra day", plural: "Extra days" },
+          admin: {
+            initCollapsed: true,
+            description:
+              "Optional. For a session that runs across more than one day, e.g. a build workshop held on both the Saturday and the Sunday. It still counts as one session.",
+          },
+          fields: [
+            {
+              name: "date",
+              type: "date",
+              required: true,
+              admin: {
+                date: { pickerAppearance: "dayOnly" },
+                description: "The further day this session also runs on.",
+              },
+            },
+            {
+              name: "startTime",
+              type: "date",
+              required: false,
+              admin: {
+                date: { pickerAppearance: "timeOnly", timeFormat: "HH:mm" },
+                description:
+                  "Leave empty to run the same hours as the session's first day.",
+              },
+            },
+            {
+              name: "endTime",
+              type: "date",
+              required: false,
+              admin: {
+                date: { pickerAppearance: "timeOnly", timeFormat: "HH:mm" },
+              },
+            },
+          ],
         },
         { name: "description", type: "textarea", required: false },
         {

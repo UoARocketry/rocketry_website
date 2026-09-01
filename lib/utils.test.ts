@@ -5,6 +5,7 @@ import {
   formatEventSessionsLabel,
   getRocketStatus,
   isEventUpcoming,
+  sortByDate,
   sortRockets,
 } from "./utils.ts";
 
@@ -18,6 +19,17 @@ const future = (day: number) => ({
   title: `Future ${day}`,
   date: `2026-07-${String(day).padStart(2, "0")}T12:00:00.000Z`,
 });
+
+// Asserts which date was picked without hard-coding a formatted string. The
+// timezone is pinned to the one the site renders in, so this says the same
+// thing on a New Zealand laptop and on a UTC build machine.
+const expectDate = (actual: string, source: string) => {
+  expect(actual).toBe(
+    new Date(source).toLocaleDateString("en-US", {
+      timeZone: "Pacific/Auckland",
+    }),
+  );
+};
 
 beforeEach(() => {
   vi.useFakeTimers();
@@ -98,6 +110,67 @@ describe("isEventUpcoming", () => {
   });
 });
 
+describe("sortByDate", () => {
+  it("puts shuffled entries in chronological order", () => {
+    const sorted = sortByDate([future(8), past(2), future(1)]);
+    expect(sorted.map((entry) => entry.title)).toEqual([
+      "Past 2",
+      "Future 1",
+      "Future 8",
+    ]);
+  });
+
+  it("does not mutate the array it was given", () => {
+    const original = [future(8), future(1)];
+    sortByDate(original);
+    expect(original[0].title).toBe("Future 8");
+  });
+
+  it("keeps unparseable dates rather than dropping them", () => {
+    const sorted = sortByDate([
+      { title: "Broken", date: "not-a-date" },
+      future(1),
+    ]);
+    expect(sorted).toHaveLength(2);
+  });
+});
+
+describe("multi-day sessions", () => {
+  // A session that started yesterday and runs again tomorrow. Its own date is
+  // in the past, so anything keying off the start alone calls it finished.
+  const inProgress = {
+    title: "Two-day workshop",
+    date: past(14).date,
+    extraDates: [{ date: future(1).date }],
+  };
+
+  it("keeps an event upcoming while a session's later day is still to come", () => {
+    expect(
+      isEventUpcoming({ date: past(20).date, sessions: [inProgress] }),
+    ).toBe(true);
+  });
+
+  it("treats a session still running as the next one up", () => {
+    expect(findNextSessionIndex([past(2), inProgress])).toBe(1);
+  });
+
+  it("counts a two-day session once, not once per day", () => {
+    expect(
+      formatEventSessionsLabel({
+        date: past(20).date,
+        sessions: [inProgress, future(8)],
+      }),
+    ).toBe("Sessions: 2 of 2 left");
+  });
+
+  it("shows the start of a session that is part-way through", () => {
+    expectDate(
+      formatEventCardDate({ date: past(20).date, sessions: [inProgress] }),
+      past(14).date,
+    );
+  });
+});
+
 describe("findNextSessionIndex", () => {
   it("finds the first session still to run", () => {
     expect(findNextSessionIndex([past(2), past(10), future(1)])).toBe(2);
@@ -113,17 +186,6 @@ describe("findNextSessionIndex", () => {
 });
 
 describe("formatEventCardDate", () => {
-  // Asserts which session was picked without hard-coding a formatted date.
-  // The timezone is pinned to the one the site renders in, so this says the
-  // same thing on a New Zealand laptop and on a UTC build machine.
-  const expectDate = (actual: string, source: string) => {
-    expect(actual).toBe(
-      new Date(source).toLocaleDateString("en-US", {
-        timeZone: "Pacific/Auckland",
-      }),
-    );
-  };
-
   it("falls back to the event date when there are no sessions", () => {
     expectDate(formatEventCardDate({ date: future(1).date }), future(1).date);
   });

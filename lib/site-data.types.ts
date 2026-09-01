@@ -31,6 +31,8 @@ export type EventSession = {
   date: string;
   /** Only the clock part is used. Null when the session has no stated finish. */
   endTime?: string | null;
+  /** Further days this one session runs on. It still counts as one session. */
+  extraDates: EventExtraDate[];
   description?: string | null;
   location?: string | null;
 };

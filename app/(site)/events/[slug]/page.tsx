@@ -6,9 +6,7 @@ import { getEventBySlug, getEventBySlugDraft } from "@/lib/site-data";
 import {
   findNextSessionIndex,
   formatDateLong,
-  formatDateWithTime,
   formatEventWhen,
-  formatTimeOfDay,
   isEventUpcoming,
   toSafeJsonLd,
 } from "@/lib/utils";
@@ -254,6 +252,10 @@ export default async function EventPage({ params }: EventPageProps) {
               const isNext = sessionIndex === nextSessionIndex;
 
               const sessionLocation = session.location ?? event.location;
+              // A session has the same shape as an event's own "when", so it
+              // gets the same formatting: one day keeps its weekday, several
+              // collapse to "September 3 & 4" with the hours stated once.
+              const sessionWhen = formatEventWhen(session);
 
               return (
                 <li key={`${session.title}-${session.date}`}>
@@ -293,9 +295,9 @@ export default async function EventPage({ params }: EventPageProps) {
                       )}
                       <span className="ml-auto flex items-center gap-3">
                         <span className="text-sm text-text-secondary">
-                          {formatDateWithTime(session.date)}
-                          {session.endTime
-                            ? ` – ${formatTimeOfDay(session.endTime)}`
+                          {sessionWhen.dateLabel}
+                          {sessionWhen.timeLabel
+                            ? `, ${sessionWhen.timeLabel}`
                             : ""}
                         </span>
                         <svg
@@ -315,6 +317,17 @@ export default async function EventPage({ params }: EventPageProps) {
                       </span>
                     </summary>
                     <div className="px-5 pb-5 pl-15 space-y-1">
+                      {/* Only when the session's days do not share their hours,
+                          which the single summary line cannot express. */}
+                      {sessionWhen.schedule.length > 0 && (
+                        <ul className="mb-2 space-y-1 text-sm text-text-secondary">
+                          {sessionWhen.schedule.map((entry) => (
+                            <li key={entry.day}>
+                              {entry.day}: {entry.time}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                       {sessionLocation && (
                         <p className="text-sm text-text-secondary">
                           {sessionLocation}

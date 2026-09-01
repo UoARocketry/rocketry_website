@@ -13,7 +13,12 @@ import type {
   WhatWeDo as PayloadWhatWeDo,
 } from "@/payload-types";
 import { getPayloadClient } from "@/lib/payload";
-import { getRocketStatus, isEventUpcoming, sortRockets } from "@/lib/utils";
+import {
+  getRocketStatus,
+  isEventUpcoming,
+  sortByDate,
+  sortRockets,
+} from "@/lib/utils";
 import type {
   AboutPayload,
   EventDetail,
@@ -222,25 +227,47 @@ function mapEvent(doc: PayloadEvent): EventSummary {
       ? doc.eventTag.name
       : null;
 
-  const sessions = (doc.sessions ?? [])
-    .map((session) => ({
-      title: session.title,
-      date: normalizeEventDate(session.date),
-      endTime: normalizeEventDate(session.endTime) || null,
-      description: session.description ?? null,
-      location: session.location ?? null,
-    }))
-    .filter((session) => session.date.length > 0);
-
   // A row with no date is an editor part-way through adding one; it would
   // otherwise render as a stray entry in the date list.
-  const extraDates = (doc.extraDates ?? [])
-    .map((extra) => ({
-      date: normalizeEventDate(extra.date),
-      startTime: normalizeEventDate(extra.startTime) || null,
-      endTime: normalizeEventDate(extra.endTime) || null,
-    }))
-    .filter((extra) => extra.date.length > 0);
+  const mapExtraDates = (
+    rows:
+      | {
+          date?: string | null;
+          startTime?: string | null;
+          endTime?: string | null;
+        }[]
+      | null
+      | undefined,
+  ) =>
+    sortByDate(
+      (rows ?? [])
+        .map((extra) => ({
+          date: normalizeEventDate(extra.date),
+          startTime: normalizeEventDate(extra.startTime) || null,
+          endTime: normalizeEventDate(extra.endTime) || null,
+        }))
+        .filter((extra) => extra.date.length > 0),
+    );
+
+  // Sorted here rather than trusted from the CMS. The admin lets rows sit in
+  // any order, and the detail page reads position for the "Runs" range, the
+  // "Next up" badge and which sessions are greyed out as complete — so a
+  // series entered out of order rendered a backwards date range and marked
+  // the wrong sessions done.
+  const sessions = sortByDate(
+    (doc.sessions ?? [])
+      .map((session) => ({
+        title: session.title,
+        date: normalizeEventDate(session.date),
+        endTime: normalizeEventDate(session.endTime) || null,
+        extraDates: mapExtraDates(session.extraDates),
+        description: session.description ?? null,
+        location: session.location ?? null,
+      }))
+      .filter((session) => session.date.length > 0),
+  );
+
+  const extraDates = mapExtraDates(doc.extraDates);
 
   return {
     id: doc.id,
