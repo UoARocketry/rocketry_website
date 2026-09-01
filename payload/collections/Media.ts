@@ -22,6 +22,42 @@ export function assertWithinSizeLimit(size: unknown): void {
   }
 }
 
+/**
+ * Formats no browser but Safari will render, so they must never be stored.
+ *
+ * iPhones shoot HEIC by default. `CompressedUpload` converts one to JPEG in
+ * the browser before it is ever sent, so reaching here means that conversion
+ * did not run — an unsupported browser, a script failure, or an upload made
+ * straight through the API. Without this the file would save happily and then
+ * show as a broken image everywhere, which is far harder to diagnose than a
+ * refused upload.
+ */
+const UNDISPLAYABLE_MIME_TYPES = new Set(["image/heic", "image/heif"]);
+const UNDISPLAYABLE_EXTENSIONS = /\.(heic|heif)$/i;
+
+export function assertDisplayableImage(
+  file: { mimetype?: string; name?: string } | undefined,
+): void {
+  if (!file) return;
+
+  const mimetype = (file.mimetype ?? "").toLowerCase();
+  const name = file.name ?? "";
+
+  // The extension is checked as well because a browser that cannot decode the
+  // format often cannot name it either, handing over an empty or generic type.
+  if (
+    UNDISPLAYABLE_MIME_TYPES.has(mimetype) ||
+    UNDISPLAYABLE_EXTENSIONS.test(name)
+  ) {
+    throw new APIError(
+      "That is an iPhone HEIC photo, which most browsers cannot display. It should have been converted automatically — try again, or save it as a JPEG first.",
+      400,
+      undefined,
+      true,
+    );
+  }
+}
+
 export function resolveMediaPrefix(existingPrefix: unknown): string {
   if (typeof existingPrefix === "string" && existingPrefix.trim().length > 0) {
     return existingPrefix.trim();
@@ -49,6 +85,7 @@ export const Media: CollectionConfig = {
         // Payload 3.80 exposes no filesize option on `upload`, so the ceiling
         // has to be enforced here or not at all.
         assertWithinSizeLimit(req?.file?.size);
+        assertDisplayableImage(req?.file);
       },
       ({ data }) => {
         if (!data || typeof data !== "object") {
