@@ -77,9 +77,24 @@ function buildSupabasePublicUrl(
     : `${baseUrl}/${filename}`;
 }
 
+/**
+ * The flattened URL field is read directly by the public site, so only an
+ * absolute URL is safe to store in it.
+ *
+ * This matters because Payload reports a media doc's `url` as a relative
+ * `/api/media/file/...` path whenever the S3 storage plugin is skipped, which
+ * is exactly what happens when the `SUPABASE_STORAGE_*` env group is unset —
+ * the normal state of a local dev server. Saving a document in that
+ * environment against the production database would otherwise overwrite a good
+ * Supabase URL with a path that resolves nowhere on the live site.
+ */
+export function isAbsoluteUrl(value: string): boolean {
+  return /^https?:\/\//i.test(value);
+}
+
 function extractUrlFromMediaDoc(doc: UnknownRecord): string | null {
   const directUrl = asNonEmptyString(doc.url);
-  if (directUrl) {
+  if (directUrl && isAbsoluteUrl(directUrl)) {
     return directUrl;
   }
 
@@ -90,6 +105,9 @@ function extractUrlFromMediaDoc(doc: UnknownRecord): string | null {
 
   const prefix = asNonEmptyString(doc.prefix);
 
+  // Returning null here is deliberate: `syncMediaRelationToUrlField` then keeps
+  // whatever URL the document already had rather than replacing it with a
+  // worse one.
   return buildSupabasePublicUrl(filename, prefix);
 }
 
