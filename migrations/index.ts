@@ -15,6 +15,8 @@ import * as migration_20260826_120000_add_rocket_featured from "./20260826_12000
 import * as migration_20260826_130000_add_rocket_specs from "./20260826_130000_add_rocket_specs";
 import * as migration_20260901_120000_fix_version_orphans from "./20260901_120000_fix_version_orphans";
 import * as migration_20260901_130000_add_user_roles_and_trash from "./20260901_130000_add_user_roles_and_trash";
+import * as migration_20260901_140000_rocket_gallery_to_rels from "./20260901_140000_rocket_gallery_to_rels";
+import * as migration_20260901_150000_drop_rocket_gallery_arrays from "./20260901_150000_drop_rocket_gallery_arrays";
 
 export const migrations = [
   {
@@ -101,5 +103,15 @@ export const migrations = [
     up: migration_20260901_130000_add_user_roles_and_trash.up,
     down: migration_20260901_130000_add_user_roles_and_trash.down,
     name: "20260901_130000_add_user_roles_and_trash",
+  },
+  {
+    up: migration_20260901_140000_rocket_gallery_to_rels.up,
+    down: migration_20260901_140000_rocket_gallery_to_rels.down,
+    name: "20260901_140000_rocket_gallery_to_rels",
+  },
+  {
+    up: migration_20260901_150000_drop_rocket_gallery_arrays.up,
+    down: migration_20260901_150000_drop_rocket_gallery_arrays.down,
+    name: "20260901_150000_drop_rocket_gallery_arrays",
   },
 ];

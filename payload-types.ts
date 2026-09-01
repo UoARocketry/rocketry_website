@@ -315,14 +315,9 @@ export interface Rocket {
       }[]
     | null;
   /**
-   * Additional photos shown in the image gallery on the rocket's detail page, after the cover image above.
+   * Additional photos shown in the image gallery on the rocket's detail page, after the cover image above. Drag to reorder.
    */
-  gallery?:
-    | {
-        image: number | Media;
-        id?: string | null;
-      }[]
-    | null;
+  gallery?: (number | Media)[] | null;
   updatedAt: string;
   createdAt: string;
   deletedAt?: string | null;
@@ -742,12 +737,7 @@ export interface RocketsSelect<T extends boolean = true> {
         value?: T;
         id?: T;
       };
-  gallery?:
-    | T
-    | {
-        image?: T;
-        id?: T;
-      };
+  gallery?: T;
   updatedAt?: T;
   createdAt?: T;
   deletedAt?: T;

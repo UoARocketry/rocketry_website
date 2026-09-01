@@ -65,7 +65,7 @@ export const Media: CollectionConfig = {
         checks: [
           { collection: "events", field: "imageMedia", label: "Events" },
           { collection: "rockets", field: "imageMedia", label: "Rockets" },
-          { collection: "rockets", field: "gallery.image", label: "Rocket galleries" },
+          { collection: "rockets", field: "gallery", label: "Rocket galleries" },
           { collection: "executives", field: "photoMedia", label: "Executives" },
           { collection: "sponsors", field: "logoMedia", label: "Sponsors" },
           { collection: "what-we-do", field: "imageMedia", label: "What We Do" },

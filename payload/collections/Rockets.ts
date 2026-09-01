@@ -144,21 +144,14 @@ export const Rockets: CollectionConfig = {
     },
     {
       name: "gallery",
-      type: "array",
+      type: "upload",
+      relationTo: "media" as never,
+      hasMany: true,
       required: false,
       admin: {
-        initCollapsed: true,
         description:
-          "Additional photos shown in the image gallery on the rocket's detail page, after the cover image above.",
+          "Additional photos shown in the image gallery on the rocket's detail page, after the cover image above. Drag to reorder.",
       },
-      fields: [
-        {
-          name: "image",
-          type: "upload",
-          relationTo: "media" as never,
-          required: true,
-        },
-      ],
     },
   ],
 };

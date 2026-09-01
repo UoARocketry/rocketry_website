@@ -188,10 +188,10 @@ function mapRocket(doc: PayloadRocket): RocketSummary {
 }
 
 function mapRocketDetail(doc: PayloadRocket): RocketDetail {
+  // `gallery` is a hasMany upload, so entries arrive either as a populated
+  // media object or as a bare id when depth is too shallow to resolve them.
   const galleryImages = (doc.gallery ?? [])
-    .map((item) =>
-      item.image && typeof item.image === "object" ? item.image.url : null,
-    )
+    .map((item) => (item && typeof item === "object" ? item.url : null))
     .filter((url): url is string => Boolean(url));
 
   const images = [doc.image, ...galleryImages].filter(
