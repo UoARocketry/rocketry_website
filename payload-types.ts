@@ -494,7 +494,7 @@ export interface Sponsor {
   id: number;
   name: string;
   /**
-   * Upload a new image or pick one already in the Media library.
+   * Upload a new image or pick one already in the Media library. Optional. A transparent PNG or an SVG is best. A logo with a white background baked into the file will show as a white rectangle on a dark backing.
    */
   logoMedia?: (number | null) | Media;
   /**
@@ -502,7 +502,7 @@ export interface Sponsor {
    */
   logo?: string | null;
   /**
-   * Logos sit on a white plate, which suits dark and full-colour artwork. Switch to dark if this sponsor's logo is white or very pale, or it will be invisible.
+   * Logos sit on a white plate, which suits dark and full-colour artwork. Switch to dark only for a logo that is white or very pale AND has a transparent background. A logo with white baked into the file will show as a white rectangle on a dark backing.
    */
   logoPlate?: ('light' | 'dark') | null;
   /**
