@@ -13,6 +13,8 @@ import {
 } from "@/lib/utils";
 import DraftBanner from "@/components/ui/draft-banner";
 import EventHeroImage from "@/components/ui/event-hero-image";
+import LocationPin from "@/components/ui/location-pin";
+import ScheduleList from "@/components/ui/schedule-list";
 
 interface EventPageProps {
   readonly params: Promise<{ slug: string }>;
@@ -159,77 +161,50 @@ export default async function EventPage({ params }: EventPageProps) {
                   {event.eventTag ?? "General"}
                 </span>
               </div>
+              {/* A series shows everything a one-off does. Its own date, hours
+                  and room are real details an editor filled in, and hiding
+                  them behind the session list lost them. `Runs:` is the extra
+                  a series earns, not a replacement. */}
               <div className="space-y-2 mb-4 text-sm sm:text-base">
-                {hasSessions ? (
-                  <>
-                    {/* The event's own date is not when the series runs — it
-                        is when it went up. Shown rather than dropped, so any
-                        extra days entered against the event still appear. */}
-                    {when.dateLabel && (
-                      <p className="text-text-secondary leading-relaxed">
-                        <span className="text-primary font-semibold">
-                          Announced:
-                        </span>{" "}
-                        {when.dateLabel}
-                      </p>
-                    )}
-                    <p className="text-text-secondary leading-relaxed">
-                      <span className="text-primary font-semibold">Runs:</span>{" "}
-                      {`${formatDateLong(seriesStart)} – ${formatDateLong(
-                        seriesEnd ?? seriesStart,
-                      )} (${sessions.length} sessions)`}
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <p className="text-text-secondary leading-relaxed">
-                      <span className="text-primary font-semibold">Date:</span>{" "}
-                      {when.dateLabel}
-                    </p>
-                    {when.timeLabel && (
-                      <p className="text-text-secondary leading-relaxed">
-                        <span className="text-primary font-semibold">
-                          Time:
-                        </span>{" "}
-                        {when.timeLabel}
-                      </p>
-                    )}
-                    {when.locationLabel && (
-                      <p className="text-text-secondary leading-relaxed">
-                        <span className="text-primary font-semibold">
-                          Location:
-                        </span>{" "}
-                        {when.locationLabel}
-                      </p>
-                    )}
-                    {/* Only reached when the days disagree on their hours or
-                        their room, which is what a single line cannot state. */}
-                    {when.schedule.length > 0 && (
-                      <div className="text-text-secondary leading-relaxed">
-                        <span className="text-primary font-semibold">
-                          Each day:
-                        </span>
-                        <ul className="mt-1 space-y-1">
-                          {when.schedule.map((entry) => (
-                            <li key={entry.day}>
-                              {entry.day}
-                              {entry.time ? `, ${entry.time}` : ""}
-                              {entry.location ? ` — ${entry.location}` : ""}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </>
-                )}
-                {/* A series states its location per session below, and an
-                    empty location used to render a bare "Location:" label. */}
-                {hasSessions && event.location && (
+                <p className="text-text-secondary leading-relaxed">
+                  <span className="text-primary font-semibold">Date:</span>{" "}
+                  {when.dateLabel}
+                </p>
+                {when.timeLabel && (
                   <p className="text-text-secondary leading-relaxed">
+                    <span className="text-primary font-semibold">Time:</span>{" "}
+                    {when.timeLabel}
+                  </p>
+                )}
+                {/* Null as soon as the days disagree, in which case each one
+                    names its own room in the list below instead. */}
+                {when.locationLabel && (
+                  <p className="flex items-center gap-2 text-text-secondary leading-relaxed">
                     <span className="text-primary font-semibold">
                       Location:
-                    </span>{" "}
-                    {event.location}
+                    </span>
+                    <LocationPin className="h-4 w-4 shrink-0 text-primary" />
+                    {when.locationLabel}
+                  </p>
+                )}
+                {/* Only reached when the days disagree on their hours or
+                    their room, which is what a single line cannot state. */}
+                {when.schedule.length > 0 && (
+                  <div className="text-text-secondary leading-relaxed">
+                    <span className="text-primary font-semibold">
+                      Each day:
+                    </span>
+                    <div className="mt-1.5">
+                      <ScheduleList entries={when.schedule} />
+                    </div>
+                  </div>
+                )}
+                {hasSessions && (
+                  <p className="text-text-secondary leading-relaxed">
+                    <span className="text-primary font-semibold">Runs:</span>{" "}
+                    {`${formatDateLong(seriesStart)} – ${formatDateLong(
+                      seriesEnd ?? seriesStart,
+                    )} (${sessions.length} sessions)`}
                   </p>
                 )}
               </div>
@@ -287,7 +262,20 @@ export default async function EventPage({ params }: EventPageProps) {
               // A session has the same shape as an event's own "when", so it
               // gets the same formatting: one day keeps its weekday, several
               // collapse to "September 3 & 4" with the hours stated once.
-              const sessionWhen = formatEventWhen(session);
+              // The resolved location goes in so that a day without one of its
+              // own inherits the room the session actually uses, rather than
+              // showing blank beside the days that do differ.
+              const sessionWhen = formatEventWhen({
+                ...session,
+                location: sessionLocation,
+              });
+
+              // Once the days name their own rooms, repeating one of them
+              // underneath as *the* session location just reads as a
+              // contradiction.
+              const hasPerDayLocations = sessionWhen.schedule.some(
+                (entry) => entry.location,
+              );
 
               return (
                 <li key={`${session.title}-${session.date}`}>
@@ -356,53 +344,21 @@ export default async function EventPage({ params }: EventPageProps) {
                         <div className="rounded-lg border border-border bg-surface/60 px-4 py-3">
                           {/* Only when the session's days disagree on their
                               hours or their room, which the summary cannot
-                              say. */}
+                              say. Each day carries its own pin. */}
                           {sessionWhen.schedule.length > 0 && (
-                            <ul className="space-y-1 text-sm text-text-secondary">
-                              {sessionWhen.schedule.map((entry) => (
-                                <li key={entry.day} className="flex gap-2">
-                                  <span className="min-w-28 shrink-0 font-medium text-text-main">
-                                    {entry.day}
-                                  </span>
-                                  <span>
-                                    {entry.time}
-                                    {entry.location
-                                      ? `${entry.time ? " — " : ""}${entry.location}`
-                                      : ""}
-                                  </span>
-                                </li>
-                              ))}
-                            </ul>
+                            <ScheduleList entries={sessionWhen.schedule} />
                           )}
                           {sessionWhen.schedule.length > 0 &&
+                            !hasPerDayLocations &&
                             sessionLocation && (
                               <hr className="my-3 border-border" />
                             )}
-                          {/* A pin and a label, because a bare room code
-                              sitting above the description read as part
-                              of it. */}
-                          {sessionLocation && (
+                          {/* One room for the whole session. Suppressed once
+                              the days name their own, which they only do when
+                              they genuinely differ. */}
+                          {!hasPerDayLocations && sessionLocation && (
                             <p className="flex items-start gap-2 text-sm text-text-secondary">
-                              <svg
-                                className="mt-0.5 h-4 w-4 shrink-0 text-primary"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                                aria-hidden="true"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                                />
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                                />
-                              </svg>
+                              <LocationPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                               <span>
                                 <span className="sr-only">Location: </span>
                                 {sessionLocation}
