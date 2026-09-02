@@ -13,11 +13,22 @@ import LocationPin from "@/components/ui/location-pin";
  */
 export default function ScheduleList({
   entries,
+  indented = false,
 }: {
   readonly entries: EventWhen["schedule"];
+  /**
+   * Sets the list in from its heading. Used by the event's own "Each day"
+   * block, which sits in the open beside the Date and Location lines and needs
+   * the separation. A session's list already has a panel around it.
+   */
+  readonly indented?: boolean;
 }) {
   return (
-    <ul className="space-y-2 text-sm text-text-secondary">
+    <ul
+      className={`space-y-2 text-sm text-text-secondary${
+        indented ? " pl-4" : ""
+      }`}
+    >
       {entries.map((entry) => (
         <li key={entry.day} className="flex flex-wrap gap-x-3 gap-y-1">
           <span className="min-w-28 shrink-0 font-medium text-text-main">

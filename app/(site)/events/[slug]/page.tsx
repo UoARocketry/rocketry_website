@@ -202,7 +202,7 @@ export default async function EventPage({ params }: EventPageProps) {
                       {when.schedule.length > 1 ? "Each day:" : "Times:"}
                     </span>
                     <div className="mt-1.5">
-                      <ScheduleList entries={when.schedule} />
+                      <ScheduleList entries={when.schedule} indented />
                     </div>
                   </div>
                 )}
