@@ -13,6 +13,7 @@ import {
 } from "@/lib/utils";
 import DraftBanner from "@/components/ui/draft-banner";
 import ImageCycler from "@/components/ui/image-cycler";
+import LinkPanel from "@/components/ui/link-panel";
 import LocationPin from "@/components/ui/location-pin";
 import ScheduleList from "@/components/ui/schedule-list";
 
@@ -251,6 +252,15 @@ export default async function EventPage({ params }: EventPageProps) {
                   </p>
                 </div>
               )}
+
+            {/* Kept out of the signup block: these stay useful long after
+                registration has closed. */}
+            <LinkPanel
+              heading={event.linksHeading?.trim() || "Resources"}
+              links={event.links}
+              icon="external"
+              describedBy={event.title}
+            />
           </div>
         </div>
       </section>

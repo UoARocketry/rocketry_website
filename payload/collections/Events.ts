@@ -12,6 +12,7 @@ import {
   createMediaUsageHook,
 } from "../hooks/media-usage.ts";
 import { createImagePairFields } from "../fields/image-pair.ts";
+import { createLinkListFields } from "../fields/link-list.ts";
 import { createPreviewUrl, createSlugField } from "../fields/slug.ts";
 import {
   createEndTimeValidate,
@@ -278,6 +279,18 @@ export const Events: CollectionConfig = {
         return true;
       },
     },
+    ...createLinkListFields({
+      name: "links",
+      headingName: "linksHeading",
+      defaultHeading: "Resources",
+      singular: "Link",
+      plural: "Links",
+      description:
+        "Optional. Anything worth linking to alongside the event: slides, a reading list, an OpenRocket starter file. Shown in their own section on the event page.",
+      headingDescription:
+        'What this section is called. Leave empty for "Resources".',
+      labelPlaceholder: "Workshop slides",
+    }),
     { name: "location", type: "text", required: false },
     {
       name: "sessions",

@@ -20,16 +20,24 @@ export type RocketSpec = {
   value: string;
 };
 
-/** A labelled link to footage of the rocket, shown as a button on its page. */
-export type RocketVideo = {
+/** A labelled outbound link: footage, a spreadsheet, a write-up. */
+export type ResourceLink = {
   label: string;
   url: string;
 };
 
+/** Kept as an alias so existing callers reading `videos` still typecheck. */
+export type RocketVideo = ResourceLink;
+
 export type RocketDetail = RocketSummary & {
   images: string[];
   specs: RocketSpec[];
-  videos: RocketVideo[];
+  videos: ResourceLink[];
+  /** Heading for the videos section. Null falls back to "Videos". */
+  videosHeading?: string | null;
+  links: ResourceLink[];
+  /** Heading for the links section. Null falls back to "Resources". */
+  linksHeading?: string | null;
 };
 
 export type EventSession = {
@@ -80,6 +88,9 @@ export type EventSummary = {
 export type EventDetail = EventSummary & {
   /** The poster followed by any gallery images, ready for the cycler. */
   images: string[];
+  links: ResourceLink[];
+  /** Heading for the links section. Null falls back to "Resources". */
+  linksHeading?: string | null;
 };
 
 export type Exec = {

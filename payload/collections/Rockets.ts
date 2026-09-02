@@ -12,7 +12,7 @@ import {
 } from "../hooks/media-usage.ts";
 import { createImagePairFields } from "../fields/image-pair.ts";
 import { createPreviewUrl, createSlugField } from "../fields/slug.ts";
-import { urlFieldHooks, validateRequiredUrl } from "../fields/validators.ts";
+import { createLinkListFields } from "../fields/link-list.ts";
 
 export const Rockets: CollectionConfig = {
   slug: "rockets",
@@ -114,38 +114,30 @@ export const Rockets: CollectionConfig = {
       },
     }),
     { name: "description", type: "textarea", required: false },
-    {
+    ...createLinkListFields({
       name: "videos",
-      type: "array",
-      label: "Videos",
-      required: false,
-      labels: { singular: "Video", plural: "Videos" },
-      admin: {
-        initCollapsed: true,
-        description:
-          "Optional. YouTube, Instagram or Drive links to footage of this rocket. Each one becomes a button on the rocket's page, in this order. Leave empty and no buttons appear.",
-      },
-      fields: [
-        {
-          name: "label",
-          type: "text",
-          required: true,
-          admin: {
-            description:
-              'What the button should say, e.g. "Launch", "Onboard camera", "Recovery".',
-          },
-        },
-        {
-          name: "url",
-          type: "text",
-          label: "Video URL",
-          required: true,
-          hooks: urlFieldHooks,
-          validate: (value: unknown) =>
-            validateRequiredUrl(value, "Video URL"),
-        },
-      ],
-    },
+      headingName: "videosHeading",
+      defaultHeading: "Videos",
+      singular: "Video",
+      plural: "Videos",
+      description:
+        "Optional. YouTube, Instagram or Drive links to footage of this rocket. They appear together in their own section on the rocket page, in this order.",
+      headingDescription:
+        'What this section is called. Leave empty for "Videos".',
+      labelPlaceholder: "Launch",
+    }),
+    ...createLinkListFields({
+      name: "links",
+      headingName: "linksHeading",
+      defaultHeading: "Resources",
+      singular: "Link",
+      plural: "Links",
+      description:
+        "Optional. Anything else worth linking to: a telemetry spreadsheet, an OpenRocket file, a write-up. Shown in their own section on the rocket page.",
+      headingDescription:
+        'What this section is called. Leave empty for "Resources".',
+      labelPlaceholder: "Telemetry data",
+    }),
     {
       name: "featured",
       type: "checkbox",

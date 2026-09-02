@@ -9,6 +9,7 @@ import StatusBadgePill, {
 } from "@/components/ui/status-badge";
 import DraftBanner from "@/components/ui/draft-banner";
 import ImageCycler from "@/components/ui/image-cycler";
+import LinkPanel from "@/components/ui/link-panel";
 
 interface RocketPageProps {
   readonly params: Promise<{ slug: string }>;
@@ -109,33 +110,22 @@ export default async function RocketPage({ params }: RocketPageProps) {
               </p>
             </div>
 
-            {rocket.videos.length > 0 && (
-              // Wraps rather than scrolls: a rocket with three videos should
-              // stack them on a phone, not hide the third off-screen.
-              <div className="flex flex-wrap gap-3">
-                {rocket.videos.map((video) => (
-                  <a
-                    key={video.url}
-                    href={video.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-bold transition-all duration-200 hover:bg-primary-dark hover:shadow-lg hover:shadow-primary/20"
-                    style={{ color: "#ffffff" }}
-                    aria-label={`${video.label} video for ${rocket.name} (opens in a new tab)`}
-                  >
-                    <svg
-                      className="h-5 w-5"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                      aria-hidden="true"
-                    >
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
-                    {video.label}
-                  </a>
-                ))}
-              </div>
-            )}
+            {/* Videos and resources are the same kind of thing — a labelled
+                list of places to go — so they read as sibling sections rather
+                than a row of buttons above an unrelated list. */}
+            <LinkPanel
+              heading={rocket.videosHeading?.trim() || "Videos"}
+              links={rocket.videos}
+              icon="play"
+              describedBy={rocket.name}
+            />
+
+            <LinkPanel
+              heading={rocket.linksHeading?.trim() || "Resources"}
+              links={rocket.links}
+              icon="external"
+              describedBy={rocket.name}
+            />
 
             {/* Details, entirely CMS-driven. The name, status and launch date
                 that used to sit here are all already shown above, so the box

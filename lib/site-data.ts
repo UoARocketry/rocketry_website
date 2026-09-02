@@ -28,6 +28,7 @@ import type {
   Exec,
   ExecTeamPayload,
   Feature,
+  ResourceLink,
   RocketDetail,
   RocketSummary,
   SiteSettings,
@@ -224,19 +225,33 @@ function mapRocketDetail(doc: PayloadRocket): RocketDetail {
     }))
     .filter((spec) => spec.label.length > 0 && spec.value.length > 0);
 
-  const videos = (doc.videos ?? [])
-    .map((video) => ({
-      label: video.label?.trim() ?? "",
-      url: video.url?.trim() ?? "",
-    }))
-    .filter((video) => video.label.length > 0 && video.url.length > 0);
-
   return {
     ...mapRocket(doc),
     images,
     specs,
-    videos,
+    videos: mapResourceLinks(doc.videos),
+    videosHeading: blankToNull(doc.videosHeading),
+    links: mapResourceLinks(doc.links),
+    linksHeading: blankToNull(doc.linksHeading),
   };
+}
+
+/**
+ * Labelled links, with half-filled rows dropped.
+ *
+ * Both fields are required in the CMS, but the columns are nullable, so a row
+ * saved before that could render as a link with no text or a label that goes
+ * nowhere.
+ */
+function mapResourceLinks(
+  rows: { label?: string | null; url?: string | null }[] | null | undefined,
+): ResourceLink[] {
+  return (rows ?? [])
+    .map((row) => ({
+      label: row.label?.trim() ?? "",
+      url: row.url?.trim() ?? "",
+    }))
+    .filter((row) => row.label.length > 0 && row.url.length > 0);
 }
 
 function mapEventDetail(doc: PayloadEvent): EventDetail {
@@ -252,6 +267,8 @@ function mapEventDetail(doc: PayloadEvent): EventDetail {
     images: [doc.image, ...galleryImages].filter((url): url is string =>
       Boolean(url),
     ),
+    links: mapResourceLinks(doc.links),
+    linksHeading: blankToNull(doc.linksHeading),
   };
 }
 

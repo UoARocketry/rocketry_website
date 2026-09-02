@@ -281,6 +281,23 @@ export interface Event {
    * Shown in place of the button, e.g. "Sign up link in our Instagram bio".
    */
   signupNote?: string | null;
+  /**
+   * What this section is called. Leave empty for "Resources".
+   */
+  linksHeading?: string | null;
+  /**
+   * Optional. Anything worth linking to alongside the event: slides, a reading list, an OpenRocket starter file. Shown in their own section on the event page.
+   */
+  links?:
+    | {
+        /**
+         * What the link says on the page.
+         */
+        label: string;
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
   location?: string | null;
   /**
    * Optional. For a multi-session series (e.g. Level 1 build workshops), add each session. The site puts them in date order for you, so it does not matter what order you add them in. Leave empty for a normal one-off event.
@@ -367,12 +384,33 @@ export interface Rocket {
   imagePosition?: string | null;
   description?: string | null;
   /**
-   * Optional. YouTube, Instagram or Drive links to footage of this rocket. Each one becomes a button on the rocket's page, in this order. Leave empty and no buttons appear.
+   * What this section is called. Leave empty for "Videos".
+   */
+  videosHeading?: string | null;
+  /**
+   * Optional. YouTube, Instagram or Drive links to footage of this rocket. They appear together in their own section on the rocket page, in this order.
    */
   videos?:
     | {
         /**
-         * What the button should say, e.g. "Launch", "Onboard camera", "Recovery".
+         * What the link says on the page.
+         */
+        label: string;
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * What this section is called. Leave empty for "Resources".
+   */
+  linksHeading?: string | null;
+  /**
+   * Optional. Anything else worth linking to: a telemetry spreadsheet, an OpenRocket file, a write-up. Shown in their own section on the rocket page.
+   */
+  links?:
+    | {
+        /**
+         * What the link says on the page.
          */
         label: string;
         url: string;
@@ -799,6 +837,14 @@ export interface EventsSelect<T extends boolean = true> {
   signupUrl?: T;
   signupLabel?: T;
   signupNote?: T;
+  linksHeading?: T;
+  links?:
+    | T
+    | {
+        label?: T;
+        url?: T;
+        id?: T;
+      };
   location?: T;
   sessions?:
     | T
@@ -845,7 +891,16 @@ export interface RocketsSelect<T extends boolean = true> {
   image?: T;
   imagePosition?: T;
   description?: T;
+  videosHeading?: T;
   videos?:
+    | T
+    | {
+        label?: T;
+        url?: T;
+        id?: T;
+      };
+  linksHeading?: T;
+  links?:
     | T
     | {
         label?: T;
