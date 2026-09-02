@@ -79,16 +79,25 @@ export default function Navigation({ joinUrl }: NavigationProps) {
                   key={link.href}
                   href={link.href}
                   aria-current={isActive ? "page" : undefined}
-                  className={`relative px-4 py-2 text-sm font-medium tracking-wide transition-colors duration-200 ${
+                  className={`group relative px-4 py-2 text-sm font-medium tracking-wide transition-colors duration-200 ${
                     isActive
                       ? "text-primary"
                       : "text-text-secondary hover:text-text-main"
                   }`}
                 >
                   {link.label}
-                  {isActive && (
-                    <span className="absolute bottom-0 left-4 right-4 h-0.5 bg-primary rounded-full" />
-                  )}
+                  {/* Hovering previews the active state rather than inventing
+                      a second one: the same underline, wiped out from the
+                      centre and held back in weight so the page you are
+                      actually on still reads as the strongest. */}
+                  <span
+                    aria-hidden="true"
+                    className={`absolute bottom-0 left-4 right-4 h-0.5 origin-center rounded-full transition-transform duration-200 ${
+                      isActive
+                        ? "scale-x-100 bg-primary"
+                        : "scale-x-0 bg-primary/60 group-hover:scale-x-100"
+                    }`}
+                  />
                 </Link>
               );
             })}

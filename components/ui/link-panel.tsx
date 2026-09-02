@@ -36,7 +36,7 @@ export default function LinkPanel({
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="group/link relative flex items-center gap-3 px-4 py-3 text-sm text-text-secondary transition-colors duration-200 hover:bg-primary/10 hover:text-primary focus-visible:bg-primary/10 focus-visible:text-primary focus-visible:outline-none"
+              className="group/link relative flex items-center gap-3 px-4 py-3 text-sm text-text-secondary transition-colors duration-200 hover:bg-primary/10 hover:text-primary focus-visible:bg-primary/10 focus-visible:text-primary"
               aria-label={`${link.label} for ${describedBy} (opens in a new tab)`}
             >
               {/* The accent the rest of the site uses to mark the live item,

@@ -73,7 +73,7 @@ export default async function Footer() {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-10 h-10 rounded-lg bg-elevated border border-border flex items-center justify-center text-text-secondary hover:text-primary hover:border-primary/50 transition-all duration-200"
+                    className="w-10 h-10 rounded-lg bg-elevated border border-border flex items-center justify-center text-text-secondary transition-all duration-200 hover:text-primary hover:border-primary/50 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/10"
                     aria-label={social.label}
                   >
                     <Icon />
@@ -93,7 +93,7 @@ export default async function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-text-secondary hover:text-primary transition-colors duration-200 text-sm"
+                    className="inline-block text-sm text-text-secondary transition-all duration-200 hover:translate-x-1 hover:text-primary"
                   >
                     {link.label}
                   </Link>
@@ -110,7 +110,7 @@ export default async function Footer() {
             <div className="space-y-3">
               <a
                 href={`mailto:${contactEmail}`}
-                className="block text-text-secondary hover:text-primary transition-colors duration-200 text-sm"
+                className="inline-block text-sm text-text-secondary transition-all duration-200 hover:translate-x-1 hover:text-primary"
               >
                 {contactEmail}
               </a>

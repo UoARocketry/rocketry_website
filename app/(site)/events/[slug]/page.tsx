@@ -15,6 +15,7 @@ import DraftBanner from "@/components/ui/draft-banner";
 import ImageCycler from "@/components/ui/image-cycler";
 import LinkPanel from "@/components/ui/link-panel";
 import LocationPin from "@/components/ui/location-pin";
+import CollapsibleSection from "@/components/ui/collapsible-section";
 import ScheduleList from "@/components/ui/schedule-list";
 
 interface EventPageProps {
@@ -305,18 +306,20 @@ export default async function EventPage({ params }: EventPageProps) {
                     `${session.title}-${session.date}-${sessionIndex}`
                   }
                 >
-                  {/* Native <details> keeps this a server component — the next
-                      session opens by default, the rest stay collapsed so a
-                      long series with long descriptions isn't overwhelming. */}
-                  <details
-                    open={isNext}
-                    className={`group rounded-xl border transition-colors ${
+                  {/* The next session opens by default, the rest stay
+                      collapsed so a long series with long descriptions is not
+                      overwhelming. Only the open/closed state is client-side;
+                      everything inside is still rendered on the server. */}
+                  <CollapsibleSection
+                    defaultOpen={isNext}
+                    className={`block rounded-xl border transition-colors ${
                       isNext
                         ? "border-primary/50 bg-primary/5"
                         : "border-border bg-card"
                     } ${isPast ? "opacity-60" : ""}`}
-                  >
-                    <summary className="flex cursor-pointer flex-wrap items-center gap-3 p-5 list-none [&::-webkit-details-marker]:hidden">
+                    summaryClassName="flex w-full cursor-pointer flex-wrap items-center gap-3 p-5 text-left transition-colors duration-200 hover:bg-primary/5 rounded-xl"
+                    summary={
+                      <>
                       <span
                         className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
                           isNext
@@ -347,7 +350,7 @@ export default async function EventPage({ params }: EventPageProps) {
                             : ""}
                         </span>
                         <svg
-                          className="h-4 w-4 shrink-0 text-text-muted transition-transform duration-200 group-open:rotate-90"
+                          className="h-4 w-4 shrink-0 text-text-muted transition-transform duration-200 group-data-[open=true]:rotate-90"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -361,7 +364,9 @@ export default async function EventPage({ params }: EventPageProps) {
                           />
                         </svg>
                       </span>
-                    </summary>
+                      </>
+                    }
+                  >
                     <div className="px-5 pb-5 pl-15">
                       {/* When and where sit together in their own panel so the
                           facts read as a block rather than running into the
@@ -394,9 +399,16 @@ export default async function EventPage({ params }: EventPageProps) {
                         </div>
                       )}
                       {session.description ? (
-                        <p className="mt-4 whitespace-pre-line text-sm text-text-secondary leading-relaxed">
-                          {session.description}
-                        </p>
+                        // An accent rule rather than another panel: the facts
+                        // above are already boxed, and two stacked boxes read
+                        // as two unrelated blocks. The rule marks this as
+                        // commentary on them, using the same primary accent as
+                        // the nav underline and the resource links.
+                        <div className="mt-4 border-l-2 border-primary/40 pl-4">
+                          <p className="whitespace-pre-line text-sm leading-relaxed text-text-secondary">
+                            {session.description}
+                          </p>
+                        </div>
                       ) : (
                         !sessionLocation && (
                           <p className="text-sm text-text-muted">
@@ -405,7 +417,7 @@ export default async function EventPage({ params }: EventPageProps) {
                         )
                       )}
                     </div>
-                  </details>
+                  </CollapsibleSection>
                 </li>
               );
             })}
