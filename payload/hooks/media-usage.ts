@@ -1,5 +1,8 @@
-import type { CollectionAfterChangeHook, CollectionAfterDeleteHook } from "payload";
-import type { Payload } from "payload";
+import type {
+  CollectionAfterChangeHook,
+  CollectionAfterDeleteHook,
+  PayloadRequest,
+} from "payload";
 
 /** Every place an image can be attached, and how that reads in the admin. */
 export const MEDIA_USAGE_SOURCES = [
@@ -22,83 +25,133 @@ export const MEDIA_USAGE_OPTIONS = [
   { label: "Site Settings", value: "site-settings" },
 ];
 
+type MediaId = number | string;
+
 /**
- * Which parts of the site currently use a given image.
+ * Sources grouped so one query covers a collection however many fields on it
+ * can hold an image — `rockets` holds both a cover and a gallery.
+ */
+const SOURCES_BY_COLLECTION = MEDIA_USAGE_SOURCES.reduce<
+  Map<string, { field: string; value: string }[]>
+>((grouped, source) => {
+  const existing = grouped.get(source.collection) ?? [];
+  existing.push({ field: source.field, value: source.value });
+  grouped.set(source.collection, existing);
+  return grouped;
+}, new Map());
+
+/**
+ * Which parts of the site currently use each of the given images.
  *
  * Read straight from the relation columns rather than trusted from a cached
- * field, so it cannot describe a state that no longer exists. Drafts count:
- * an image attached to an unpublished event is still in use, and deleting it
+ * field, so it cannot describe a state that no longer exists. Drafts count: an
+ * image attached to an unpublished event is still in use, and deleting it
  * would break that event the moment it is published.
+ *
+ * Takes the whole set of images at once. A rocket save touches its cover and
+ * its entire gallery, and asking per image meant one query per source per
+ * image — a storm of round-trips with the caller's transaction held open
+ * behind it.
  */
 export async function computeMediaUsage(
-  payload: Payload,
-  mediaId: number | string,
-): Promise<string[]> {
-  const used = new Set<string>();
+  req: PayloadRequest,
+  mediaIds: readonly MediaId[],
+): Promise<Map<string, string[]>> {
+  const wanted = new Map<string, MediaId>();
+  for (const id of mediaIds) wanted.set(String(id), id);
 
-  await Promise.all(
-    MEDIA_USAGE_SOURCES.map(async (source) => {
-      // Already recorded by a sibling field on the same collection.
-      if (used.has(source.value)) return;
+  if (wanted.size === 0) return new Map();
 
-      const result = await payload.find({
-        collection: source.collection as never,
-        where: { [source.field]: { equals: mediaId } } as never,
-        limit: 1,
-        depth: 0,
-        pagination: false,
-        draft: true,
-      });
+  const used = new Map<string, Set<string>>();
+  for (const key of wanted.keys()) used.set(key, new Set());
 
-      if (result.totalDocs > 0) used.add(source.value);
-    }),
-  );
+  const ids = [...wanted.values()];
+
+  for (const [collection, sources] of SOURCES_BY_COLLECTION) {
+    const result = await req.payload.find({
+      collection: collection as never,
+      where: {
+        or: sources.map((source) => ({ [source.field]: { in: ids } })),
+      } as never,
+      limit: 0,
+      depth: 0,
+      pagination: false,
+      draft: true,
+      // Binds the read to the caller's transaction. Without it Payload opens a
+      // second connection, which then contends with the very rows the caller
+      // is midway through writing.
+      req,
+    });
+
+    for (const doc of result.docs) {
+      for (const source of sources) {
+        const attached = readRelationIds(
+          (doc as Record<string, unknown>)[source.field],
+        );
+
+        for (const id of attached) {
+          used.get(String(id))?.add(source.value);
+        }
+      }
+    }
+  }
 
   // The one global, which `find` cannot be pointed at.
-  const settings = await payload.findGlobal({
+  const settings = await req.payload.findGlobal({
     slug: "site-settings" as never,
     depth: 0,
+    req,
   });
   const settingsImage = (settings as Record<string, unknown>)
     ?.execTeamImageMedia;
-  const settingsImageId =
-    settingsImage && typeof settingsImage === "object"
-      ? (settingsImage as { id?: unknown }).id
-      : settingsImage;
 
-  if (settingsImageId !== undefined && String(settingsImageId) === String(mediaId)) {
-    used.add("site-settings");
+  for (const id of readRelationIds(settingsImage)) {
+    used.get(String(id))?.add("site-settings");
   }
 
-  return MEDIA_USAGE_OPTIONS.map((option) => option.value).filter((value) =>
-    used.has(value),
+  const order = MEDIA_USAGE_OPTIONS.map((option) => option.value);
+
+  return new Map(
+    [...used].map(([key, values]) => [
+      key,
+      order.filter((value) => values.has(value)),
+    ]),
   );
 }
 
-/** Writes the computed usage back onto the media document. */
-async function refreshMediaUsage(
-  payload: Payload,
-  mediaId: number | string | null | undefined,
+/**
+ * Writes the computed usage back onto each media document.
+ *
+ * Errors are deliberately *not* swallowed. This runs inside the caller's
+ * transaction, so a failure here has already poisoned it — catching and
+ * carrying on let Payload commit a dead transaction, which Postgres accepts as
+ * a no-op. The save then reported success and wrote nothing. Better a visible
+ * error on an image-bookkeeping field than a silently discarded edit.
+ */
+async function writeMediaUsage(
+  req: PayloadRequest,
+  mediaIds: readonly MediaId[],
 ): Promise<void> {
-  if (mediaId === null || mediaId === undefined) return;
+  const usage = await computeMediaUsage(req, mediaIds);
 
-  try {
-    const usedIn = await computeMediaUsage(payload, mediaId);
-
-    await payload.update({
+  for (const id of dedupe(mediaIds)) {
+    await req.payload.update({
       collection: "media" as never,
-      id: mediaId as never,
-      data: { usedIn } as never,
+      id: id as never,
+      data: { usedIn: usage.get(String(id)) ?? [] } as never,
       depth: 0,
+      req,
       // Media has no drafts, and this is bookkeeping rather than an edit, so
       // it must not spawn revalidation or another usage pass.
       context: { skipUsageRefresh: true },
     });
-  } catch (error) {
-    // Never block saving a document over a bookkeeping field. The worst case
-    // is a stale badge in the Media list.
-    console.error(`[media-usage] Could not refresh media ${mediaId}:`, error);
   }
+}
+
+function dedupe(ids: readonly MediaId[]): MediaId[] {
+  const seen = new Map<string, MediaId>();
+  for (const id of ids) seen.set(String(id), id);
+  return [...seen.values()];
 }
 
 /**
@@ -106,17 +159,13 @@ async function refreshMediaUsage(
  * that holds an image and so has no collection hook to hang off.
  */
 export async function refreshMediaUsageFor(
-  payload: Payload,
+  req: PayloadRequest,
   values: unknown[],
 ): Promise<void> {
-  const ids = new Set(values.flatMap((value) => readRelationIds(value)));
-
-  for (const id of ids) {
-    await refreshMediaUsage(payload, id);
-  }
+  await writeMediaUsage(req, values.flatMap((value) => readRelationIds(value)));
 }
 
-function readRelationIds(value: unknown): (number | string)[] {
+function readRelationIds(value: unknown): MediaId[] {
   if (value === null || value === undefined) return [];
 
   const items = Array.isArray(value) ? value : [value];
@@ -124,10 +173,21 @@ function readRelationIds(value: unknown): (number | string)[] {
   return items
     .map((item) =>
       item && typeof item === "object"
-        ? ((item as { id?: number | string }).id ?? null)
-        : (item as number | string),
+        ? ((item as { id?: MediaId }).id ?? null)
+        : (item as MediaId),
     )
-    .filter((id): id is number | string => id !== null && id !== undefined);
+    .filter((id): id is MediaId => id !== null && id !== undefined);
+}
+
+function collectRelationIds(
+  relationFields: readonly string[],
+  docs: readonly unknown[],
+): MediaId[] {
+  return docs.flatMap((doc) =>
+    relationFields.flatMap((field) =>
+      readRelationIds((doc as Record<string, unknown> | undefined)?.[field]),
+    ),
+  );
 }
 
 /**
@@ -144,20 +204,10 @@ export function createMediaUsageHook(
   return async ({ doc, previousDoc, req, context }) => {
     if (context?.skipUsageRefresh) return doc;
 
-    const affected = new Set<number | string>();
-
-    for (const field of relationFields) {
-      readRelationIds((doc as Record<string, unknown>)?.[field]).forEach((id) =>
-        affected.add(id),
-      );
-      readRelationIds(
-        (previousDoc as Record<string, unknown>)?.[field],
-      ).forEach((id) => affected.add(id));
-    }
-
-    for (const id of affected) {
-      await refreshMediaUsage(req.payload, id);
-    }
+    await writeMediaUsage(
+      req,
+      collectRelationIds(relationFields, [doc, previousDoc]),
+    );
 
     return doc;
   };
@@ -167,13 +217,7 @@ export function createMediaUsageDeleteHook(
   relationFields: string[],
 ): CollectionAfterDeleteHook {
   return async ({ doc, req }) => {
-    for (const field of relationFields) {
-      for (const id of readRelationIds(
-        (doc as Record<string, unknown>)?.[field],
-      )) {
-        await refreshMediaUsage(req.payload, id);
-      }
-    }
+    await writeMediaUsage(req, collectRelationIds(relationFields, [doc]));
 
     return doc;
   };

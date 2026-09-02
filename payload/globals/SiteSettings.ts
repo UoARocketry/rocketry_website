@@ -29,7 +29,7 @@ export const SiteSettings: GlobalConfig = {
     afterChange: [
       // The one image held by a global rather than a collection.
       async ({ doc, previousDoc, req }) => {
-        await refreshMediaUsageFor(req.payload, [
+        await refreshMediaUsageFor(req, [
           (doc as Record<string, unknown>)?.execTeamImageMedia,
           (previousDoc as Record<string, unknown>)?.execTeamImageMedia,
         ]);
