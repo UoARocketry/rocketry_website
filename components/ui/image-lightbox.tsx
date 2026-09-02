@@ -1,14 +1,18 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import ImageWithFallback from "@/components/ui/image-with-fallback";
 
 const MIN_ZOOM = 1;
-const MAX_ZOOM = 3;
+const MAX_ZOOM = 4;
 const ZOOM_STEP = 0.5;
+/** What a double tap jumps to, and back from. */
+const DOUBLE_TAP_ZOOM = 2.5;
+const DOUBLE_TAP_MS = 300;
+const DOUBLE_TAP_SLOP_PX = 24;
 
 interface ImageLightboxProps {
   readonly images: readonly string[];
@@ -17,6 +21,11 @@ interface ImageLightboxProps {
   readonly onClose: () => void;
   readonly onIndexChange?: (index: number) => void;
 }
+
+/** Zoom and pan held together, because a pinch changes both at once. */
+type View = { zoom: number; x: number; y: number };
+
+const RESET: View = { zoom: MIN_ZOOM, x: 0, y: 0 };
 
 export default function ImageLightbox({
   images,
@@ -32,50 +41,94 @@ export default function ImageLightbox({
     ? images[(index - 1 + images.length) % images.length]
     : null;
 
-  const [zoom, setZoom] = useState(MIN_ZOOM);
-  const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const [view, setView] = useState<View>(RESET);
+  const [isGesturing, setIsGesturing] = useState(false);
   const viewportRef = useRef<HTMLDivElement>(null);
-  const dragState = useRef<{
-    startX: number;
-    startY: number;
-    startOffsetX: number;
-    startOffsetY: number;
-  } | null>(null);
+
+  /**
+   * Live pointers, keyed by id. Two at once is a pinch, one is a drag.
+   * Tracking them here rather than in state keeps a move handler from
+   * re-rendering before it has finished reading the other finger.
+   */
+  const pointers = useRef(new Map<number, { x: number; y: number }>());
+  const lastPinch = useRef<
+    { distance: number; midX: number; midY: number } | undefined
+  >(undefined);
+  const lastDrag = useRef<{ x: number; y: number } | undefined>(undefined);
+  const lastTap = useRef<{ at: number; x: number; y: number } | undefined>(
+    undefined,
+  );
 
   const goTo = (next: number) => {
     onIndexChange?.((next + images.length) % images.length);
   };
 
-  const clampOffset = (value: { x: number; y: number }, forZoom: number) => {
+  /**
+   * Keeps the image overlapping its frame.
+   *
+   * The image is `object-contain`, so at zoom 1 it may be letterboxed and
+   * there is nothing to pan to; past that, half the overflow in each axis is
+   * the furthest it can usefully move.
+   */
+  const clamp = useCallback((next: View): View => {
     const viewport = viewportRef.current;
-    if (!viewport || forZoom <= MIN_ZOOM) return { x: 0, y: 0 };
+    const zoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, next.zoom));
 
-    const maxX = (viewport.clientWidth * (forZoom - 1)) / 2;
-    const maxY = (viewport.clientHeight * (forZoom - 1)) / 2;
+    if (!viewport || zoom <= MIN_ZOOM) return { zoom, x: 0, y: 0 };
+
+    const maxX = (viewport.clientWidth * (zoom - 1)) / 2;
+    const maxY = (viewport.clientHeight * (zoom - 1)) / 2;
 
     return {
-      x: Math.min(maxX, Math.max(-maxX, value.x)),
-      y: Math.min(maxY, Math.max(-maxY, value.y)),
+      zoom,
+      x: Math.min(maxX, Math.max(-maxX, next.x)),
+      y: Math.min(maxY, Math.max(-maxY, next.y)),
     };
+  }, []);
+
+  /** Viewport centre in page coordinates, the origin the transform works in. */
+  const centre = () => {
+    const rect = viewportRef.current?.getBoundingClientRect();
+    if (!rect) return { x: 0, y: 0 };
+    return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
   };
 
-  const zoomIn = () =>
-    setZoom((current) => Math.min(MAX_ZOOM, current + ZOOM_STEP));
-  const zoomOut = () =>
-    setZoom((current) => Math.max(MIN_ZOOM, current - ZOOM_STEP));
+  /**
+   * Rescales around a fixed screen point, so the spot under the fingers stays
+   * under the fingers. Zooming about the centre instead made a pinch feel like
+   * the image was sliding away from you.
+   */
+  const zoomAround = useCallback(
+    (previous: View, nextZoom: number, screenX: number, screenY: number) => {
+      const origin = centre();
+      const focusX = screenX - origin.x;
+      const focusY = screenY - origin.y;
+      const ratio = nextZoom / previous.zoom;
+
+      return clamp({
+        zoom: nextZoom,
+        x: focusX - ratio * (focusX - previous.x),
+        y: focusY - ratio * (focusY - previous.y),
+      });
+    },
+    [clamp],
+  );
+
+  const zoomInFromCentre = () =>
+    setView((previous) => clamp({ ...previous, zoom: previous.zoom + ZOOM_STEP }));
+  const zoomOutFromCentre = () =>
+    setView((previous) => clamp({ ...previous, zoom: previous.zoom - ZOOM_STEP }));
 
   useEffect(() => {
-    setZoom(MIN_ZOOM);
-    setOffset({ x: 0, y: 0 });
+    setView(RESET);
   }, [index]);
 
   useEffect(() => {
-    setOffset((current) => clampOffset(current, zoom));
-  }, [zoom]);
-
-  useEffect(() => {
     const originalOverflow = document.body.style.overflow;
+    const originalOverscroll = document.body.style.overscrollBehavior;
     document.body.style.overflow = "hidden";
+    // Stops the page behind rubber-banding when a drag reaches the edge.
+    document.body.style.overscrollBehavior = "none";
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -85,42 +138,141 @@ export default function ImageLightbox({
       } else if (hasMultiple && event.key === "ArrowRight") {
         goTo(index + 1);
       } else if (event.key === "+" || event.key === "=") {
-        zoomIn();
+        zoomInFromCentre();
       } else if (event.key === "-") {
-        zoomOut();
+        zoomOutFromCentre();
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => {
       document.body.style.overflow = originalOverflow;
+      document.body.style.overscrollBehavior = originalOverscroll;
       window.removeEventListener("keydown", handleKeyDown);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onClose, hasMultiple, index, images.length]);
 
+  const readPointers = () => [...pointers.current.values()];
+
   const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (zoom <= MIN_ZOOM) return;
-    dragState.current = {
-      startX: event.clientX,
-      startY: event.clientY,
-      startOffsetX: offset.x,
-      startOffsetY: offset.y,
-    };
+    pointers.current.set(event.pointerId, {
+      x: event.clientX,
+      y: event.clientY,
+    });
     event.currentTarget.setPointerCapture(event.pointerId);
+    setIsGesturing(true);
+
+    const active = readPointers();
+
+    if (active.length === 2) {
+      const [a, b] = active;
+      lastPinch.current = {
+        distance: Math.hypot(a.x - b.x, a.y - b.y),
+        midX: (a.x + b.x) / 2,
+        midY: (a.y + b.y) / 2,
+      };
+      lastDrag.current = undefined;
+    } else if (active.length === 1) {
+      lastDrag.current = { x: event.clientX, y: event.clientY };
+    }
   };
 
   const handlePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!dragState.current) return;
-    const next = {
-      x: dragState.current.startOffsetX + (event.clientX - dragState.current.startX),
-      y: dragState.current.startOffsetY + (event.clientY - dragState.current.startY),
-    };
-    setOffset(clampOffset(next, zoom));
+    if (!pointers.current.has(event.pointerId)) return;
+
+    pointers.current.set(event.pointerId, {
+      x: event.clientX,
+      y: event.clientY,
+    });
+
+    const active = readPointers();
+
+    if (active.length >= 2) {
+      const [a, b] = active;
+      const distance = Math.hypot(a.x - b.x, a.y - b.y);
+      const midX = (a.x + b.x) / 2;
+      const midY = (a.y + b.y) / 2;
+      const previous = lastPinch.current;
+
+      if (!previous || previous.distance === 0) {
+        lastPinch.current = { distance, midX, midY };
+        return;
+      }
+
+      const scaleBy = distance / previous.distance;
+      const panX = midX - previous.midX;
+      const panY = midY - previous.midY;
+
+      setView((current) => {
+        const nextZoom = Math.min(
+          MAX_ZOOM,
+          Math.max(MIN_ZOOM, current.zoom * scaleBy),
+        );
+        const zoomed = zoomAround(current, nextZoom, midX, midY);
+
+        // Two fingers moving together drag as well as pinch.
+        return clamp({ ...zoomed, x: zoomed.x + panX, y: zoomed.y + panY });
+      });
+
+      lastPinch.current = { distance, midX, midY };
+      return;
+    }
+
+    const previous = lastDrag.current;
+    if (!previous) return;
+
+    const deltaX = event.clientX - previous.x;
+    const deltaY = event.clientY - previous.y;
+    lastDrag.current = { x: event.clientX, y: event.clientY };
+
+    setView((current) =>
+      current.zoom <= MIN_ZOOM
+        ? current
+        : clamp({ ...current, x: current.x + deltaX, y: current.y + deltaY }),
+    );
   };
 
-  const handlePointerUp = () => {
-    dragState.current = null;
+  /** Toggles between fit and close-up at the point that was tapped. */
+  const toggleZoomAt = (screenX: number, screenY: number) => {
+    setView((current) =>
+      current.zoom > MIN_ZOOM
+        ? RESET
+        : zoomAround(current, DOUBLE_TAP_ZOOM, screenX, screenY),
+    );
+  };
+
+  const endPointer = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const wasTracked = pointers.current.delete(event.pointerId);
+    const remaining = readPointers();
+
+    if (remaining.length < 2) lastPinch.current = undefined;
+
+    if (remaining.length === 1) {
+      // Lifting one finger of a pinch continues as a drag from where the
+      // other one is, rather than jumping.
+      lastDrag.current = { x: remaining[0].x, y: remaining[0].y };
+    } else if (remaining.length === 0) {
+      lastDrag.current = undefined;
+      setIsGesturing(false);
+    }
+
+    if (!wasTracked || event.pointerType === "mouse") return;
+
+    const now = Date.now();
+    const previous = lastTap.current;
+    const isDoubleTap =
+      previous &&
+      now - previous.at < DOUBLE_TAP_MS &&
+      Math.hypot(event.clientX - previous.x, event.clientY - previous.y) <
+        DOUBLE_TAP_SLOP_PX;
+
+    if (isDoubleTap) {
+      toggleZoomAt(event.clientX, event.clientY);
+      lastTap.current = undefined;
+    } else {
+      lastTap.current = { at: now, x: event.clientX, y: event.clientY };
+    }
   };
 
   if (!current) return null;
@@ -163,7 +315,7 @@ export default function ImageLightbox({
         type="button"
         onClick={onClose}
         aria-label="Close"
-        className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white transition-colors hover:bg-black/70 cursor-pointer"
+        className="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-black/50 text-white transition-colors hover:bg-black/70 cursor-pointer"
       >
         <svg
           className="h-6 w-6"
@@ -186,10 +338,14 @@ export default function ImageLightbox({
         onClick={(event) => event.stopPropagation()}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-        onPointerLeave={handlePointerUp}
+        onPointerUp={endPointer}
+        onPointerCancel={endPointer}
+        // Without this the browser claims the gesture as a page scroll or its
+        // own pinch, and the pointer events stop arriving mid-drag. It is the
+        // single reason dragging felt broken on a phone.
+        style={{ touchAction: "none" }}
         className={`flex h-[90vh] w-[95vw] items-center justify-center overflow-hidden ${
-          zoom > MIN_ZOOM ? "cursor-grab active:cursor-grabbing" : ""
+          view.zoom > MIN_ZOOM ? "cursor-grab active:cursor-grabbing" : ""
         }`}
       >
         {/* h-full/w-full (not h-auto) so smaller source images scale UP to fill
@@ -203,9 +359,11 @@ export default function ImageLightbox({
           sizes="95vw"
           draggable={false}
           style={{
-            transform: `translate(${offset.x}px, ${offset.y}px) scale(${zoom})`,
+            transform: `translate(${view.x}px, ${view.y}px) scale(${view.zoom})`,
+            // Animating during a gesture leaves the image trailing the finger.
+            transition: isGesturing ? "none" : "transform 150ms",
           }}
-          className="h-full w-full select-none rounded-lg object-contain transition-transform duration-150"
+          className="h-full w-full select-none rounded-lg object-contain"
         />
       </div>
 
@@ -215,22 +373,22 @@ export default function ImageLightbox({
       >
         <button
           type="button"
-          onClick={zoomOut}
-          disabled={zoom <= MIN_ZOOM}
+          onClick={zoomOutFromCentre}
+          disabled={view.zoom <= MIN_ZOOM}
           aria-label="Zoom out"
-          className="flex h-8 w-8 items-center justify-center rounded-full text-lg transition-colors hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
+          className="flex h-9 w-9 items-center justify-center rounded-full text-lg transition-colors hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
         >
           −
         </button>
         <span className="w-12 text-center text-sm tabular-nums">
-          {Math.round(zoom * 100)}%
+          {Math.round(view.zoom * 100)}%
         </span>
         <button
           type="button"
-          onClick={zoomIn}
-          disabled={zoom >= MAX_ZOOM}
+          onClick={zoomInFromCentre}
+          disabled={view.zoom >= MAX_ZOOM}
           aria-label="Zoom in"
-          className="flex h-8 w-8 items-center justify-center rounded-full text-lg transition-colors hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
+          className="flex h-9 w-9 items-center justify-center rounded-full text-lg transition-colors hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
         >
           +
         </button>

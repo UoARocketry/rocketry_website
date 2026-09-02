@@ -59,26 +59,40 @@ function isValidUrl(value: string): boolean {
   }
 }
 
+/**
+ * Validation must judge the value that will actually be *stored*, not the one
+ * that was typed.
+ *
+ * `urlFieldHooks` prepends the scheme, but a field hook only runs on the
+ * server. The admin validates in the browser first, so typing a bare
+ * "docs.google.com/..." flashed "must be a valid http(s) URL" before the save
+ * went through and quietly succeeded. Normalising here first makes the two
+ * agree, and it is the same function the hook uses, so they cannot drift.
+ */
 export function validateOptionalUrl(
   value: unknown,
   fieldLabel = "URL",
 ): true | string {
-  if (!isNonEmptyString(value)) {
+  const normalized = normalizeUrlValue(value);
+
+  if (!isNonEmptyString(normalized)) {
     return true;
   }
 
-  return isValidUrl(value) || `${fieldLabel} must be a valid http(s) URL.`;
+  return isValidUrl(normalized) || `${fieldLabel} must be a valid http(s) URL.`;
 }
 
 export function validateRequiredUrl(
   value: unknown,
   fieldLabel = "URL",
 ): true | string {
-  if (!isNonEmptyString(value)) {
+  const normalized = normalizeUrlValue(value);
+
+  if (!isNonEmptyString(normalized)) {
     return `${fieldLabel} is required.`;
   }
 
-  return isValidUrl(value) || `${fieldLabel} must be a valid http(s) URL.`;
+  return isValidUrl(normalized) || `${fieldLabel} must be a valid http(s) URL.`;
 }
 
 /**
@@ -153,8 +167,12 @@ export function validateUrlOrUpload(
   relationField: string,
   fieldLabel = "URL",
 ): true | string {
-  if (isNonEmptyString(value)) {
-    return isValidUrl(value) || `${fieldLabel} must be a valid http(s) URL.`;
+  const normalized = normalizeUrlValue(value);
+
+  if (isNonEmptyString(normalized)) {
+    return (
+      isValidUrl(normalized) || `${fieldLabel} must be a valid http(s) URL.`
+    );
   }
 
   const sibling =
