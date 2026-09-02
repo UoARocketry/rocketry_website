@@ -6,6 +6,7 @@ import {
   revalidateTags,
 } from "../hooks/revalidation.ts";
 import { createMediaRelationUrlSyncHook } from "../hooks/media-url-sync.ts";
+import { rejectDuplicateDays } from "../hooks/duplicate-days.ts";
 import {
   createMediaUsageDeleteHook,
   createMediaUsageHook,
@@ -48,6 +49,7 @@ export const Events: CollectionConfig = {
     delete: isLoggedIn,
   },
   hooks: {
+    beforeValidate: [rejectDuplicateDays],
     beforeChange: [
       createMediaRelationUrlSyncHook({
         relationField: "imageMedia",

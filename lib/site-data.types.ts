@@ -33,6 +33,8 @@ export type RocketDetail = RocketSummary & {
 };
 
 export type EventSession = {
+  /** Payload's own row id. The only key that survives a retitle or a reorder. */
+  id?: string | null;
   title: string;
   date: string;
   /** Only the clock part is used. Null when the session has no stated finish. */

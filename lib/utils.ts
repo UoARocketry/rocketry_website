@@ -70,6 +70,37 @@ export function normalizeDayOnlyDate(value: string | Date): string {
   ).toISOString();
 }
 
+/**
+ * The calendar day a real instant falls on in Auckland, as YYYY-MM-DD.
+ *
+ * For a timed value only. A day-only value is not an instant and must be read
+ * through `toDayInputValue` instead, which takes its UTC parts.
+ */
+export function nzCalendarDay(
+  value: string | Date | null | undefined,
+): string | null {
+  if (!value) return null;
+
+  const parsed = toValidDate(value);
+  if (!parsed) return null;
+
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: DEFAULT_TIME_ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(parsed);
+
+  const read = (type: string) =>
+    parts.find((part) => part.type === type)?.value ?? "";
+
+  const year = read("year");
+  const month = read("month");
+  const day = read("day");
+
+  return year && month && day ? `${year}-${month}-${day}` : null;
+}
+
 export function toSafeJsonLd(data: unknown): string {
   // JSON.stringify doesn't escape "<", so a literal "</script>" inside a
   // string field (e.g. an admin-entered title) would break out of the

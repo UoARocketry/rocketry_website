@@ -279,6 +279,7 @@ function mapEvent(doc: PayloadEvent): EventSummary {
   const sessions = sortByDate(
     (doc.sessions ?? [])
       .map((session) => ({
+        id: session.id ?? null,
         title: session.title,
         date: normalizeEventDate(session.date),
         endTime: normalizeEventDate(session.endTime) || null,

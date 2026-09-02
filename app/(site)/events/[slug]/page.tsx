@@ -283,8 +283,16 @@ export default async function EventPage({ params }: EventPageProps) {
                 (entry) => entry.location,
               );
 
+              // Payload's row id, which two sessions cannot share. Title and
+              // date can: a series runs a 3D printing and a laser cutting
+              // workshop on the same afternoon.
               return (
-                <li key={`${session.title}-${session.date}`}>
+                <li
+                  key={
+                    session.id ??
+                    `${session.title}-${session.date}-${sessionIndex}`
+                  }
+                >
                   {/* Native <details> keeps this a server component — the next
                       session opens by default, the rest stay collapsed so a
                       long series with long descriptions isn't overwhelming. */}
