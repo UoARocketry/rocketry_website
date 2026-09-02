@@ -33,12 +33,14 @@ export default function SponsorCard({
             isDarkPlate ? "bg-[#111318] border border-white/10" : "bg-white"
           }`}
         >
-          {/* Taller than it was, and the logo is held back from the full plate
-              width. `object-contain` scales to whichever edge binds first, so
-              a 3:1 wordmark used to fill the plate while a square badge sat at
-              64px in the middle of it — roughly a quarter the visual weight
-              for the same tier. */}
-          <div className="relative mx-auto h-20 w-[85%] sm:h-24">
+          {/* Roughly 2:1, the compromise a sponsor wall wants. A company's
+              primary logo is usually a horizontal wordmark, so a square plate
+              would starve the common case; a very wide one strands the square
+              badges. `object-contain` scales to whichever edge binds first,
+              which makes the height cap asymmetric on purpose: a wordmark is
+              width-bound and ignores it, while a square mark is height-bound
+              and grows with it. */}
+          <div className="relative mx-auto h-24 w-[85%] sm:h-32">
             {logoSrc ? (
               <ImageWithFallback
                 src={logoSrc}
@@ -74,8 +76,10 @@ export default function SponsorCard({
           </p>
         )}
 
-        {/* External link indicator */}
-        <div className="mt-4 flex items-center text-primary text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+        {/* Dimmed rather than invisible: it reserves its space either way, and
+            hiding it outright left an unexplained gap under a card with no
+            description. */}
+        <div className="mt-4 flex items-center text-primary text-sm font-medium opacity-50 group-hover:opacity-100 transition-opacity duration-200">
           Visit website
           <svg
             className="w-4 h-4 ml-1"
