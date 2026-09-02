@@ -113,6 +113,17 @@ export const Rockets: CollectionConfig = {
         appliesTo: "the rocket cards",
       },
     }),
+    {
+      name: "gallery",
+      type: "upload",
+      relationTo: "media" as never,
+      hasMany: true,
+      required: false,
+      admin: {
+        description:
+          "Additional photos shown in the image gallery on the rocket's detail page, after the cover image above. Drag to reorder.",
+      },
+    },
     { name: "description", type: "textarea", required: false },
     ...createLinkListFields({
       name: "videos",
@@ -190,17 +201,6 @@ export const Rockets: CollectionConfig = {
           },
         },
       ],
-    },
-    {
-      name: "gallery",
-      type: "upload",
-      relationTo: "media" as never,
-      hasMany: true,
-      required: false,
-      admin: {
-        description:
-          "Additional photos shown in the image gallery on the rocket's detail page, after the cover image above. Drag to reorder.",
-      },
     },
   ],
 };

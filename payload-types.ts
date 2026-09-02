@@ -228,7 +228,7 @@ export interface Event {
    */
   image?: string | null;
   /**
-   * Optional. Further photos shown after the poster above, stepped through with arrows on the event's page. Drag to reorder. The cards elsewhere on the site always use the poster.
+   * Additional photos shown in the image gallery on the event's detail page, after the cover image above. Drag to reorder.
    */
   gallery?: (number | Media)[] | null;
   description: string;
@@ -382,6 +382,10 @@ export interface Rocket {
    */
   image?: string | null;
   imagePosition?: string | null;
+  /**
+   * Additional photos shown in the image gallery on the rocket's detail page, after the cover image above. Drag to reorder.
+   */
+  gallery?: (number | Media)[] | null;
   description?: string | null;
   /**
    * What this section is called. Leave empty for "Videos".
@@ -441,10 +445,6 @@ export interface Rocket {
         id?: string | null;
       }[]
     | null;
-  /**
-   * Additional photos shown in the image gallery on the rocket's detail page, after the cover image above. Drag to reorder.
-   */
-  gallery?: (number | Media)[] | null;
   updatedAt: string;
   createdAt: string;
   deletedAt?: string | null;
@@ -890,6 +890,7 @@ export interface RocketsSelect<T extends boolean = true> {
   imageMedia?: T;
   image?: T;
   imagePosition?: T;
+  gallery?: T;
   description?: T;
   videosHeading?: T;
   videos?:
@@ -916,7 +917,6 @@ export interface RocketsSelect<T extends boolean = true> {
         value?: T;
         id?: T;
       };
-  gallery?: T;
   updatedAt?: T;
   createdAt?: T;
   deletedAt?: T;

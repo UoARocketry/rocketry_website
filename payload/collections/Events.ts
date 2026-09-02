@@ -114,7 +114,7 @@ export const Events: CollectionConfig = {
       required: false,
       admin: {
         description:
-          "Optional. Further photos shown after the poster above, stepped through with arrows on the event's page. Drag to reorder. The cards elsewhere on the site always use the poster.",
+          "Additional photos shown in the image gallery on the event's detail page, after the cover image above. Drag to reorder.",
       },
     },
     { name: "description", type: "textarea", required: true },
