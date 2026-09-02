@@ -143,6 +143,41 @@ export function formatTimeOfDay(
   });
 }
 
+/**
+ * Minutes since midnight, read in Auckland.
+ *
+ * A `timeOnly` field stores a full instant and only its clock part means
+ * anything, so two of them can only be compared on that clock part — and it
+ * has to be read in the site's timezone, or a 9am start on a UTC server
+ * compares as 9pm the previous day.
+ */
+export function minutesOfDay(
+  value: string | Date | null | undefined,
+): number | null {
+  if (!value) return null;
+
+  const parsed = toValidDate(value);
+  if (!parsed) return null;
+
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: DEFAULT_TIME_ZONE,
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).formatToParts(parsed);
+
+  const read = (type: string) =>
+    Number(parts.find((part) => part.type === type)?.value);
+
+  const hour = read("hour");
+  const minute = read("minute");
+
+  if (!Number.isFinite(hour) || !Number.isFinite(minute)) return null;
+
+  // Some engines render midnight as hour 24 under hour12: false.
+  return (hour % 24) * 60 + minute;
+}
+
 /** "12:00 PM – 3:00 PM", or just the start when there is no end. */
 export function formatTimeRange(
   start: string | Date | null | undefined,
@@ -347,7 +382,57 @@ function formatDateWithWeekday(date: Date, locale: string): string {
   });
 }
 
-const DAY_MS = 24 * 60 * 60 * 1000;
+/** How far the site's timezone is from UTC at a given instant, in ms. */
+function nzOffsetMs(date: Date): number {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: DEFAULT_TIME_ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  }).formatToParts(date);
+
+  const read = (type: string) =>
+    Number(parts.find((part) => part.type === type)?.value);
+
+  const asIfUtc = Date.UTC(
+    read("year"),
+    read("month") - 1,
+    read("day"),
+    read("hour") % 24,
+    read("minute"),
+    read("second"),
+  );
+
+  return asIfUtc - date.getTime();
+}
+
+/**
+ * Midnight at the end of the Auckland day a value falls on.
+ *
+ * Anything dated is "still on" until its day is actually over locally. A flat
+ * +24h from the stored instant was close but wrong in both directions: a
+ * day-only date is anchored at midday, so adding a day retired it at noon the
+ * *following* day, while a timed event was retired the minute it began.
+ */
+export function endOfNzDay(value: string | Date): number | null {
+  const parsed = toValidDate(value);
+  if (!parsed) return null;
+
+  const offset = nzOffsetMs(parsed);
+  const local = new Date(parsed.getTime() + offset);
+
+  const nextMidnight = Date.UTC(
+    local.getUTCFullYear(),
+    local.getUTCMonth(),
+    local.getUTCDate() + 1,
+  );
+
+  return nextMidnight - offset;
+}
 
 function getExtraDateTimestamps(
   source: { readonly extraDates?: readonly ExtraDateLike[] } | undefined,
@@ -392,14 +477,45 @@ function getSessionSpans(sessions: readonly SessionLike[]): SessionSpan[] {
       const start = toValidDate(session.date)?.getTime();
       if (typeof start !== "number") return null;
 
-      const extras = getExtraDateTimestamps(session).map(
-        (timestamp) => timestamp + DAY_MS,
-      );
+      const ends = [
+        endOfNzDay(session.date),
+        ...getExtraDateTimestamps(session).map((timestamp) =>
+          endOfNzDay(new Date(timestamp)),
+        ),
+      ].filter((end): end is number => end !== null);
 
-      return { start, end: Math.max(start, ...extras) };
+      return { start, end: Math.max(start, ...ends) };
     })
     .filter((span): span is SessionSpan => span !== null)
     .sort((a, b) => a.start - b.start);
+}
+
+/**
+ * The last calendar day a series runs on, as a stored date value.
+ *
+ * The final session is not necessarily the one that finishes last: a session
+ * carrying extra days runs past its own date. Reading only `date` off the last
+ * session made a series ending with a two-day workshop report the wrong end.
+ */
+export function getSeriesEndDate(
+  sessions: readonly SessionLike[],
+): string | null {
+  let latest: { value: string; at: number } | null = null;
+
+  for (const session of sessions) {
+    const candidates = [
+      session.date,
+      ...(session.extraDates ?? []).map((extra) => extra.date),
+    ];
+
+    for (const candidate of candidates) {
+      const at = candidate ? toValidDate(candidate)?.getTime() : undefined;
+      if (typeof at !== "number") continue;
+      if (!latest || at > latest.at) latest = { value: candidate, at };
+    }
+  }
+
+  return latest?.value ?? null;
 }
 
 /**
@@ -416,10 +532,12 @@ function getOccurrenceSpans(event: EventLike): SessionSpan[] {
   const start = toValidDate(event.date)?.getTime();
 
   return [
-    ...(typeof start === "number" ? [{ start, end: start }] : []),
+    ...(typeof start === "number"
+      ? [{ start, end: endOfNzDay(event.date) ?? start }]
+      : []),
     ...getExtraDateTimestamps(event).map((timestamp) => ({
       start: timestamp,
-      end: timestamp + DAY_MS,
+      end: endOfNzDay(new Date(timestamp)) ?? timestamp,
     })),
   ].sort((a, b) => a.start - b.start);
 }
@@ -485,13 +603,13 @@ export function isEventUpcoming(event: EventLike): boolean {
 
   const start = toValidDate(event.date)?.getTime();
 
-  // The day-only picker stores an extra day as its opening midnight. Read
-  // literally that would retire an event the instant its final day began,
-  // which is exactly when people are still checking the details, so a day
-  // counts as running until the next midnight.
+  // An event runs until its last day is over locally, not from the instant it
+  // begins — people check the details most while it is actually happening.
   const ends = [
-    ...(typeof start === "number" ? [start] : []),
-    ...getExtraDateTimestamps(event).map((timestamp) => timestamp + DAY_MS),
+    ...(typeof start === "number" ? [endOfNzDay(event.date) ?? start] : []),
+    ...getExtraDateTimestamps(event).map(
+      (timestamp) => endOfNzDay(new Date(timestamp)) ?? timestamp,
+    ),
   ];
 
   return ends.length > 0 && Math.max(...ends) >= now;
@@ -513,11 +631,14 @@ export function findNextSessionIndex(
     const start = toValidDate(session.date)?.getTime();
     if (typeof start !== "number") return false;
 
-    const extras = getExtraDateTimestamps(session).map(
-      (timestamp) => timestamp + DAY_MS,
-    );
+    const ends = [
+      endOfNzDay(session.date),
+      ...getExtraDateTimestamps(session).map((timestamp) =>
+        endOfNzDay(new Date(timestamp)),
+      ),
+    ].filter((end): end is number => end !== null);
 
-    return Math.max(start, ...extras) >= now;
+    return Math.max(start, ...ends) >= now;
   });
 }
 

@@ -3,6 +3,7 @@ function isNonEmptyString(value: unknown): value is string {
 }
 
 import type { FieldHook } from "payload";
+import { minutesOfDay } from "../../lib/utils.ts";
 
 /** Straight and curly quotes, as pasted from a chat app or a document. */
 const WRAPPING_QUOTES = /^["'‘’“”]+|["'‘’“”]+$/g;
@@ -78,6 +79,40 @@ export function validateRequiredUrl(
   }
 
   return isValidUrl(value) || `${fieldLabel} must be a valid http(s) URL.`;
+}
+
+/**
+ * Rejects an end time at or before the start time it belongs to.
+ *
+ * Nothing stopped a session being saved as "1:30 PM – 12:30 PM", which the
+ * site then printed exactly as entered. Both values are compared on their
+ * clock part alone, because a `timeOnly` field carries a real but meaningless
+ * date alongside the time.
+ *
+ * Blank passes: an end time is optional everywhere it appears, and an extra
+ * day with no start of its own inherits the parent's hours, so there is no
+ * local pair to compare.
+ */
+export function createEndTimeValidate(startField: string) {
+  return (value: unknown, { siblingData }: { siblingData: unknown }) => {
+    const start = (siblingData as Record<string, unknown> | undefined)?.[
+      startField
+    ];
+
+    const startMinutes = minutesOfDay(start as string | null | undefined);
+    const endMinutes = minutesOfDay(value as string | null | undefined);
+
+    if (startMinutes === null || endMinutes === null) return true;
+
+    if (endMinutes === startMinutes) {
+      return "The end time is the same as the start time.";
+    }
+
+    return (
+      endMinutes > startMinutes ||
+      "The end time must be after the start time."
+    );
+  };
 }
 
 /**

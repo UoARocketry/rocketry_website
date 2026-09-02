@@ -12,7 +12,11 @@ import {
 } from "../hooks/media-usage.ts";
 import { createImagePairFields } from "../fields/image-pair.ts";
 import { createPreviewUrl, createSlugField } from "../fields/slug.ts";
-import { urlFieldHooks, validateOptionalUrl } from "../fields/validators.ts";
+import {
+  createEndTimeValidate,
+  urlFieldHooks,
+  validateOptionalUrl,
+} from "../fields/validators.ts";
 
 export const Events: CollectionConfig = {
   slug: "events",
@@ -119,6 +123,7 @@ export const Events: CollectionConfig = {
         description:
           "Optional. When the event finishes that day. Leave empty and the page shows a start time only.",
       },
+      validate: createEndTimeValidate("date"),
     },
     {
       name: "extraDates",
@@ -137,7 +142,10 @@ export const Events: CollectionConfig = {
           type: "date",
           required: true,
           admin: {
-            date: { pickerAppearance: "dayOnly" },
+            components: {
+              Field:
+                "/payload/components/DayOnlyDateField.tsx#DayOnlyDateField",
+            },
             description: "The further day this event also runs on.",
           },
         },
@@ -158,6 +166,7 @@ export const Events: CollectionConfig = {
           admin: {
             date: { pickerAppearance: "timeOnly", timeFormat: "HH:mm" },
           },
+          validate: createEndTimeValidate("startTime"),
         },
         {
           name: "location",
@@ -270,6 +279,7 @@ export const Events: CollectionConfig = {
             date: { pickerAppearance: "timeOnly", timeFormat: "HH:mm" },
             description: "Optional. When this session finishes.",
           },
+          validate: createEndTimeValidate("date"),
         },
         {
           name: "extraDates",
@@ -288,7 +298,10 @@ export const Events: CollectionConfig = {
               type: "date",
               required: true,
               admin: {
-                date: { pickerAppearance: "dayOnly" },
+                components: {
+                  Field:
+                    "/payload/components/DayOnlyDateField.tsx#DayOnlyDateField",
+                },
                 description: "The further day this session also runs on.",
               },
             },
@@ -309,6 +322,7 @@ export const Events: CollectionConfig = {
               admin: {
                 date: { pickerAppearance: "timeOnly", timeFormat: "HH:mm" },
               },
+              validate: createEndTimeValidate("startTime"),
             },
             {
               name: "location",

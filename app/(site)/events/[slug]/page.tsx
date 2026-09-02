@@ -7,6 +7,7 @@ import {
   findNextSessionIndex,
   formatDateLong,
   formatEventWhen,
+  getSeriesEndDate,
   isEventUpcoming,
   toSafeJsonLd,
 } from "@/lib/utils";
@@ -69,7 +70,9 @@ export default async function EventPage({ params }: EventPageProps) {
   const hasSessions = sessions.length > 0;
   const nextSessionIndex = findNextSessionIndex(sessions);
   const seriesStart = hasSessions ? sessions[0].date : event.date;
-  const seriesEnd = hasSessions ? sessions[sessions.length - 1].date : null;
+  // Not the last session's own date: a session carrying extra days runs past
+  // it, so a series ending in a two-day workshop reported the wrong end.
+  const seriesEnd = hasSessions ? getSeriesEndDate(sessions) : null;
 
   const when = formatEventWhen(event);
 
@@ -158,12 +161,25 @@ export default async function EventPage({ params }: EventPageProps) {
               </div>
               <div className="space-y-2 mb-4 text-sm sm:text-base">
                 {hasSessions ? (
-                  <p className="text-text-secondary leading-relaxed">
-                    <span className="text-primary font-semibold">Runs:</span>{" "}
-                    {`${formatDateLong(seriesStart)} – ${formatDateLong(
-                      seriesEnd ?? seriesStart,
-                    )} (${sessions.length} sessions)`}
-                  </p>
+                  <>
+                    {/* The event's own date is not when the series runs — it
+                        is when it went up. Shown rather than dropped, so any
+                        extra days entered against the event still appear. */}
+                    {when.dateLabel && (
+                      <p className="text-text-secondary leading-relaxed">
+                        <span className="text-primary font-semibold">
+                          Announced:
+                        </span>{" "}
+                        {when.dateLabel}
+                      </p>
+                    )}
+                    <p className="text-text-secondary leading-relaxed">
+                      <span className="text-primary font-semibold">Runs:</span>{" "}
+                      {`${formatDateLong(seriesStart)} – ${formatDateLong(
+                        seriesEnd ?? seriesStart,
+                      )} (${sessions.length} sessions)`}
+                    </p>
+                  </>
                 ) : (
                   <>
                     <p className="text-text-secondary leading-relaxed">
@@ -332,52 +348,71 @@ export default async function EventPage({ params }: EventPageProps) {
                         </svg>
                       </span>
                     </summary>
-                    <div className="px-5 pb-5 pl-15 space-y-1">
-                      {/* Only when the session's days disagree on their hours
-                          or their room, which the summary line cannot say. */}
-                      {sessionWhen.schedule.length > 0 && (
-                        <ul className="mb-2 space-y-1 text-sm text-text-secondary">
-                          {sessionWhen.schedule.map((entry) => (
-                            <li key={entry.day}>
-                              {entry.day}
-                              {entry.time ? `, ${entry.time}` : ""}
-                              {entry.location ? ` — ${entry.location}` : ""}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                      {/* A pin and a label, because a bare room code sitting
-                          above the description read as part of it. */}
-                      {sessionLocation && (
-                        <p className="flex items-start gap-2 text-sm text-text-secondary">
-                          <svg
-                            className="mt-0.5 h-4 w-4 shrink-0 text-primary"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            aria-hidden="true"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                            />
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                            />
-                          </svg>
-                          <span>
-                            <span className="sr-only">Location: </span>
-                            {sessionLocation}
-                          </span>
-                        </p>
+                    <div className="px-5 pb-5 pl-15">
+                      {/* When and where sit together in their own panel so the
+                          facts read as a block rather than running into the
+                          description as one undifferentiated column of text. */}
+                      {(sessionWhen.schedule.length > 0 || sessionLocation) && (
+                        <div className="rounded-lg border border-border bg-surface/60 px-4 py-3">
+                          {/* Only when the session's days disagree on their
+                              hours or their room, which the summary cannot
+                              say. */}
+                          {sessionWhen.schedule.length > 0 && (
+                            <ul className="space-y-1 text-sm text-text-secondary">
+                              {sessionWhen.schedule.map((entry) => (
+                                <li key={entry.day} className="flex gap-2">
+                                  <span className="min-w-28 shrink-0 font-medium text-text-main">
+                                    {entry.day}
+                                  </span>
+                                  <span>
+                                    {entry.time}
+                                    {entry.location
+                                      ? `${entry.time ? " — " : ""}${entry.location}`
+                                      : ""}
+                                  </span>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                          {sessionWhen.schedule.length > 0 &&
+                            sessionLocation && (
+                              <hr className="my-3 border-border" />
+                            )}
+                          {/* A pin and a label, because a bare room code
+                              sitting above the description read as part
+                              of it. */}
+                          {sessionLocation && (
+                            <p className="flex items-start gap-2 text-sm text-text-secondary">
+                              <svg
+                                className="mt-0.5 h-4 w-4 shrink-0 text-primary"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                                />
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                />
+                              </svg>
+                              <span>
+                                <span className="sr-only">Location: </span>
+                                {sessionLocation}
+                              </span>
+                            </p>
+                          )}
+                        </div>
                       )}
                       {session.description ? (
-                        <p className="whitespace-pre-line text-sm text-text-secondary leading-relaxed">
+                        <p className="mt-4 whitespace-pre-line text-sm text-text-secondary leading-relaxed">
                           {session.description}
                         </p>
                       ) : (
