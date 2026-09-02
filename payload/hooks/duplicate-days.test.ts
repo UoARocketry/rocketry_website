@@ -5,6 +5,9 @@ import { findDuplicateDays } from "./duplicate-days.ts";
 const day = (iso: string) => `${iso}T12:00:00.000Z`;
 /** Noon in Auckland on the given day, which is midnight UTC the same day. */
 const nzNoon = (iso: string) => `${iso}T00:00:00.000Z`;
+/** A time-only value: only its Auckland clock reading matters. */
+const at = (hour: number, minute = 0) =>
+  new Date(Date.UTC(2026, 8, 1, hour - 12, minute)).toISOString();
 
 describe("findDuplicateDays", () => {
   beforeAll(() => {
@@ -20,8 +23,9 @@ describe("findDuplicateDays", () => {
     ).toEqual([]);
   });
 
-  it("catches an extra day repeating the event's own date", () => {
-    // Silently dropped before, taking that day's hours and location with it.
+  it("catches an extra day repeating the event's own date with no hours", () => {
+    // With no hours of its own it inherits the event's, so it is the same
+    // sitting again rather than a second one.
     const errors = findDuplicateDays({
       date: nzNoon("2026-09-03"),
       extraDates: [{ date: day("2026-09-03") }],
@@ -29,7 +33,32 @@ describe("findDuplicateDays", () => {
 
     expect(errors).toHaveLength(1);
     expect(errors[0]).toContain("3 September 2026");
-    expect(errors[0]).toContain("already");
+    expect(errors[0]).toContain("own start and end time");
+  });
+
+  it("allows a second sitting on the same day at different hours", () => {
+    expect(
+      findDuplicateDays({
+        date: nzNoon("2026-09-03"),
+        endTime: at(14),
+        extraDates: [
+          { date: day("2026-09-03"), startTime: at(15), endTime: at(17) },
+        ],
+      }),
+    ).toEqual([]);
+  });
+
+  it("rejects two sittings on one day at exactly the same hours", () => {
+    const errors = findDuplicateDays({
+      date: nzNoon("2026-09-03"),
+      extraDates: [
+        { date: day("2026-09-03"), startTime: at(15), endTime: at(17) },
+        { date: day("2026-09-03"), startTime: at(15), endTime: at(17) },
+      ],
+    });
+
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toContain("twice on 3 September 2026 at the same time");
   });
 
   it("catches one extra day repeating another", () => {

@@ -1,20 +1,37 @@
 import type { CollectionBeforeValidateHook } from "payload";
 import { toDayInputValue } from "../../lib/day-date.ts";
-import { nzCalendarDay } from "../../lib/utils.ts";
+import { minutesOfDay, nzCalendarDay } from "../../lib/utils.ts";
 
-type DayRow = { date?: string | null };
+type DayRow = {
+  date?: string | null;
+  startTime?: string | null;
+  endTime?: string | null;
+};
 
 type SessionRow = {
   title?: string | null;
   date?: string | null;
+  endTime?: string | null;
   extraDates?: DayRow[] | null;
 };
 
 type EventDoc = {
   date?: string | null;
+  endTime?: string | null;
   extraDates?: DayRow[] | null;
   sessions?: SessionRow[] | null;
 };
+
+/** The clock part of a row's hours, or null when it states none of its own. */
+function hoursKey(
+  startTime: string | null | undefined,
+  endTime: string | null | undefined,
+): string | null {
+  const start = minutesOfDay(startTime);
+  const end = minutesOfDay(endTime);
+
+  return start === null && end === null ? null : `${start ?? ""}-${end ?? ""}`;
+}
 
 /** "4 September 2026", from a YYYY-MM-DD key. */
 function readableDay(key: string): string {
@@ -38,33 +55,52 @@ function readableDay(key: string): string {
 function findRepeats(
   label: string,
   ownDate: string | null | undefined,
+  ownEndTime: string | null | undefined,
   extraDates: DayRow[] | null | undefined,
 ): string[] {
   const errors: string[] = [];
-  const seen = new Set<string>();
+  // Day to the sittings already claimed on it. A day may appear more than
+  // once, but never twice at the same hours.
+  const seen = new Map<string, Set<string | null>>();
+
+  const claim = (day: string, hours: string | null) => {
+    const existing = seen.get(day);
+    if (existing) {
+      existing.add(hours);
+      return;
+    }
+    seen.set(day, new Set([hours]));
+  };
 
   const own = nzCalendarDay(ownDate);
-  if (own) seen.add(own);
+  if (own) claim(own, hoursKey(ownDate, ownEndTime));
 
   for (const extra of extraDates ?? []) {
     const key = toDayInputValue(extra?.date);
     if (!key) continue;
 
-    if (key === own) {
-      errors.push(
-        `${label} already runs on ${readableDay(key)}. Remove that extra day, or change it to a different day.`,
-      );
-      continue;
+    const hours = hoursKey(extra?.startTime, extra?.endTime);
+    const claimed = seen.get(key);
+
+    if (claimed) {
+      // No hours of its own means it inherits the parent's, so it is the same
+      // sitting all over again rather than a second one.
+      if (hours === null) {
+        errors.push(
+          `${label} already runs on ${readableDay(key)}. Give that extra day its own start and end time to add a second session that day, or remove it.`,
+        );
+        continue;
+      }
+
+      if (claimed.has(hours)) {
+        errors.push(
+          `${label} runs twice on ${readableDay(key)} at the same time. Change the hours, or remove the duplicate.`,
+        );
+        continue;
+      }
     }
 
-    if (seen.has(key)) {
-      errors.push(
-        `${label} lists ${readableDay(key)} twice. Each extra day must be a different day.`,
-      );
-      continue;
-    }
-
-    seen.add(key);
+    claim(key, hours);
   }
 
   return errors;
@@ -79,13 +115,20 @@ function findRepeats(
  * same afternoon.
  */
 export function findDuplicateDays(doc: EventDoc): string[] {
-  const errors = findRepeats("This event", doc.date, doc.extraDates);
+  const errors = findRepeats(
+    "This event",
+    doc.date,
+    doc.endTime,
+    doc.extraDates,
+  );
 
   for (const session of doc.sessions ?? []) {
     const title = session?.title?.trim();
     const label = title ? `The session "${title}"` : "This session";
 
-    errors.push(...findRepeats(label, session?.date, session?.extraDates));
+    errors.push(
+      ...findRepeats(label, session?.date, session?.endTime, session?.extraDates),
+    );
   }
 
   return errors;

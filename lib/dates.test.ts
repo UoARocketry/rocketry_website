@@ -141,8 +141,8 @@ describe("formatEventWhen", () => {
     expect(when.dateLabel).toBe("September 3 & 4, 2026");
     expect(when.timeLabel).toBeNull();
     expect(when.schedule).toEqual([
-      { day: "September 3", time: "12:00 PM – 3:00 PM", location: null },
-      { day: "September 4", time: "9:00 AM – 10:00 AM", location: null },
+      { day: "September 3", slots: [{ time: "12:00 PM – 3:00 PM", location: null }] },
+      { day: "September 4", slots: [{ time: "9:00 AM – 10:00 AM", location: null }] },
     ]);
   });
 
@@ -171,8 +171,8 @@ describe("formatEventWhen", () => {
     expect(when.timeLabel).toBe("12:00 PM – 3:00 PM, both days");
     expect(when.locationLabel).toBeNull();
     expect(when.schedule).toEqual([
-      { day: "September 3", time: "", location: "Engineering Block 401" },
-      { day: "September 4", time: "", location: "W&D Rooms 405-122" },
+      { day: "September 3", slots: [{ time: "", location: "Engineering Block 401" }] },
+      { day: "September 4", slots: [{ time: "", location: "W&D Rooms 405-122" }] },
     ]);
   });
 

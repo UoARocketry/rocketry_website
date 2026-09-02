@@ -198,7 +198,8 @@ export default async function EventPage({ params }: EventPageProps) {
                 {when.schedule.length > 0 && (
                   <div className="text-text-secondary leading-relaxed">
                     <span className="text-primary font-semibold">
-                      Each day:
+                      {/* One day with two sittings is not "each day". */}
+                      {when.schedule.length > 1 ? "Each day:" : "Times:"}
                     </span>
                     <div className="mt-1.5">
                       <ScheduleList entries={when.schedule} />
@@ -279,8 +280,8 @@ export default async function EventPage({ params }: EventPageProps) {
               // Once the days name their own rooms, repeating one of them
               // underneath as *the* session location just reads as a
               // contradiction.
-              const hasPerDayLocations = sessionWhen.schedule.some(
-                (entry) => entry.location,
+              const hasPerDayLocations = sessionWhen.schedule.some((entry) =>
+                entry.slots.some((slot) => slot.location),
               );
 
               // Payload's row id, which two sessions cannot share. Title and

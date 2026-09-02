@@ -292,15 +292,24 @@ function formatDayList(days: readonly DayParts[], sameYear: boolean): string {
   return sameYear ? `${joined}, ${days[0].year}` : joined;
 }
 
+/** One sitting: a time range and, when it differs, where it is held. */
+export type EventDaySlot = { time: string; location: string | null };
+
 export type EventWhen = {
-  /** The day or days, e.g. "September 3 & 4, 2026". */
+  /** The day or days, e.g. "September 3 & 4, 2026". Each day named once. */
   dateLabel: string;
   /** Hours shared by every day, or null when they differ. */
   timeLabel: string | null;
   /** Where every day is held, or null when they differ or none was given. */
   locationLabel: string | null;
-  /** Per-day detail, only when the days do not all share hours and place. */
-  schedule: { day: string; time: string; location: string | null }[];
+  /**
+   * Per-day detail, only when the days do not all share hours and place.
+   *
+   * Grouped by day rather than flat, because one day can hold more than one
+   * sitting: a workshop run in the morning and again in the afternoon is a
+   * single session on a single day with two time ranges.
+   */
+  schedule: { day: string; slots: EventDaySlot[] }[];
 };
 
 /**
@@ -349,25 +358,33 @@ export function formatEventWhen(
     }),
   ]
     .filter((day): day is Day => day.date !== null)
-    .sort((a, b) => a.date.getTime() - b.date.getTime())
-    // Two rows landing on one calendar day rendered as "September 19 & 19".
-    // Whatever the editor intended, a day printed twice is never right, and
-    // the first entry wins because it is the one carrying the event's own time.
-    .filter(
-      (day, index, all) =>
-        index ===
-        all.findIndex(
-          (other) =>
-            other.date.toLocaleDateString(locale, {
-              timeZone: DEFAULT_TIME_ZONE,
-            }) ===
-            day.date.toLocaleDateString(locale, {
-              timeZone: DEFAULT_TIME_ZONE,
-            }),
-        ),
+    .sort(
+      (a, b) =>
+        a.date.getTime() - b.date.getTime() ||
+        // Two sittings on one day put the earlier one first.
+        (minutesOfDay(a.start) ?? 0) - (minutesOfDay(b.start) ?? 0),
     );
 
-  if (days.length === 0) {
+  const slots = days.map((day) => ({
+    date: day.date,
+    time: formatTimeRange(day.start, day.end, locale),
+    location: day.location?.trim() || "",
+  }));
+
+  // Genuine duplicates only: same day, same hours, same room. A day repeated
+  // with *different* hours is a second sitting and must survive.
+  const unique = slots.filter(
+    (slot, index, all) =>
+      index ===
+      all.findIndex(
+        (other) =>
+          other.date.getTime() === slot.date.getTime() &&
+          other.time === slot.time &&
+          other.location === slot.location,
+      ),
+  );
+
+  if (unique.length === 0) {
     return {
       dateLabel: "",
       timeLabel: null,
@@ -376,24 +393,51 @@ export function formatEventWhen(
     };
   }
 
-  const times = days.map((day) => formatTimeRange(day.start, day.end, locale));
-  const locations = days.map((day) => day.location?.trim() || "");
+  // One entry per calendar day, however many sittings it holds. Building the
+  // date label off this is what stops a two-sitting day reading "19 & 19".
+  const byDay: { parts: DayParts; slots: typeof unique }[] = [];
 
-  if (days.length === 1) {
+  for (const slot of unique) {
+    const parts = getDayParts(slot.date, locale);
+    const current = byDay[byDay.length - 1];
+
+    if (
+      current &&
+      current.parts.year === parts.year &&
+      current.parts.month === parts.month &&
+      current.parts.day === parts.day
+    ) {
+      current.slots.push(slot);
+    } else {
+      byDay.push({ parts, slots: [slot] });
+    }
+  }
+
+  const times = unique.map((slot) => slot.time);
+  const locations = unique.map((slot) => slot.location);
+
+  if (byDay.length === 1 && unique.length === 1) {
     return {
-      dateLabel: formatDateWithWeekday(days[0].date, locale),
+      dateLabel: formatDateWithWeekday(unique[0].date, locale),
       timeLabel: times[0] || null,
       locationLabel: locations[0] || null,
       schedule: [],
     };
   }
 
-  const parts = days.map((day) => getDayParts(day.date, locale));
+  const parts = byDay.map((entry) => entry.parts);
   const sameYear = parts.every((part) => part.year === parts[0].year);
-  const dateLabel = formatDayList(parts, sameYear);
+  // A single day keeps its weekday even when it holds two sittings. Only a run
+  // of days collapses to the compact "September 3, 4 & 5" form.
+  const dateLabel =
+    byDay.length === 1
+      ? formatDateWithWeekday(byDay[0].slots[0].date, locale)
+      : formatDayList(parts, sameYear);
 
-  const everyDay = days.length === 2 ? "both days" : "all days";
-  const sameTimes = times.every((time) => time === times[0]);
+  const everyDay = byDay.length === 2 ? "both days" : "all days";
+  // A day holding two sittings can never be spoken for by one shared line.
+  const oneSittingEach = byDay.every((entry) => entry.slots.length === 1);
+  const sameTimes = oneSittingEach && times.every((time) => time === times[0]);
   const samePlaces = locations.every((place) => place === locations[0]);
 
   // One line can only speak for every day when every day agrees. As soon as
@@ -402,9 +446,7 @@ export function formatEventWhen(
     return {
       dateLabel,
       timeLabel: times[0] ? `${times[0]}, ${everyDay}` : null,
-      locationLabel: locations[0]
-        ? `${locations[0]}, ${everyDay}`
-        : null,
+      locationLabel: locations[0] ? `${locations[0]}, ${everyDay}` : null,
       schedule: [],
     };
   }
@@ -416,10 +458,12 @@ export function formatEventWhen(
     timeLabel: sameTimes && times[0] ? `${times[0]}, ${everyDay}` : null,
     locationLabel:
       samePlaces && locations[0] ? `${locations[0]}, ${everyDay}` : null,
-    schedule: parts.map((part, index) => ({
-      day: `${part.month} ${part.day}`,
-      time: sameTimes ? "" : times[index],
-      location: samePlaces ? null : locations[index] || null,
+    schedule: byDay.map((entry) => ({
+      day: `${entry.parts.month} ${entry.parts.day}`,
+      slots: entry.slots.map((slot) => ({
+        time: sameTimes ? "" : slot.time,
+        location: samePlaces ? null : slot.location || null,
+      })),
     })),
   };
 }
