@@ -233,6 +233,20 @@ export const Events: CollectionConfig = {
       },
     },
     {
+      name: "signupLabel",
+      type: "text",
+      label: "Signup button label",
+      required: false,
+      admin: {
+        condition: (_data, siblingData) =>
+          (siblingData as Record<string, unknown> | undefined)?.signupType ===
+          "link",
+        placeholder: "Sign Up",
+        description:
+          'What the button says. Leave empty for "Sign Up". Use something else when the link is not a signup, e.g. "Buy tickets" or "RSVP".',
+      },
+    },
+    {
       name: "signupNote",
       type: "text",
       label: "Signup text",

@@ -28,6 +28,7 @@ import * as migration_20260902_170000_add_media_used_in from "./20260902_170000_
 import * as migration_20260902_180000_rocket_videos_array from "./20260902_180000_rocket_videos_array";
 
 import * as migration_20260902_190000_add_extra_date_locations from "./20260902_190000_add_extra_date_locations";
+import * as migration_20260902_200000_add_event_signup_label from "./20260902_200000_add_event_signup_label";
 
 export const migrations = [
   {
@@ -164,5 +165,10 @@ export const migrations = [
     up: migration_20260902_190000_add_extra_date_locations.up,
     down: migration_20260902_190000_add_extra_date_locations.down,
     name: "20260902_190000_add_extra_date_locations",
+  },
+  {
+    up: migration_20260902_200000_add_event_signup_label.up,
+    down: migration_20260902_200000_add_event_signup_label.down,
+    name: "20260902_200000_add_event_signup_label",
   },
 ];

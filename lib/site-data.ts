@@ -307,6 +307,7 @@ function mapEvent(doc: PayloadEvent): EventSummary {
     // the render depend on the backfill having run.
     signupType: doc.signupType ?? (doc.signupUrl ? "link" : "none"),
     signupUrl: doc.signupUrl ?? null,
+    signupLabel: blankToNull(doc.signupLabel),
     signupNote: doc.signupNote ?? null,
     location: blankToNull(doc.location),
     sessions,

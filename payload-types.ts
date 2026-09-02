@@ -229,9 +229,9 @@ export interface Event {
   image?: string | null;
   description: string;
   /**
-   * When the event starts. For an event running over more than one day, this is the first day.
+   * When the event starts. For an event running over more than one day, this is the first day. Optional: leave it empty for a series where only the sessions below have dates.
    */
-  date: string;
+  date?: string | null;
   /**
    * Optional. When the event finishes that day. Leave empty and the page shows a start time only.
    */
@@ -269,6 +269,10 @@ export interface Event {
    * Shown as a Sign Up button on the event page, for upcoming events only.
    */
   signupUrl?: string | null;
+  /**
+   * What the button says. Leave empty for "Sign Up". Use something else when the link is not a signup, e.g. "Buy tickets" or "RSVP".
+   */
+  signupLabel?: string | null;
   /**
    * Shown in place of the button, e.g. "Sign up link in our Instagram bio".
    */
@@ -788,6 +792,7 @@ export interface EventsSelect<T extends boolean = true> {
   eventTag?: T;
   signupType?: T;
   signupUrl?: T;
+  signupLabel?: T;
   signupNote?: T;
   location?: T;
   sessions?:

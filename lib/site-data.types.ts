@@ -68,6 +68,8 @@ export type EventSummary = {
   /** How people sign up: a link, a sentence, or nothing. */
   signupType: "none" | "link" | "text";
   signupUrl?: string | null;
+  /** What the signup button says. Null falls back to "Sign Up". */
+  signupLabel?: string | null;
   signupNote?: string | null;
   location?: string | null;
   sessions: EventSession[];

@@ -78,6 +78,10 @@ export default async function EventPage({ params }: EventPageProps) {
 
   const when = formatEventWhen(event);
 
+  // Editable, because the link is not always a signup: it might sell tickets
+  // or take an RSVP. Blank keeps the wording every existing event has.
+  const signupLabel = event.signupLabel?.trim() || "Sign Up";
+
   // Only a further day is a date that can stand as an end date. An end *time*
   // is stored as a clock reading on an unrelated day, so publishing it here
   // would put a wrong instant into search results.
@@ -234,9 +238,9 @@ export default async function EventPage({ params }: EventPageProps) {
                     rel="noopener noreferrer"
                     className="button bg-primary px-6 py-3 font-bold hover:bg-primary-dark transition-all duration-200"
                     style={{ color: "#ffffff" }}
-                    aria-label={`Sign up for ${event.title}`}
+                    aria-label={`${signupLabel} for ${event.title}`}
                   >
-                    Sign Up
+                    {signupLabel}
                   </a>
                 </div>
               )}
