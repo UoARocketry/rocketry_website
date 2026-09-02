@@ -12,7 +12,7 @@ import {
   type EventSummary,
   type RocketSummary,
 } from "@/lib/site-data";
-import { formatDateShort } from "@/lib/utils";
+import { formatDateShort, formatEventCardDate } from "@/lib/utils";
 
 /** Matches the three featured rockets above it, so the page stays balanced. */
 const HOME_EVENT_LIMIT = 2;
@@ -221,7 +221,7 @@ export default async function HomePage() {
                   <Card
                     image={event.image}
                     title={event.title}
-                    date={formatDateShort(event.date)}
+                    date={formatEventCardDate(event)}
                     tag={event.eventTag ?? "General"}
                     description={event.description ?? ""}
                     vertical

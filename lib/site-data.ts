@@ -78,6 +78,16 @@ function normalizeEventDate(value: string | null | undefined): string {
   return parseDateValue(value)?.toISOString() ?? "";
 }
 
+/**
+ * Clearing a text field in the Payload admin stores `""`, not `null`. Left as
+ * it is, an emptied per-day location defeats the `?? fallback` that should
+ * have inherited the session's or the event's room.
+ */
+function blankToNull(value: string | null | undefined): string | null {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : null;
+}
+
 function getSessionTimestamps(event: EventSummary): number[] {
   return event.sessions
     .map((session) => parseDateValue(session.date)?.getTime())
@@ -256,7 +266,7 @@ function mapEvent(doc: PayloadEvent): EventSummary {
           date: extra.date ? normalizeDayOnlyDate(extra.date) : "",
           startTime: normalizeEventDate(extra.startTime) || null,
           endTime: normalizeEventDate(extra.endTime) || null,
-          location: extra.location ?? null,
+          location: blankToNull(extra.location),
         }))
         .filter((extra) => extra.date.length > 0),
     );
@@ -274,7 +284,7 @@ function mapEvent(doc: PayloadEvent): EventSummary {
         endTime: normalizeEventDate(session.endTime) || null,
         extraDates: mapExtraDates(session.extraDates),
         description: session.description ?? null,
-        location: session.location ?? null,
+        location: blankToNull(session.location),
       }))
       .filter((session) => session.date.length > 0),
   );
@@ -297,7 +307,7 @@ function mapEvent(doc: PayloadEvent): EventSummary {
     signupType: doc.signupType ?? (doc.signupUrl ? "link" : "none"),
     signupUrl: doc.signupUrl ?? null,
     signupNote: doc.signupNote ?? null,
-    location: doc.location ?? null,
+    location: blankToNull(doc.location),
     sessions,
     status: doc._status ?? null,
   };

@@ -24,6 +24,19 @@ const DEFAULT_TIME_ZONE = "Pacific/Auckland";
 const normalizeWhitespace = (value: string) =>
   value.trim().replace(/\s+/g, " ");
 
+/**
+ * Treats a blank string as no value.
+ *
+ * Clearing a text field in the Payload admin stores `""`, not `null`, so every
+ * `value ?? fallback` in this file silently stopped falling back: an emptied
+ * per-day location came through as `""` and the day rendered with no location
+ * at all rather than inheriting the event's.
+ */
+function blankToNull(value: string | null | undefined): string | null {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : null;
+}
+
 function toValidDate(value: string | Date): Date | null {
   const parsed = value instanceof Date ? value : new Date(value);
   return Number.isNaN(parsed.getTime()) ? null : parsed;
@@ -271,12 +284,12 @@ export function formatEventWhen(
   locale = DEFAULT_LOCALE,
 ): EventWhen {
   const startTime = event.date;
-  const endTime = event.endTime ?? null;
-  const baseLocation = event.location ?? null;
+  const endTime = blankToNull(event.endTime);
+  const baseLocation = blankToNull(event.location);
 
   type Day = {
     date: Date;
-    start: string;
+    start: string | null;
     end: string | null;
     location: string | null;
   };
@@ -288,13 +301,21 @@ export function formatEventWhen(
       end: endTime,
       location: baseLocation,
     },
-    ...(event.extraDates ?? []).map((extra) => ({
-      date: extra.date ? toValidDate(extra.date) : null,
-      // A blank per-day value means "same as the first day".
-      start: extra.startTime ?? startTime,
-      end: extra.endTime ?? endTime,
-      location: extra.location ?? baseLocation,
-    })),
+    ...(event.extraDates ?? []).map((extra) => {
+      // Hours are inherited as a pair, never half of one. A day that set only
+      // its own start used to pick up the event's finish as well, printing
+      // impossible ranges like "4:30 PM – 3:00 PM".
+      const statesOwnHours = Boolean(
+        blankToNull(extra.startTime) || blankToNull(extra.endTime),
+      );
+
+      return {
+        date: extra.date ? toValidDate(extra.date) : null,
+        start: statesOwnHours ? blankToNull(extra.startTime) : startTime,
+        end: statesOwnHours ? blankToNull(extra.endTime) : endTime,
+        location: blankToNull(extra.location) ?? baseLocation,
+      };
+    }),
   ]
     .filter((day): day is Day => day.date !== null)
     .sort((a, b) => a.date.getTime() - b.date.getTime())

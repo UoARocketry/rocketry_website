@@ -100,7 +100,9 @@ export default async function EventPage({ params }: EventPageProps) {
     "@type": hasSessions ? "EventSeries" : "Event",
     name: event.title,
     description: event.description ?? undefined,
-    startDate: seriesStart,
+    // An event with no date of its own still has sessions; without either,
+    // publishing an empty string would be worse than publishing nothing.
+    startDate: seriesStart || undefined,
     endDate: seriesEnd ?? lastExtraDay ?? undefined,
     eventStatus: "https://schema.org/EventScheduledStatus",
     eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
@@ -166,10 +168,14 @@ export default async function EventPage({ params }: EventPageProps) {
                   them behind the session list lost them. `Runs:` is the extra
                   a series earns, not a replacement. */}
               <div className="space-y-2 mb-4 text-sm sm:text-base">
-                <p className="text-text-secondary leading-relaxed">
-                  <span className="text-primary font-semibold">Date:</span>{" "}
-                  {when.dateLabel}
-                </p>
+                {/* Optional: a series can leave its own date empty and let the
+                    sessions carry every date. */}
+                {when.dateLabel && (
+                  <p className="text-text-secondary leading-relaxed">
+                    <span className="text-primary font-semibold">Date:</span>{" "}
+                    {when.dateLabel}
+                  </p>
+                )}
                 {when.timeLabel && (
                   <p className="text-text-secondary leading-relaxed">
                     <span className="text-primary font-semibold">Time:</span>{" "}

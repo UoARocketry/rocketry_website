@@ -116,6 +116,29 @@ export function createEndTimeValidate(startField: string) {
 }
 
 /**
+ * Demands a start time on an extra day that states an end time.
+ *
+ * An extra day inherits the parent's hours as a pair, so a row giving only an
+ * end time has nothing to pair it with: it would either lose the end time or
+ * silently borrow a start that could fall after it. Requiring both removes the
+ * ambiguity at the point of entry.
+ */
+export function validateStartTimePresent(
+  value: unknown,
+  { siblingData }: { siblingData: unknown },
+) {
+  const end = (siblingData as Record<string, unknown> | undefined)?.endTime;
+  const hasEnd = typeof end === "string" && end.trim().length > 0;
+  const hasStart = typeof value === "string" && value.trim().length > 0;
+
+  if (hasEnd && !hasStart) {
+    return "Add a start time as well, or clear the end time.";
+  }
+
+  return true;
+}
+
+/**
  * For URL fields that are auto-filled from a sibling upload relation by a
  * `beforeChange` hook.
  *

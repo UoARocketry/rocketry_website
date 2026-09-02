@@ -16,6 +16,7 @@ import {
   createEndTimeValidate,
   urlFieldHooks,
   validateOptionalUrl,
+  validateStartTimePresent,
 } from "../fields/validators.ts";
 
 export const Events: CollectionConfig = {
@@ -106,11 +107,11 @@ export const Events: CollectionConfig = {
     {
       name: "date",
       type: "date",
-      required: true,
+      required: false,
       admin: {
         date: { pickerAppearance: "dayAndTime", timeFormat: "HH:mm" },
         description:
-          "When the event starts. For an event running over more than one day, this is the first day.",
+          "When the event starts. For an event running over more than one day, this is the first day. Optional: leave it empty for a series where only the sessions below have dates.",
       },
     },
     {
@@ -158,6 +159,7 @@ export const Events: CollectionConfig = {
             description:
               "Leave empty to run the same hours as the first day. Fill both in only if this day differs.",
           },
+          validate: validateStartTimePresent,
         },
         {
           name: "endTime",
@@ -314,6 +316,7 @@ export const Events: CollectionConfig = {
                 description:
                   "Leave empty to run the same hours as the session's first day.",
               },
+              validate: validateStartTimePresent,
             },
             {
               name: "endTime",
