@@ -239,6 +239,22 @@ function mapRocketDetail(doc: PayloadRocket): RocketDetail {
   };
 }
 
+function mapEventDetail(doc: PayloadEvent): EventDetail {
+  // `gallery` is a hasMany upload, so entries arrive either as a populated
+  // media object or as a bare id when depth is too shallow to resolve them.
+  const galleryImages = (doc.gallery ?? [])
+    .map((item) => (item && typeof item === "object" ? item.url : null))
+    .filter((url): url is string => Boolean(url));
+
+  return {
+    ...mapEvent(doc),
+    // The poster leads, so the page opens on the image the cards already show.
+    images: [doc.image, ...galleryImages].filter((url): url is string =>
+      Boolean(url),
+    ),
+  };
+}
+
 function mapEvent(doc: PayloadEvent): EventSummary {
   const eventTag =
     doc.eventTag && typeof doc.eventTag === "object"
@@ -440,7 +456,7 @@ const getEventBySlugCached = createCachedByStringArg<EventDetail | null>({
     });
 
     const doc = result.docs[0];
-    return doc ? mapEvent(doc as PayloadEvent) : null;
+    return doc ? mapEventDetail(doc as PayloadEvent) : null;
   },
 });
 
@@ -725,7 +741,7 @@ export async function getEventBySlugDraft(
   });
 
   const doc = result.docs[0];
-  return doc ? mapEvent(doc as PayloadEvent) : null;
+  return doc ? mapEventDetail(doc as PayloadEvent) : null;
 }
 
 export async function getEventBySlug(

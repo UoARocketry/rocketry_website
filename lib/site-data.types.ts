@@ -77,7 +77,10 @@ export type EventSummary = {
   status?: "draft" | "published" | null;
 };
 
-export type EventDetail = EventSummary;
+export type EventDetail = EventSummary & {
+  /** The poster followed by any gallery images, ready for the cycler. */
+  images: string[];
+};
 
 export type Exec = {
   id: number;

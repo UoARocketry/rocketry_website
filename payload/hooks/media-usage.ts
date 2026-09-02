@@ -7,6 +7,7 @@ import type {
 /** Every place an image can be attached, and how that reads in the admin. */
 export const MEDIA_USAGE_SOURCES = [
   { collection: "events", field: "imageMedia", value: "events" },
+  { collection: "events", field: "gallery", value: "events" },
   { collection: "rockets", field: "imageMedia", value: "rockets" },
   { collection: "rockets", field: "gallery", value: "rockets" },
   { collection: "executives", field: "photoMedia", value: "executives" },

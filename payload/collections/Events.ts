@@ -57,7 +57,7 @@ export const Events: CollectionConfig = {
       }),
     ],
     afterChange: [
-      createMediaUsageHook(["imageMedia"]),
+      createMediaUsageHook(["imageMedia", "gallery"]),
       ({ doc, previousDoc }) => {
         const currentSlug = getStringField(doc, "slug");
         const previousSlug = getStringField(previousDoc, "slug");
@@ -81,7 +81,7 @@ export const Events: CollectionConfig = {
       },
     ],
     afterDelete: [
-      createMediaUsageDeleteHook(["imageMedia"]),
+      createMediaUsageDeleteHook(["imageMedia", "gallery"]),
       ({ doc }) => {
         const deletedSlug = getStringField(doc, "slug");
 
@@ -105,6 +105,17 @@ export const Events: CollectionConfig = {
       uploadDescription:
         "Usually the Instagram poster. Leave empty and the card shows a plain UARC panel instead.",
     }),
+    {
+      name: "gallery",
+      type: "upload",
+      relationTo: "media" as never,
+      hasMany: true,
+      required: false,
+      admin: {
+        description:
+          "Optional. Further photos shown after the poster above, stepped through with arrows on the event's page. Drag to reorder. The cards elsewhere on the site always use the poster.",
+      },
+    },
     { name: "description", type: "textarea", required: true },
     {
       name: "date",

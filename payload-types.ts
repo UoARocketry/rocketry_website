@@ -227,6 +227,10 @@ export interface Event {
    * Only needed if you are linking an image hosted somewhere else instead of uploading one. Choose a file above and this disappears.
    */
   image?: string | null;
+  /**
+   * Optional. Further photos shown after the poster above, stepped through with arrows on the event's page. Drag to reorder. The cards elsewhere on the site always use the poster.
+   */
+  gallery?: (number | Media)[] | null;
   description: string;
   /**
    * When the event starts. For an event running over more than one day, this is the first day. Optional: leave it empty for a series where only the sessions below have dates.
@@ -777,6 +781,7 @@ export interface EventsSelect<T extends boolean = true> {
   slug?: T;
   imageMedia?: T;
   image?: T;
+  gallery?: T;
   description?: T;
   date?: T;
   endTime?: T;

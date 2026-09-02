@@ -12,7 +12,7 @@ import {
   toSafeJsonLd,
 } from "@/lib/utils";
 import DraftBanner from "@/components/ui/draft-banner";
-import EventHeroImage from "@/components/ui/event-hero-image";
+import ImageCycler from "@/components/ui/image-cycler";
 import LocationPin from "@/components/ui/location-pin";
 import ScheduleList from "@/components/ui/schedule-list";
 
@@ -151,10 +151,7 @@ export default async function EventPage({ params }: EventPageProps) {
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           {/* Event Image */}
-          <EventHeroImage
-            src={event.image}
-            alt={event.title}
-          />
+          <ImageCycler images={event.images} alt={event.title} />
 
           {/* Event Details */}
           <div className="space-y-6">

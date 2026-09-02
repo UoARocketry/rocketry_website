@@ -6,7 +6,7 @@ import ImageWithFallback from "@/components/ui/image-with-fallback";
 import ImagePlaceholder from "@/components/ui/image-placeholder";
 import ImageLightbox from "@/components/ui/image-lightbox";
 
-interface RocketImageCyclerProps {
+interface ImageCyclerProps {
   /** Empty renders the themed placeholder, with no zoom affordance. */
   readonly images: readonly string[];
   readonly alt: string;
@@ -14,10 +14,10 @@ interface RocketImageCyclerProps {
 
 const FRAME_HEIGHT = "h-104 sm:h-128 lg:h-152 max-h-[75vh]";
 
-export default function RocketImageCycler({
+export default function ImageCycler({
   images,
   alt,
-}: RocketImageCyclerProps) {
+}: ImageCyclerProps) {
   const [index, setIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
@@ -59,10 +59,10 @@ export default function RocketImageCycler({
           sizes="(max-width: 1024px) 100vw, 50vw"
           className="absolute inset-0 h-full w-full scale-110 object-cover opacity-30 blur-2xl"
         />
-        {/* Taller than a landscape hero needs, because rocket photos are
-            usually portrait — at h-96 a 2:3 photo rendered barely 256px wide.
-            Capped against the viewport so it still fits on screen. Same
-            treatment as the event hero. */}
+        {/* Taller than a landscape hero needs, because the images here are
+            usually portrait: a 2:3 rocket photo, or an event poster whose
+            date and location are text inside the image. At h-96 both were
+            too small to read. Capped so it still fits on screen. */}
         <ImageWithFallback
           src={current}
           alt={alt}

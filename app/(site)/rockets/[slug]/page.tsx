@@ -8,7 +8,7 @@ import StatusBadgePill, {
   rocketStatusBadge,
 } from "@/components/ui/status-badge";
 import DraftBanner from "@/components/ui/draft-banner";
-import RocketImageCycler from "@/components/ui/rocket-image-cycler";
+import ImageCycler from "@/components/ui/image-cycler";
 
 interface RocketPageProps {
   readonly params: Promise<{ slug: string }>;
@@ -85,7 +85,7 @@ export default async function RocketPage({ params }: RocketPageProps) {
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           {/* Rocket Image */}
-          <RocketImageCycler images={rocket.images} alt={rocket.name} />
+          <ImageCycler images={rocket.images} alt={rocket.name} />
 
           {/* Rocket Details */}
           <div className="space-y-6">
