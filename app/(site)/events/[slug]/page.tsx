@@ -411,7 +411,12 @@ export default async function EventPage({ params }: EventPageProps) {
                         </div>
                       ) : (
                         !sessionLocation && (
-                          <p className="text-sm text-text-muted">
+                          // Same top margin the description carries. Without
+                          // it this sat straight under the session title,
+                          // since the content block has no top padding of its
+                          // own and there may be no meta panel above to
+                          // separate them.
+                          <p className="mt-4 text-sm text-text-muted">
                             No further details for this session.
                           </p>
                         )
