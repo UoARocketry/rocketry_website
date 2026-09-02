@@ -30,6 +30,8 @@ import * as migration_20260902_180000_rocket_videos_array from "./20260902_18000
 import * as migration_20260902_190000_add_extra_date_locations from "./20260902_190000_add_extra_date_locations";
 import * as migration_20260902_200000_add_event_signup_label from "./20260902_200000_add_event_signup_label";
 import * as migration_20260902_210000_add_event_gallery from "./20260902_210000_add_event_gallery";
+import * as migration_20260902_220000_add_resource_links from "./20260902_220000_add_resource_links";
+import * as migration_20260902_230000_add_sponsor_logo_plate from "./20260902_230000_add_sponsor_logo_plate";
 
 export const migrations = [
   {
@@ -176,5 +178,15 @@ export const migrations = [
     up: migration_20260902_210000_add_event_gallery.up,
     down: migration_20260902_210000_add_event_gallery.down,
     name: "20260902_210000_add_event_gallery",
+  },
+  {
+    up: migration_20260902_220000_add_resource_links.up,
+    down: migration_20260902_220000_add_resource_links.down,
+    name: "20260902_220000_add_resource_links",
+  },
+  {
+    up: migration_20260902_230000_add_sponsor_logo_plate.up,
+    down: migration_20260902_230000_add_sponsor_logo_plate.down,
+    name: "20260902_230000_add_sponsor_logo_plate",
   },
 ];

@@ -502,6 +502,10 @@ export interface Sponsor {
    */
   logo?: string | null;
   /**
+   * Logos sit on a white plate, which suits dark and full-colour artwork. Switch to dark if this sponsor's logo is white or very pale, or it will be invisible.
+   */
+  logoPlate?: ('light' | 'dark') | null;
+  /**
    * The sponsor's own website, linked from their logo.
    */
   url: string;
@@ -949,6 +953,7 @@ export interface SponsorsSelect<T extends boolean = true> {
   name?: T;
   logoMedia?: T;
   logo?: T;
+  logoPlate?: T;
   url?: T;
   description?: T;
   tier?: T;

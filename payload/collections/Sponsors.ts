@@ -61,6 +61,21 @@ export const Sponsors: CollectionConfig = {
       required: true,
     }),
     {
+      name: "logoPlate",
+      type: "select",
+      label: "Logo backing",
+      required: false,
+      defaultValue: "light",
+      options: [
+        { label: "Light (default)", value: "light" },
+        { label: "Dark — for a white or pale logo", value: "dark" },
+      ],
+      admin: {
+        description:
+          "Logos sit on a white plate, which suits dark and full-colour artwork. Switch to dark if this sponsor's logo is white or very pale, or it will be invisible.",
+      },
+    },
+    {
       name: "url",
       type: "text",
       required: true,

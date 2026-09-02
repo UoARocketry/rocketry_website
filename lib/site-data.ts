@@ -406,8 +406,10 @@ function mapSponsor(doc: PayloadSponsor): Sponsor {
     id: doc.id,
     name: doc.name,
     // Typed non-null, but the column is nullable and rows published before the
-    // image became mandatory may still hold null. Cards fall back to the logo.
+    // image became mandatory may still hold null. The card then shows the
+    // sponsor's initials rather than a stand-in logo.
     logo: doc.logo ?? "",
+    logoPlate: doc.logoPlate ?? "light",
     url: doc.url,
     description: doc.description ?? null,
     tier,

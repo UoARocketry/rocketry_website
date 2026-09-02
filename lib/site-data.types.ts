@@ -136,6 +136,8 @@ export type Sponsor = {
   id: number;
   name: string;
   logo: string;
+  /** Backing colour behind the logo. A pale logo needs "dark" to be visible. */
+  logoPlate?: "light" | "dark" | null;
   url: string;
   description?: string | null;
   tier?: SponsorTier | null;

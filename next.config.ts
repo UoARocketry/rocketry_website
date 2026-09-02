@@ -42,6 +42,17 @@ const nextConfig: NextConfig = {
       // Only authenticated admins can set these fields.
       { protocol: "https" as const, hostname: "**" },
     ],
+    // Sponsor press kits hand out SVG, and it is the one format that stays
+    // crisp at every plate size. The upload field already accepts `image/*`,
+    // so without this an editor could upload one and next/image would refuse
+    // to serve it, leaving a broken logo with no explanation.
+    dangerouslyAllowSVG: true,
+    // The two standard mitigations: an SVG is script-capable, so it is served
+    // as a download rather than rendered inline if fetched directly, and
+    // scripts inside one are refused.
+    contentDispositionType: "attachment",
+    contentSecurityPolicy:
+      "default-src 'self'; script-src 'none'; sandbox; style-src 'unsafe-inline'",
   },
   async headers() {
     const supabaseHost = getSupabaseHostname();
