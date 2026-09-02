@@ -144,12 +144,12 @@ export const Events: CollectionConfig = {
       name: "extraDates",
       type: "array",
       required: false,
-      label: "Extra days",
-      labels: { singular: "Extra day", plural: "Extra days" },
+      label: "Extra days and times",
+      labels: { singular: "Extra day or time", plural: "Extra days and times" },
       admin: {
         initCollapsed: true,
         description:
-          "Optional. For one event that runs across more than one day, e.g. an open day on both the Saturday and the Sunday. Add each further day here and the page reads 'September 3 & 4'. For a workshop series with different content each week, use Sessions below instead.",
+          "Optional. Two uses. For an event running across several days, add each further day and the page reads 'September 3 & 4'. For an event running twice in one day, add the same date again with its own start and end time, and the page lists both sittings under that date. For a workshop series with different content each week, use Sessions below instead.",
       },
       fields: [
         {
@@ -161,7 +161,8 @@ export const Events: CollectionConfig = {
               Field:
                 "/payload/components/DayOnlyDateField.tsx#DayOnlyDateField",
             },
-            description: "The further day this event also runs on.",
+            description:
+              "Another day this event runs on, or the same day again for a second sitting with different hours.",
           },
         },
         {
@@ -171,7 +172,7 @@ export const Events: CollectionConfig = {
           admin: {
             date: { pickerAppearance: "timeOnly", timeFormat: "HH:mm" },
             description:
-              "Leave empty to run the same hours as the first day. Fill both in only if this day differs.",
+              "Leave empty to run the same hours as the first day. Fill both in if this day differs, or to add a second sitting on a date already listed.",
           },
           validate: validateStartTimePresent,
         },
@@ -327,12 +328,12 @@ export const Events: CollectionConfig = {
           name: "extraDates",
           type: "array",
           required: false,
-          label: "Extra days",
-          labels: { singular: "Extra day", plural: "Extra days" },
+          label: "Extra days and times",
+          labels: { singular: "Extra day or time", plural: "Extra days and times" },
           admin: {
             initCollapsed: true,
             description:
-              "Optional. For a session that runs across more than one day, e.g. a build workshop held on both the Saturday and the Sunday. It still counts as one session.",
+              "Optional. For a session running across more than one day, e.g. a build workshop held on the Saturday and the Sunday. For a session running twice in one day, add the same date again with its own start and end time. Either way it still counts as one session.",
           },
           fields: [
             {
@@ -344,7 +345,8 @@ export const Events: CollectionConfig = {
                   Field:
                     "/payload/components/DayOnlyDateField.tsx#DayOnlyDateField",
                 },
-                description: "The further day this session also runs on.",
+                description:
+                  "Another day this session runs on, or the same day again for a second sitting with different hours.",
               },
             },
             {
@@ -354,7 +356,7 @@ export const Events: CollectionConfig = {
               admin: {
                 date: { pickerAppearance: "timeOnly", timeFormat: "HH:mm" },
                 description:
-                  "Leave empty to run the same hours as the session's first day.",
+                  "Leave empty to run the same hours as the session's first day. Fill both in if this day differs, or to add a second sitting on a date already listed.",
               },
               validate: validateStartTimePresent,
             },
