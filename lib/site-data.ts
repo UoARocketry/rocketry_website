@@ -12,6 +12,7 @@ import type {
   TeamRole as PayloadTeamRole,
   WhatWeDo as PayloadWhatWeDo,
 } from "@/payload-types";
+import { createCachedByArg as createBoundedCachedByArg } from "@/lib/cached-by-arg";
 import { getPayloadClient } from "@/lib/payload";
 import {
   getRocketStatus,
@@ -141,53 +142,19 @@ function partitionEventsByDate(events: EventSummary[]): EventsOverview {
   return { upcoming, past };
 }
 
-function createCachedByNumberArg<T>(options: {
+/**
+ * Wraps the shared factory so every per-argument loader in this file picks up
+ * the same revalidate window without repeating it at each call site.
+ */
+function createCachedByArg<K extends string | number, T>(options: {
   keyPrefix: string;
-  tags: (value: number) => string[];
-  load: (value: number) => Promise<T>;
+  tags: (value: K) => string[];
+  load: (value: K) => Promise<T>;
 }) {
-  const cache = new Map<number, () => Promise<T>>();
-
-  return (value: number) => {
-    let loader = cache.get(value);
-
-    if (!loader) {
-      loader = unstable_cache(() => options.load(value), [
-        options.keyPrefix,
-        String(value),
-      ], {
-        revalidate: CONTENT_REVALIDATE_SECONDS,
-        tags: options.tags(value),
-      });
-
-      cache.set(value, loader);
-    }
-
-    return loader();
-  };
-}
-
-function createCachedByStringArg<T>(options: {
-  keyPrefix: string;
-  tags: (value: string) => string[];
-  load: (value: string) => Promise<T>;
-}) {
-  const cache = new Map<string, () => Promise<T>>();
-
-  return (value: string) => {
-    let loader = cache.get(value);
-
-    if (!loader) {
-      loader = unstable_cache(() => options.load(value), [options.keyPrefix, value], {
-        revalidate: CONTENT_REVALIDATE_SECONDS,
-        tags: options.tags(value),
-      });
-
-      cache.set(value, loader);
-    }
-
-    return loader();
-  };
+  return createBoundedCachedByArg<K, T>({
+    ...options,
+    revalidate: CONTENT_REVALIDATE_SECONDS,
+  });
 }
 
 function mapRocket(doc: PayloadRocket): RocketSummary {
@@ -416,7 +383,7 @@ function mapSponsor(doc: PayloadSponsor): Sponsor {
   };
 }
 
-const getExecTeamByYear = createCachedByNumberArg<Exec[]>({
+const getExecTeamByYear = createCachedByArg<number, Exec[]>({
   keyPrefix: "exec-team",
   tags: (year) => ["about", "exec", `exec-year:${year}`],
   load: async (year) => {
@@ -437,7 +404,7 @@ const getExecTeamByYear = createCachedByNumberArg<Exec[]>({
   },
 });
 
-const getRocketBySlugCached = createCachedByStringArg<RocketDetail | null>({
+const getRocketBySlugCached = createCachedByArg<string, RocketDetail | null>({
   keyPrefix: "rocket-by-slug",
   tags: (slug) => ["rockets", `rocket:${slug}`],
   load: async (slug) => {
@@ -458,7 +425,7 @@ const getRocketBySlugCached = createCachedByStringArg<RocketDetail | null>({
   },
 });
 
-const getEventBySlugCached = createCachedByStringArg<EventDetail | null>({
+const getEventBySlugCached = createCachedByArg<string, EventDetail | null>({
   keyPrefix: "event-by-slug",
   tags: (slug) => ["events", `event:${slug}`],
   load: async (slug) => {
