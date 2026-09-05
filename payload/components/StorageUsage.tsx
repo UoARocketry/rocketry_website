@@ -136,17 +136,20 @@ export default async function StorageUsage() {
     );
 
     stats = [
+      // Named for what a committee member recognises, not for the technology
+      // underneath. "Database" and "Postgres" tell a marketing exec nothing
+      // they can act on; "everything written on the site" does.
       {
-        label: "Database",
+        label: "Site content",
         used: databaseBytes,
         limit: toLimitBytes(limits?.databaseLimitMb, DEFAULT_DATABASE_LIMIT_MB),
-        note: "Postgres, measured live",
+        note: "Events, rockets, people and text",
       },
       {
-        label: "Media storage",
+        label: "Photos and files",
         used: mediaBytes,
         limit: toLimitBytes(limits?.storageLimitMb, DEFAULT_STORAGE_LIMIT_MB),
-        note: "Sum of uploaded files",
+        note: "Everything uploaded to the site",
       },
     ];
   } catch (error) {
@@ -163,7 +166,9 @@ export default async function StorageUsage() {
         marginBottom: "1.5rem",
       }}
     >
-      <h3 style={{ margin: "0 0 1rem", fontSize: "1rem" }}>Supabase usage</h3>
+      <h3 style={{ margin: "0 0 1rem", fontSize: "1rem" }}>
+        How much room the site has left
+      </h3>
 
       {errorMessage ? (
         <p style={{ margin: 0, fontSize: "0.85rem", opacity: 0.7 }}>
@@ -183,17 +188,20 @@ export default async function StorageUsage() {
           lineHeight: 1.5,
         }}
       >
-        Media storage counts files tracked by the CMS, so anything uploaded to
-        the bucket outside Payload is not included. Limits are editable in Site
-        Settings and default to the free tier —{" "}
+        Running low? Deleting images nothing uses is the quickest win: open
+        Media and look for entries with an empty &ldquo;Used in&rdquo; column.
+        If it is still tight after that, the club needs a paid plan, which is a
+        committee decision. These figures are measured live; the limits they are
+        measured against are set in Site Settings and match the free plan. For
+        billing, see the{" "}
         <a
           href={SUPABASE_DASHBOARD_URL}
           target="_blank"
           rel="noopener noreferrer"
         >
-          check Supabase
-        </a>{" "}
-        for authoritative billing figures.
+          Supabase dashboard
+        </a>
+        .
       </p>
     </div>
   );
