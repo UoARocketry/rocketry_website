@@ -153,9 +153,6 @@ export interface User {
    * Shown in the account list so it is not just an email.
    */
   name: string;
-  /**
-   * Editors can manage all site content. Admins can additionally create, edit and delete accounts. Keep at least two admins so nobody is locked out.
-   */
   role: 'admin' | 'editor';
   updatedAt: string;
   createdAt: string;
@@ -184,9 +181,6 @@ export interface User {
  */
 export interface Media {
   id: number;
-  /**
-   * Filled in automatically. Filter the list by this to find every image used in one part of the site, or leave the filter empty to find images nothing uses.
-   */
   usedIn?:
     | ('events' | 'rockets' | 'executives' | 'sponsors' | 'what-we-do' | 'journey-items' | 'site-settings')[]
     | null;
@@ -194,6 +188,7 @@ export interface Media {
    * Describe the image in a few words, for screen readers and for when the image fails to load. E.g. "Aurora Mk II on the launch rail".
    */
   alt: string;
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -207,7 +202,7 @@ export interface Media {
   focalY?: number | null;
 }
 /**
- * Everything listed on the Events page, newest first. Unpublished drafts appear at the top and are not visible on the site.
+ * Talks, workshops and launches shown on the Events page. A draft stays off the site until you publish it.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "events".
@@ -215,13 +210,7 @@ export interface Media {
 export interface Event {
   id: number;
   title: string;
-  /**
-   * The URL for this page: /events/your-slug. Filled in automatically from the title when you first save. Changing it later breaks any link already shared, so only edit it if you mean to.
-   */
   slug: string;
-  /**
-   * Upload a new image or pick one already in the Media library. Optional. Usually the Instagram poster. Leave empty and the card shows a plain UARC panel instead.
-   */
   imageMedia?: (number | null) | Media;
   /**
    * Only needed if you are linking an image hosted somewhere else instead of uploading one. Choose a file above and this disappears.
@@ -232,25 +221,19 @@ export interface Event {
    */
   gallery?: (number | Media)[] | null;
   description: string;
-  /**
-   * When the event starts. For an event running over more than one day, this is the first day. Optional: leave it empty for a series where only the sessions below have dates.
-   */
   date?: string | null;
   /**
    * Optional. When the event finishes that day. Leave empty and the page shows a start time only.
    */
   endTime?: string | null;
-  /**
-   * Optional. For one event that runs across more than one day, e.g. an open day on both the Saturday and the Sunday. Add each further day here and the page reads 'September 3 & 4'. For a workshop series with different content each week, use Sessions below instead.
-   */
   extraDates?:
     | {
         /**
-         * The further day this event also runs on.
+         * Another day this event runs on, or the same day again for a second sitting with different hours.
          */
         date: string;
         /**
-         * Leave empty to run the same hours as the first day. Fill both in only if this day differs.
+         * Leave empty to run the same hours as the first day. Fill both in if this day differs, or to add a second sitting on a date already listed.
          */
         startTime?: string | null;
         endTime?: string | null;
@@ -285,9 +268,6 @@ export interface Event {
    * What this section is called. Leave empty for "Resources".
    */
   linksHeading?: string | null;
-  /**
-   * Optional. Anything worth linking to alongside the event: slides, a reading list, an OpenRocket starter file. Shown in their own section on the event page.
-   */
   links?:
     | {
         /**
@@ -299,9 +279,6 @@ export interface Event {
       }[]
     | null;
   location?: string | null;
-  /**
-   * Optional. For a multi-session series (e.g. Level 1 build workshops), add each session. The site puts them in date order for you, so it does not matter what order you add them in. Leave empty for a normal one-off event.
-   */
   sessions?:
     | {
         title: string;
@@ -310,18 +287,12 @@ export interface Event {
          * Optional. When this session finishes.
          */
         endTime?: string | null;
-        /**
-         * Optional. For a session that runs across more than one day, e.g. a build workshop held on both the Saturday and the Sunday. It still counts as one session.
-         */
         extraDates?:
           | {
               /**
-               * The further day this session also runs on.
+               * Another day this session runs on, or the same day again for a second sitting with different hours.
                */
               date: string;
-              /**
-               * Leave empty to run the same hours as the session's first day.
-               */
               startTime?: string | null;
               endTime?: string | null;
               /**
@@ -369,13 +340,7 @@ export interface EventTag {
 export interface Rocket {
   id: number;
   name: string;
-  /**
-   * The URL for this page: /rockets/your-slug. Filled in automatically from the name when you first save. Changing it later breaks any link already shared, so only edit it if you mean to.
-   */
   slug: string;
-  /**
-   * Upload a new image or pick one already in the Media library. Optional. The cover image at the top of the rocket's page. Leave empty and both the card and the page show a plain UARC panel instead.
-   */
   imageMedia?: (number | null) | Media;
   /**
    * Only needed if you are linking an image hosted somewhere else instead of uploading one. Choose a file above and this disappears.
@@ -391,9 +356,6 @@ export interface Rocket {
    * What this section is called. Leave empty for "Videos".
    */
   videosHeading?: string | null;
-  /**
-   * Optional. YouTube, Instagram or Drive links to footage of this rocket. They appear together in their own section on the rocket page, in this order.
-   */
   videos?:
     | {
         /**
@@ -408,9 +370,6 @@ export interface Rocket {
    * What this section is called. Leave empty for "Resources".
    */
   linksHeading?: string | null;
-  /**
-   * Optional. Anything else worth linking to: a telemetry spreadsheet, an OpenRocket file, a write-up. Shown in their own section on the rocket page.
-   */
   links?:
     | {
         /**
@@ -421,13 +380,7 @@ export interface Rocket {
         id?: string | null;
       }[]
     | null;
-  /**
-   * Tick to feature this rocket in the Featured Rockets section on the home page. Up to 3 are shown, next launch first. If none are ticked the home page falls back to the most recently launched rockets.
-   */
   featured?: boolean | null;
-  /**
-   * Leave empty while the rocket is still in development. A date in the future marks it as a scheduled launch; a date in the past marks it as launched.
-   */
   launchedAt?: string | null;
   /**
    * Entries shown in the Details box on this rocket's page, in this order, laid out in two columns. Leave empty and the box is hidden entirely.
@@ -461,9 +414,6 @@ export interface Executive {
   name: string;
   role: string;
   bio: string;
-  /**
-   * Upload a new image or pick one already in the Media library. Optional. Leave empty and the card shows the exec's initials instead.
-   */
   photoMedia?: (number | null) | Media;
   /**
    * Only needed if you are linking an image hosted somewhere else instead of uploading one. Choose a file above and this disappears.
@@ -493,17 +443,11 @@ export interface Executive {
 export interface Sponsor {
   id: number;
   name: string;
-  /**
-   * Upload a new image or pick one already in the Media library. Optional. A transparent PNG or an SVG is best. A logo with a white background baked into the file will show as a white rectangle on a dark backing.
-   */
   logoMedia?: (number | null) | Media;
   /**
    * Only needed if you are linking an image hosted somewhere else instead of uploading one. Choose a file above and this disappears.
    */
   logo?: string | null;
-  /**
-   * Logos sit on a white plate, which suits dark and full-colour artwork. Switch to dark only for a logo that is white or very pale AND has a transparent background. A logo with white baked into the file will show as a white rectangle on a dark backing.
-   */
   logoPlate?: ('light' | 'dark') | null;
   /**
    * The sponsor's own website, linked from their logo.
@@ -546,9 +490,6 @@ export interface WhatWeDo {
   id: number;
   title: string;
   body?: string | null;
-  /**
-   * Upload a new image or pick one already in the Media library.
-   */
   imageMedia?: (number | null) | Media;
   /**
    * Only needed if you are linking an image hosted somewhere else instead of uploading one. Choose a file above and this disappears.
@@ -578,9 +519,6 @@ export interface JourneyItem {
   id: number;
   title: string;
   body?: string | null;
-  /**
-   * Upload a new image or pick one already in the Media library.
-   */
   imageMedia?: (number | null) | Media;
   /**
    * Only needed if you are linking an image hosted somewhere else instead of uploading one. Choose a file above and this disappears.
@@ -802,6 +740,7 @@ export interface UsersSelect<T extends boolean = true> {
 export interface MediaSelect<T extends boolean = true> {
   usedIn?: T;
   alt?: T;
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -1098,13 +1037,7 @@ export interface SiteSetting {
   discordUrl?: string | null;
   instagramUrl?: string | null;
   linkedinUrl?: string | null;
-  /**
-   * Used by every Contact / email link on the site (footer, sponsorship enquiries) and in search-engine structured data. Leave blank to fall back to the built-in default.
-   */
   contactEmail?: string | null;
-  /**
-   * Upload a new image or pick one already in the Media library. Optional. The group photo on the About page.
-   */
   execTeamImageMedia?: (number | null) | Media;
   /**
    * Only needed if you are linking an image hosted somewhere else instead of uploading one. Choose a file above and this disappears.

@@ -188,12 +188,14 @@ export default async function StorageUsage() {
           lineHeight: 1.5,
         }}
       >
-        Running low? The quickest win is deleting images nothing uses: open
-        Media and look for ones with an empty &ldquo;Used in&rdquo; column. If
-        it&rsquo;s still tight after that, the club needs a paid plan, and
-        that&rsquo;s a committee call. These figures are measured live. The
-        limits they&rsquo;re measured against are set in Site Settings and match
-        the free plan. For billing, see the{" "}
+        Running low? Check which bar is high first. For photos and files, open
+        Media and delete anything with an empty &ldquo;Used in&rdquo; column.
+        For site content, clear out events from years ago and exec years you no
+        longer show. Deleting an event doesn&rsquo;t remove its photos, so do
+        that first and then tidy Media. Still tight? The club needs a paid plan,
+        and that&rsquo;s a committee call. These figures are measured live, and
+        the limits they&rsquo;re measured against are set in Site Settings to
+        match the free plan. For billing, see the{" "}
         <a
           href={SUPABASE_DASHBOARD_URL}
           target="_blank"

@@ -91,14 +91,28 @@ export const GUIDE_SECTIONS: GuideSection[] = [
           "Add the Event image, usually the Instagram poster. If you leave it empty the card shows a plain UARC panel instead, which is fine.",
           "Write a Description. That's what people read on the event page.",
           "Set the Date, and the End time if you know when it wraps up.",
-          "Pick an Event Tag so people can filter for it on the Events page.",
+          "Pick an Event Tag so people can filter for it on the Events page. You manage the tags themselves in Event Tags.",
           "Choose how people sign up under Signup.",
           "Hit Publish changes.",
         ],
       },
       {
         type: "text",
-        text: "There are three fields for events that aren't just a single afternoon, and it's easy to pick the wrong one. Here's the difference:",
+        text: "The rest of the form is optional:",
+      },
+      {
+        type: "list",
+        items: [
+          "Signup has three modes. No signup hides it. Link to a signup page gives you a Signup URL and a Signup button label. Instructions in plain text gives you a Signup text box, for when the form only lives in the Instagram bio.",
+          "End time: when it finishes that day. Leave it and the page shows a start time only.",
+          "Location: where it's happening.",
+          "Gallery: extra photos for the event's own page.",
+          "Links: Label and Url pairs for slides, a reading list, an OpenRocket starter file. The section heading is editable.",
+        ],
+      },
+      {
+        type: "text",
+        text: "There are three ways to handle an event that isn't just a single afternoon, and it's easy to pick the wrong one. Here's the difference:",
       },
       {
         type: "list",
@@ -119,15 +133,24 @@ export const GUIDE_SECTIONS: GuideSection[] = [
         items: [
           "Go to Rockets and hit Create New.",
           "Add the Name, the Rocket image and a Description.",
-          "Leave the launch date empty while it's still being built. A date in the future shows it as a scheduled launch, and a date in the past shows it as launched.",
-          "Add Specs if you want the details box on the rocket page. Leave it empty and the box just doesn't show.",
-          "Add a Gallery for extra photos, and Videos for any footage.",
+          "Leave Launched At empty while it's still being built. A date in the future shows it as a scheduled launch, and a date in the past shows it as launched.",
           "Hit Publish changes.",
         ],
       },
       {
         type: "text",
-        text: "Tick Featured to put a rocket in the Featured Rockets section on the home page. It shows up to three. If you don't tick any, the home page falls back to the most recently launched ones.",
+        text: "That's the minimum. Everything else on the form is optional, and here's the lot:",
+      },
+      {
+        type: "list",
+        items: [
+          "Rocket image, plus Image position on cards if the crop is cutting off the important bit.",
+          "Gallery: extra photos, shown after the cover image on the rocket's own page.",
+          "Videos: a list of Label and Url pairs for footage. There's a Videos heading field if you want to call the section something other than \"Videos\".",
+          "Links: same Label and Url setup, for anything else worth linking, like a telemetry spreadsheet or an OpenRocket file. Its heading is editable too.",
+          "Details: Label and Value pairs that fill the details box on the rocket page, so things like Motor / J450 or Apogee / 1,200 m. Leave it empty and the box doesn't show at all.",
+          "Show on home page: puts it in Featured Rockets. It shows up to three, next launch first. If nobody ticks any, the home page falls back to the most recently launched.",
+        ],
       },
     ],
   },
@@ -147,8 +170,13 @@ export const GUIDE_SECTIONS: GuideSection[] = [
           "Set Year to the committee year they're serving.",
           "Set Order to where they sit in that year, starting at 1.",
           "Add a Photo. If you haven't got one, the site shows their initials instead, and that's meant to happen.",
+          "Add their Linkedin Url if they're happy for it to be public. That turns into the Visit Profile link on their card.",
           "Hit Publish changes.",
         ],
+      },
+      {
+        type: "text",
+        text: "There's also Photo position, which only shows once you've added a photo. Use it if the crop is cutting off someone's face.",
       },
       {
         type: "callout",
@@ -165,8 +193,9 @@ export const GUIDE_SECTIONS: GuideSection[] = [
         type: "steps",
         items: [
           "Go to Sponsors and hit Create New.",
-          "Add the Name, the Logo and the sponsor's website address.",
+          "Add the Name, the Logo and the Url, which is their website.",
           "Pick the Tier, which is the section of the Sponsors page they show up in.",
+          "Add a Description if you want a line about them under the logo. It's optional.",
           "Hit Publish changes.",
         ],
       },
@@ -177,6 +206,30 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         type: "text",
         text: "The tiers themselves live in Sponsor Tiers, so you can rename or reorder them there. You can't delete a tier while sponsors are still in it.",
+      },
+    ],
+  },
+  {
+    id: "about-page",
+    title: "The About page",
+    blocks: [
+      {
+        type: "text",
+        text: "The About page is built out of four separate collections, all grouped under About Page in the menu. Each one is a different part of that page, and they all have an Order field that sets what comes first.",
+      },
+      {
+        type: "list",
+        items: [
+          "What We Do: the blocks near the top. Title, Body, an Image and its position, plus Variant.",
+          "Journey Items: the club's timeline. Same fields as What We Do, so Title, Body, Image and Variant.",
+          "Team Roles: the sub-teams like Avionics or Recovery. Title, Body, a list of Bullets, and Variant.",
+          "Stats: the headline numbers. Just a Value like \"150\" and a Label like \"Active members\".",
+        ],
+      },
+      {
+        type: "callout",
+        label: "What Variant does.",
+        text: "It sets the background shade of that block, either Background or Surface. Alternate it between neighbouring blocks so the page has visible banding instead of one flat wall of colour.",
       },
     ],
   },
@@ -223,11 +276,23 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     blocks: [
       {
         type: "text",
-        text: "The dashboard shows how much room the site has left, so you can check without needing a Supabase login. One bar is everything written on the site, the other is the photos and files uploaded to it.",
+        text: "The dashboard shows how much room the site has left, so you can check without needing a Supabase login. There are two bars and they fill up for different reasons, so check which one is actually the problem before you start deleting things.",
+      },
+      {
+        type: "list",
+        items: [
+          "Photos and files: everything uploaded. This is the one that usually fills up, because images are big. Open Media, sort or scan for anything with an empty Used in column, and delete those. Nothing on the site is pointing at them.",
+          "Site content: the text side, so events, rockets, people and everything you've typed. It fills up far more slowly. If it's the one that's high, clear out events from years ago that nobody needs any more, along with old exec years you're not showing, and any rockets that never went anywhere.",
+        ],
+      },
+      {
+        type: "callout",
+        label: "Deleting an event doesn't free up its photos.",
+        text: "The images stay in Media. So if you're clearing space, delete the old events first, then go back to Media and remove the photos that have just become unused.",
       },
       {
         type: "text",
-        text: "If either is getting full, the quickest win is deleting images nothing uses. Open Media and look for ones with an empty Used in column. If it's still tight after that, the club needs a paid plan, and that's a committee call rather than something you can fix in here.",
+        text: "If it's still tight after all that, the club needs a paid plan, and that's a committee call rather than something you can fix in here.",
       },
     ],
   },

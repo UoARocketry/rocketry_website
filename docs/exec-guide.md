@@ -22,10 +22,11 @@ the bottom of the admin sidebar.
 4. [Add or update a rocket](#add-or-update-a-rocket)
 5. [Update the exec team](#update-the-exec-team)
 6. [Add a sponsor](#add-a-sponsor)
-7. [Images](#images)
-8. [Ordering things on a page](#ordering-things-on-a-page)
-9. [When storage runs low](#when-storage-runs-low)
-10. [Accounts](#accounts)
+7. [The About page](#the-about-page)
+8. [Images](#images)
+9. [Ordering things on a page](#ordering-things-on-a-page)
+10. [When storage runs low](#when-storage-runs-low)
+11. [Accounts](#accounts)
 
 ## How this works
 
@@ -55,11 +56,19 @@ If you want to see how something looks before it goes live, open it and use the 
 3. Add the Event image, usually the Instagram poster. If you leave it empty the card shows a plain UARC panel instead, which is fine.
 4. Write a Description. That's what people read on the event page.
 5. Set the Date, and the End time if you know when it wraps up.
-6. Pick an Event Tag so people can filter for it on the Events page.
+6. Pick an Event Tag so people can filter for it on the Events page. You manage the tags themselves in Event Tags.
 7. Choose how people sign up under Signup.
 8. Hit Publish changes.
 
-There are three fields for events that aren't just a single afternoon, and it's easy to pick the wrong one. Here's the difference:
+The rest of the form is optional:
+
+- Signup has three modes. No signup hides it. Link to a signup page gives you a Signup URL and a Signup button label. Instructions in plain text gives you a Signup text box, for when the form only lives in the Instagram bio.
+- End time: when it finishes that day. Leave it and the page shows a start time only.
+- Location: where it's happening.
+- Gallery: extra photos for the event's own page.
+- Links: Label and Url pairs for slides, a reading list, an OpenRocket starter file. The section heading is editable.
+
+There are three ways to handle an event that isn't just a single afternoon, and it's easy to pick the wrong one. Here's the difference:
 
 - Extra days and times: one event spread over days in a row, like a build weekend on the Saturday and Sunday. Also use it if you're running the same day twice.
 - Sessions: a series where each week is its own thing, like Level 1 build workshops across a term.
@@ -69,12 +78,17 @@ There are three fields for events that aren't just a single afternoon, and it's 
 
 1. Go to Rockets and hit Create New.
 2. Add the Name, the Rocket image and a Description.
-3. Leave the launch date empty while it's still being built. A date in the future shows it as a scheduled launch, and a date in the past shows it as launched.
-4. Add Specs if you want the details box on the rocket page. Leave it empty and the box just doesn't show.
-5. Add a Gallery for extra photos, and Videos for any footage.
-6. Hit Publish changes.
+3. Leave Launched At empty while it's still being built. A date in the future shows it as a scheduled launch, and a date in the past shows it as launched.
+4. Hit Publish changes.
 
-Tick Featured to put a rocket in the Featured Rockets section on the home page. It shows up to three. If you don't tick any, the home page falls back to the most recently launched ones.
+That's the minimum. Everything else on the form is optional, and here's the lot:
+
+- Rocket image, plus Image position on cards if the crop is cutting off the important bit.
+- Gallery: extra photos, shown after the cover image on the rocket's own page.
+- Videos: a list of Label and Url pairs for footage. There's a Videos heading field if you want to call the section something other than "Videos".
+- Links: same Label and Url setup, for anything else worth linking, like a telemetry spreadsheet or an OpenRocket file. Its heading is editable too.
+- Details: Label and Value pairs that fill the details box on the rocket page, so things like Motor / J450 or Apogee / 1,200 m. Leave it empty and the box doesn't show at all.
+- Show on home page: puts it in Featured Rockets. It shows up to three, next launch first. If nobody ticks any, the home page falls back to the most recently launched.
 
 ## Update the exec team
 
@@ -85,20 +99,35 @@ Executives are grouped by year, so adding a new committee doesn't wipe the old o
 3. Set Year to the committee year they're serving.
 4. Set Order to where they sit in that year, starting at 1.
 5. Add a Photo. If you haven't got one, the site shows their initials instead, and that's meant to happen.
-6. Hit Publish changes.
+6. Add their Linkedin Url if they're happy for it to be public. That turns into the Visit Profile link on their card.
+7. Hit Publish changes.
+
+There's also Photo position, which only shows once you've added a photo. Use it if the crop is cutting off someone's face.
 
 > **You don't have to renumber everyone.** Give someone a position that's already taken and everyone below them shifts down on their own when you publish.
 
 ## Add a sponsor
 
 1. Go to Sponsors and hit Create New.
-2. Add the Name, the Logo and the sponsor's website address.
+2. Add the Name, the Logo and the Url, which is their website.
 3. Pick the Tier, which is the section of the Sponsors page they show up in.
-4. Hit Publish changes.
+4. Add a Description if you want a line about them under the logo. It's optional.
+5. Hit Publish changes.
 
 Logos sit on a white plate by default, which works for most of them. Only switch Logo backing to dark if the logo is white or very pale and its background is see-through. If the logo has white baked into the image, a dark backing just gives you a white rectangle.
 
 The tiers themselves live in Sponsor Tiers, so you can rename or reorder them there. You can't delete a tier while sponsors are still in it.
+
+## The About page
+
+The About page is built out of four separate collections, all grouped under About Page in the menu. Each one is a different part of that page, and they all have an Order field that sets what comes first.
+
+- What We Do: the blocks near the top. Title, Body, an Image and its position, plus Variant.
+- Journey Items: the club's timeline. Same fields as What We Do, so Title, Body, Image and Variant.
+- Team Roles: the sub-teams like Avionics or Recovery. Title, Body, a list of Bullets, and Variant.
+- Stats: the headline numbers. Just a Value like "150" and a Label like "Active members".
+
+> **What Variant does.** It sets the background shade of that block, either Background or Surface. Alternate it between neighbouring blocks so the page has visible banding instead of one flat wall of colour.
 
 ## Images
 
@@ -118,9 +147,14 @@ Give something a position that's already taken and the rest shift down when you 
 
 ## When storage runs low
 
-The dashboard shows how much room the site has left, so you can check without needing a Supabase login. One bar is everything written on the site, the other is the photos and files uploaded to it.
+The dashboard shows how much room the site has left, so you can check without needing a Supabase login. There are two bars and they fill up for different reasons, so check which one is actually the problem before you start deleting things.
 
-If either is getting full, the quickest win is deleting images nothing uses. Open Media and look for ones with an empty Used in column. If it's still tight after that, the club needs a paid plan, and that's a committee call rather than something you can fix in here.
+- Photos and files: everything uploaded. This is the one that usually fills up, because images are big. Open Media, sort or scan for anything with an empty Used in column, and delete those. Nothing on the site is pointing at them.
+- Site content: the text side, so events, rockets, people and everything you've typed. It fills up far more slowly. If it's the one that's high, clear out events from years ago that nobody needs any more, along with old exec years you're not showing, and any rockets that never went anywhere.
+
+> **Deleting an event doesn't free up its photos.** The images stay in Media. So if you're clearing space, delete the old events first, then go back to Media and remove the photos that have just become unused.
+
+If it's still tight after all that, the club needs a paid plan, and that's a committee call rather than something you can fix in here.
 
 ## Accounts
 
