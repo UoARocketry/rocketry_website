@@ -3,8 +3,10 @@
  * be rendered in the admin (`ExecGuide.tsx`) and mirrored into
  * `docs/exec-guide.md` without the two drifting apart.
  *
- * Written for a marketing exec who has never used a CMS. Prefer the words they
- * see on screen ("Publish changes", "Save Draft") over the words in the code.
+ * Written for a committee member who has never used a CMS. Use the words they
+ * see on screen ("Publish changes", "Save Draft") rather than the words in the
+ * code, and keep it plain: this is a handover note to the next exec, not
+ * documentation.
  */
 
 export type GuideBlock =
@@ -21,7 +23,7 @@ export type GuideSection = {
 
 export const GUIDE_CONTACT = {
   intro:
-    "This site was built and handed over by Jerry Kim. If something here is broken, or you want to change something the admin does not let you change, get in touch rather than guessing.",
+    "I built this site and handed it over. If something's broken, or you want to change something this admin won't let you change, message me instead of guessing at it. Happy to help.",
   email: "jerryputhikunkim@gmail.com",
   linkedin: "https://www.linkedin.com/in/puthikun-jerry-kim/",
   linkedinLabel: "Puthikun (Jerry) Kim",
@@ -34,16 +36,16 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     blocks: [
       {
         type: "text",
-        text: "This admin is where the website's content lives. The public site reads from it, so anything you publish here appears on uoarocketry.com. You never need to touch code to change words, photos, events, rockets, people or sponsors.",
+        text: "This is where the website's content lives. The site reads from here, so anything you publish shows up on uoarocketry.com. You don't need to touch any code to change text, photos, events, rockets, people or sponsors.",
       },
       {
         type: "text",
-        text: "The menu on the left is grouped by the part of the site each thing controls. Events and Event Tags feed the Events page. Rockets feeds the Rockets page. Executives feeds the team section on About. What We Do, Journey Items, Team Roles and Stats are the four blocks that make up the rest of the About page.",
+        text: "The menu on the left is grouped by which part of the site each thing controls. Events and Event Tags feed the Events page. Rockets feeds the Rockets page. Executives feeds the team section on About. What We Do, Journey Items, Team Roles and Stats are the four blocks that make up the rest of the About page.",
       },
       {
         type: "callout",
-        label: "Changes are not instant.",
-        text: "The site caches pages for up to five minutes so it stays fast. If your change is not showing yet, wait a few minutes and refresh before assuming something went wrong.",
+        label: "Changes aren't instant.",
+        text: "The site caches pages for up to five minutes so it loads fast. If your change isn't showing, give it a few minutes and refresh before you assume something's broken.",
       },
     ],
   },
@@ -53,27 +55,27 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     blocks: [
       {
         type: "text",
-        text: "This is the single most important thing to understand, because it is the easiest to get wrong in both directions.",
+        text: "This is the bit people get wrong most, so it's worth reading properly. There are two buttons and they do very different things.",
       },
       {
         type: "list",
         items: [
-          "Save Draft stores your work privately. Nobody visiting the website can see it. Use this when something is half-finished.",
+          "Save Draft keeps your work private. Nobody on the website can see it. Use it when something's half finished.",
           "Publish changes puts it live. Anyone can see it straight away.",
         ],
       },
       {
         type: "text",
-        text: "A new item you only ever saved as a draft is not on the site at all. If you have written an event and cannot find it on the site, this is almost always why: open it and press Publish changes.",
+        text: "If you only ever saved a draft, it's not on the site at all. So if you've written an event and can't find it on the website, that's almost always why. Open it and hit Publish changes.",
       },
       {
         type: "callout",
-        label: "The reverse trap.",
-        text: "Editing something already published and pressing Save Draft does not take the old version down. The site keeps showing the last published version until you press Publish changes.",
+        label: "It catches you the other way too.",
+        text: "Editing something that's already live and hitting Save Draft doesn't take the old version down. The site keeps showing the last published version until you hit Publish changes.",
       },
       {
         type: "text",
-        text: "To check something before it goes live, open it and use the preview link. That shows you the page as it will look, without publishing.",
+        text: "If you want to see how something looks before it goes live, open it and use the preview link. That shows you the real page without publishing it.",
       },
     ],
   },
@@ -84,26 +86,26 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         type: "steps",
         items: [
-          "Go to Events in the left menu and press Create New.",
-          "Give it a Title. The Slug on the right fills itself in from the title, which becomes the web address. Leave it alone unless you have a reason.",
-          "Add the Event image. This is usually the Instagram poster. Leave it empty and the card shows a plain UARC panel instead.",
-          "Write a Description. This is what people read on the event page.",
-          "Set the Date, and the End time if you know when it finishes.",
-          "Pick an Event Tag so it can be filtered on the Events page.",
+          "Go to Events in the left menu and hit Create New.",
+          "Give it a Title. The Slug on the right fills itself in from that, and it becomes the web address. Leave it alone unless you've got a reason not to.",
+          "Add the Event image, usually the Instagram poster. If you leave it empty the card shows a plain UARC panel instead, which is fine.",
+          "Write a Description. That's what people read on the event page.",
+          "Set the Date, and the End time if you know when it wraps up.",
+          "Pick an Event Tag so people can filter for it on the Events page.",
           "Choose how people sign up under Signup.",
-          "Press Publish changes.",
+          "Hit Publish changes.",
         ],
       },
       {
         type: "text",
-        text: "Three fields exist for events that are not a single afternoon, and it is worth knowing which one you want:",
+        text: "There are three fields for events that aren't just a single afternoon, and it's easy to pick the wrong one. Here's the difference:",
       },
       {
         type: "list",
         items: [
-          "Extra days and times: one event spread over consecutive days, e.g. a build weekend on the Saturday and Sunday. Also use it to add a second sitting on a day already listed.",
-          "Sessions: a series where each week is its own thing, e.g. Level 1 build workshops running over a term.",
-          "Neither: a normal one-off event. Most events are this.",
+          "Extra days and times: one event spread over days in a row, like a build weekend on the Saturday and Sunday. Also use it if you're running the same day twice.",
+          "Sessions: a series where each week is its own thing, like Level 1 build workshops across a term.",
+          "Neither: a normal one-off event. That's most of them.",
         ],
       },
     ],
@@ -115,17 +117,17 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         type: "steps",
         items: [
-          "Go to Rockets and press Create New.",
+          "Go to Rockets and hit Create New.",
           "Add the Name, the Rocket image and a Description.",
-          "Leave the launch date empty while the rocket is still being built. A date in the future shows it as a scheduled launch; a date in the past shows it as launched.",
-          "Add Specs if you want the details box on the rocket page. Leave it empty and the box is hidden.",
+          "Leave the launch date empty while it's still being built. A date in the future shows it as a scheduled launch, and a date in the past shows it as launched.",
+          "Add Specs if you want the details box on the rocket page. Leave it empty and the box just doesn't show.",
           "Add a Gallery for extra photos, and Videos for any footage.",
-          "Press Publish changes.",
+          "Hit Publish changes.",
         ],
       },
       {
         type: "text",
-        text: "Tick Featured to put a rocket in the Featured Rockets section on the home page. Up to three are shown. If you tick none, the home page falls back to the most recently launched.",
+        text: "Tick Featured to put a rocket in the Featured Rockets section on the home page. It shows up to three. If you don't tick any, the home page falls back to the most recently launched ones.",
       },
     ],
   },
@@ -135,23 +137,23 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     blocks: [
       {
         type: "text",
-        text: "Executives are grouped by year, so a new committee does not overwrite the old one. The About page shows the current year and lets visitors look back at previous ones.",
+        text: "Executives are grouped by year, so adding a new committee doesn't wipe the old one. The About page shows the current year and lets people look back at previous ones.",
       },
       {
         type: "steps",
         items: [
-          "Go to Executives and press Create New for each person.",
+          "Go to Executives and hit Create New for each person.",
           "Fill in their Name, Role and a short Bio.",
-          "Set Year to the committee year they are serving.",
-          "Set Order to their position within that year, starting at 1.",
-          "Add a Photo. If you have none, the site shows their initials, which looks deliberate rather than broken.",
-          "Press Publish changes.",
+          "Set Year to the committee year they're serving.",
+          "Set Order to where they sit in that year, starting at 1.",
+          "Add a Photo. If you haven't got one, the site shows their initials instead, and that's meant to happen.",
+          "Hit Publish changes.",
         ],
       },
       {
         type: "callout",
-        label: "You do not need to renumber everyone.",
-        text: "If you give someone a position that is already taken, everyone below them shifts down automatically when you publish.",
+        label: "You don't have to renumber everyone.",
+        text: "Give someone a position that's already taken and everyone below them shifts down on their own when you publish.",
       },
     ],
   },
@@ -162,19 +164,19 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         type: "steps",
         items: [
-          "Go to Sponsors and press Create New.",
+          "Go to Sponsors and hit Create New.",
           "Add the Name, the Logo and the sponsor's website address.",
-          "Pick the Tier, which decides the section of the Sponsors page they appear in.",
-          "Press Publish changes.",
+          "Pick the Tier, which is the section of the Sponsors page they show up in.",
+          "Hit Publish changes.",
         ],
       },
       {
         type: "text",
-        text: "Logos sit on a white plate by default, which suits most artwork. Only switch Logo backing to dark when the logo is white or very pale and its background is transparent. A logo with white baked into the image will show as a white rectangle on a dark backing.",
+        text: "Logos sit on a white plate by default, which works for most of them. Only switch Logo backing to dark if the logo is white or very pale and its background is see-through. If the logo has white baked into the image, a dark backing just gives you a white rectangle.",
       },
       {
         type: "text",
-        text: "The tiers themselves live in Sponsor Tiers. You can rename or reorder them there. A tier cannot be deleted while sponsors are still in it.",
+        text: "The tiers themselves live in Sponsor Tiers, so you can rename or reorder them there. You can't delete a tier while sponsors are still in it.",
       },
     ],
   },
@@ -184,20 +186,20 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     blocks: [
       {
         type: "text",
-        text: "Every image lives in Media, so the same photo can be reused in several places without uploading it twice.",
+        text: "Every image lives in Media, so you can reuse the same photo in a few places without uploading it twice.",
       },
       {
         type: "list",
         items: [
-          "Upload landscape photos where possible. Portrait posters work for events, but get cropped on wide screens elsewhere.",
-          "Always fill in the alt text. It describes the picture for people using a screen reader, and shows if the image fails to load. A few words is enough, e.g. \"Aurora Mk II on the launch rail\".",
-          "Some images offer a drag-to-position control. Use it when the crop cuts off the important part.",
+          "Go for landscape photos where you can. Portrait posters are fine for events, but they get cropped on wide screens everywhere else.",
+          "Always fill in the alt text. It describes the photo for anyone using a screen reader, and it shows if the image fails to load. A few words does the job, like \"Aurora Mk II on the launch rail\".",
+          "Some images have a drag-to-position control. Use it if the crop is cutting off the important bit.",
         ],
       },
       {
         type: "callout",
-        label: "You cannot delete an image that is in use.",
-        text: "The Used in column shows where each one appears. Remove it from those pages first, then delete it. This is deliberate: it stops a photo vanishing from a page nobody was looking at.",
+        label: "You can't delete an image that's in use.",
+        text: "The Used in column tells you where each one shows up. Take it off those pages first, then delete it. That's on purpose, so a photo can't quietly vanish from a page nobody was looking at.",
       },
     ],
   },
@@ -207,11 +209,11 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     blocks: [
       {
         type: "text",
-        text: "Anything that appears in a row or list has an Order field: exec members, stats, team roles, journey items, what-we-do blocks and sponsor tiers. Position 1 comes first.",
+        text: "Anything that shows up in a row or a list has an Order field: exec members, stats, team roles, journey items, what-we-do blocks and sponsor tiers. Position 1 goes first.",
       },
       {
         type: "text",
-        text: "Give something a position that is already taken and the others shift down when you publish, so you never have to renumber a whole list by hand.",
+        text: "Give something a position that's already taken and the rest shift down when you publish, so you never have to renumber a whole list by hand.",
       },
     ],
   },
@@ -221,11 +223,11 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     blocks: [
       {
         type: "text",
-        text: "The dashboard shows how much room the site is using, so you can see it without needing a Supabase login. Two bars: one for everything written on the site, one for the photos and files uploaded to it.",
+        text: "The dashboard shows how much room the site has left, so you can check without needing a Supabase login. One bar is everything written on the site, the other is the photos and files uploaded to it.",
       },
       {
         type: "text",
-        text: "If either is getting close to full, the quickest win is deleting images nothing uses. Open Media and look for entries with nothing in the Used in column. If it is still tight after that, the club needs to move to a paid plan, which is a decision for the committee rather than something to fix here.",
+        text: "If either is getting full, the quickest win is deleting images nothing uses. Open Media and look for ones with an empty Used in column. If it's still tight after that, the club needs a paid plan, and that's a committee call rather than something you can fix in here.",
       },
     ],
   },
@@ -236,18 +238,18 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         type: "list",
         items: [
-          "Editors can change everything on the site but cannot manage accounts. This is the right role for most committee members.",
-          "Admins can additionally create, edit and delete accounts.",
+          "Editors can change everything on the site but can't manage accounts. That's the right role for most committee members.",
+          "Admins can do all that plus create, edit and delete accounts.",
         ],
       },
       {
         type: "callout",
         label: "Keep at least two admins.",
-        text: "If the only admin leaves the club or loses access, nobody can create accounts for the next committee, and fixing that needs developer access to the database.",
+        text: "If the only admin leaves the club or loses access, nobody can make accounts for the next committee, and sorting that out needs developer access to the database.",
       },
       {
         type: "text",
-        text: "At handover, create accounts for the incoming committee before the outgoing one loses access, and delete accounts for people who have left.",
+        text: "At handover, make accounts for the incoming committee before the outgoing one loses access, and delete the accounts of anyone who's left.",
       },
     ],
   },

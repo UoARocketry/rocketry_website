@@ -56,13 +56,13 @@ const markdown = `<!--
 
 # Guide for committee members
 
-How to keep the UARC website up to date. You do not need to know anything about
-code. Work through a section when you need it, rather than reading the whole
-thing.
+How to keep the UARC website up to date. You don't need to know anything about
+code, and you don't have to read all of this. Jump to whatever you're trying to
+do.
 
-This is a copy of the guide built into the admin. The version committee members
-should use is at **/admin/guide**, reachable from the dashboard and from the
-bottom of the admin sidebar.
+This is a copy of the guide built into the admin. The one committee members
+should actually use is at **/admin/guide**, linked from the dashboard and from
+the bottom of the admin sidebar.
 
 ## Contents
 

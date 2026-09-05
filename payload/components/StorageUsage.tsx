@@ -188,12 +188,12 @@ export default async function StorageUsage() {
           lineHeight: 1.5,
         }}
       >
-        Running low? Deleting images nothing uses is the quickest win: open
-        Media and look for entries with an empty &ldquo;Used in&rdquo; column.
-        If it is still tight after that, the club needs a paid plan, which is a
-        committee decision. These figures are measured live; the limits they are
-        measured against are set in Site Settings and match the free plan. For
-        billing, see the{" "}
+        Running low? The quickest win is deleting images nothing uses: open
+        Media and look for ones with an empty &ldquo;Used in&rdquo; column. If
+        it&rsquo;s still tight after that, the club needs a paid plan, and
+        that&rsquo;s a committee call. These figures are measured live. The
+        limits they&rsquo;re measured against are set in Site Settings and match
+        the free plan. For billing, see the{" "}
         <a
           href={SUPABASE_DASHBOARD_URL}
           target="_blank"

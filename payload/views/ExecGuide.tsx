@@ -43,9 +43,9 @@ export default function ExecGuideView({
             lineHeight: 1.6,
           }}
         >
-          How to keep the UARC website up to date. You do not need to know
-          anything about code. Work through a section when you need it, rather
-          than reading the whole thing.
+          How to keep the UARC website up to date. You don&rsquo;t need to know
+          anything about code, and you don&rsquo;t have to read all of this.
+          Jump to whatever you&rsquo;re trying to do.
         </p>
 
         <nav

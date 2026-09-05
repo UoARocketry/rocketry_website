@@ -6,13 +6,13 @@
 
 # Guide for committee members
 
-How to keep the UARC website up to date. You do not need to know anything about
-code. Work through a section when you need it, rather than reading the whole
-thing.
+How to keep the UARC website up to date. You don't need to know anything about
+code, and you don't have to read all of this. Jump to whatever you're trying to
+do.
 
-This is a copy of the guide built into the admin. The version committee members
-should use is at **/admin/guide**, reachable from the dashboard and from the
-bottom of the admin sidebar.
+This is a copy of the guide built into the admin. The one committee members
+should actually use is at **/admin/guide**, linked from the dashboard and from
+the bottom of the admin sidebar.
 
 ## Contents
 
@@ -29,111 +29,111 @@ bottom of the admin sidebar.
 
 ## How this works
 
-This admin is where the website's content lives. The public site reads from it, so anything you publish here appears on uoarocketry.com. You never need to touch code to change words, photos, events, rockets, people or sponsors.
+This is where the website's content lives. The site reads from here, so anything you publish shows up on uoarocketry.com. You don't need to touch any code to change text, photos, events, rockets, people or sponsors.
 
-The menu on the left is grouped by the part of the site each thing controls. Events and Event Tags feed the Events page. Rockets feeds the Rockets page. Executives feeds the team section on About. What We Do, Journey Items, Team Roles and Stats are the four blocks that make up the rest of the About page.
+The menu on the left is grouped by which part of the site each thing controls. Events and Event Tags feed the Events page. Rockets feeds the Rockets page. Executives feeds the team section on About. What We Do, Journey Items, Team Roles and Stats are the four blocks that make up the rest of the About page.
 
-> **Changes are not instant.** The site caches pages for up to five minutes so it stays fast. If your change is not showing yet, wait a few minutes and refresh before assuming something went wrong.
+> **Changes aren't instant.** The site caches pages for up to five minutes so it loads fast. If your change isn't showing, give it a few minutes and refresh before you assume something's broken.
 
 ## Draft and publish
 
-This is the single most important thing to understand, because it is the easiest to get wrong in both directions.
+This is the bit people get wrong most, so it's worth reading properly. There are two buttons and they do very different things.
 
-- Save Draft stores your work privately. Nobody visiting the website can see it. Use this when something is half-finished.
+- Save Draft keeps your work private. Nobody on the website can see it. Use it when something's half finished.
 - Publish changes puts it live. Anyone can see it straight away.
 
-A new item you only ever saved as a draft is not on the site at all. If you have written an event and cannot find it on the site, this is almost always why: open it and press Publish changes.
+If you only ever saved a draft, it's not on the site at all. So if you've written an event and can't find it on the website, that's almost always why. Open it and hit Publish changes.
 
-> **The reverse trap.** Editing something already published and pressing Save Draft does not take the old version down. The site keeps showing the last published version until you press Publish changes.
+> **It catches you the other way too.** Editing something that's already live and hitting Save Draft doesn't take the old version down. The site keeps showing the last published version until you hit Publish changes.
 
-To check something before it goes live, open it and use the preview link. That shows you the page as it will look, without publishing.
+If you want to see how something looks before it goes live, open it and use the preview link. That shows you the real page without publishing it.
 
 ## Add an event
 
-1. Go to Events in the left menu and press Create New.
-2. Give it a Title. The Slug on the right fills itself in from the title, which becomes the web address. Leave it alone unless you have a reason.
-3. Add the Event image. This is usually the Instagram poster. Leave it empty and the card shows a plain UARC panel instead.
-4. Write a Description. This is what people read on the event page.
-5. Set the Date, and the End time if you know when it finishes.
-6. Pick an Event Tag so it can be filtered on the Events page.
+1. Go to Events in the left menu and hit Create New.
+2. Give it a Title. The Slug on the right fills itself in from that, and it becomes the web address. Leave it alone unless you've got a reason not to.
+3. Add the Event image, usually the Instagram poster. If you leave it empty the card shows a plain UARC panel instead, which is fine.
+4. Write a Description. That's what people read on the event page.
+5. Set the Date, and the End time if you know when it wraps up.
+6. Pick an Event Tag so people can filter for it on the Events page.
 7. Choose how people sign up under Signup.
-8. Press Publish changes.
+8. Hit Publish changes.
 
-Three fields exist for events that are not a single afternoon, and it is worth knowing which one you want:
+There are three fields for events that aren't just a single afternoon, and it's easy to pick the wrong one. Here's the difference:
 
-- Extra days and times: one event spread over consecutive days, e.g. a build weekend on the Saturday and Sunday. Also use it to add a second sitting on a day already listed.
-- Sessions: a series where each week is its own thing, e.g. Level 1 build workshops running over a term.
-- Neither: a normal one-off event. Most events are this.
+- Extra days and times: one event spread over days in a row, like a build weekend on the Saturday and Sunday. Also use it if you're running the same day twice.
+- Sessions: a series where each week is its own thing, like Level 1 build workshops across a term.
+- Neither: a normal one-off event. That's most of them.
 
 ## Add or update a rocket
 
-1. Go to Rockets and press Create New.
+1. Go to Rockets and hit Create New.
 2. Add the Name, the Rocket image and a Description.
-3. Leave the launch date empty while the rocket is still being built. A date in the future shows it as a scheduled launch; a date in the past shows it as launched.
-4. Add Specs if you want the details box on the rocket page. Leave it empty and the box is hidden.
+3. Leave the launch date empty while it's still being built. A date in the future shows it as a scheduled launch, and a date in the past shows it as launched.
+4. Add Specs if you want the details box on the rocket page. Leave it empty and the box just doesn't show.
 5. Add a Gallery for extra photos, and Videos for any footage.
-6. Press Publish changes.
+6. Hit Publish changes.
 
-Tick Featured to put a rocket in the Featured Rockets section on the home page. Up to three are shown. If you tick none, the home page falls back to the most recently launched.
+Tick Featured to put a rocket in the Featured Rockets section on the home page. It shows up to three. If you don't tick any, the home page falls back to the most recently launched ones.
 
 ## Update the exec team
 
-Executives are grouped by year, so a new committee does not overwrite the old one. The About page shows the current year and lets visitors look back at previous ones.
+Executives are grouped by year, so adding a new committee doesn't wipe the old one. The About page shows the current year and lets people look back at previous ones.
 
-1. Go to Executives and press Create New for each person.
+1. Go to Executives and hit Create New for each person.
 2. Fill in their Name, Role and a short Bio.
-3. Set Year to the committee year they are serving.
-4. Set Order to their position within that year, starting at 1.
-5. Add a Photo. If you have none, the site shows their initials, which looks deliberate rather than broken.
-6. Press Publish changes.
+3. Set Year to the committee year they're serving.
+4. Set Order to where they sit in that year, starting at 1.
+5. Add a Photo. If you haven't got one, the site shows their initials instead, and that's meant to happen.
+6. Hit Publish changes.
 
-> **You do not need to renumber everyone.** If you give someone a position that is already taken, everyone below them shifts down automatically when you publish.
+> **You don't have to renumber everyone.** Give someone a position that's already taken and everyone below them shifts down on their own when you publish.
 
 ## Add a sponsor
 
-1. Go to Sponsors and press Create New.
+1. Go to Sponsors and hit Create New.
 2. Add the Name, the Logo and the sponsor's website address.
-3. Pick the Tier, which decides the section of the Sponsors page they appear in.
-4. Press Publish changes.
+3. Pick the Tier, which is the section of the Sponsors page they show up in.
+4. Hit Publish changes.
 
-Logos sit on a white plate by default, which suits most artwork. Only switch Logo backing to dark when the logo is white or very pale and its background is transparent. A logo with white baked into the image will show as a white rectangle on a dark backing.
+Logos sit on a white plate by default, which works for most of them. Only switch Logo backing to dark if the logo is white or very pale and its background is see-through. If the logo has white baked into the image, a dark backing just gives you a white rectangle.
 
-The tiers themselves live in Sponsor Tiers. You can rename or reorder them there. A tier cannot be deleted while sponsors are still in it.
+The tiers themselves live in Sponsor Tiers, so you can rename or reorder them there. You can't delete a tier while sponsors are still in it.
 
 ## Images
 
-Every image lives in Media, so the same photo can be reused in several places without uploading it twice.
+Every image lives in Media, so you can reuse the same photo in a few places without uploading it twice.
 
-- Upload landscape photos where possible. Portrait posters work for events, but get cropped on wide screens elsewhere.
-- Always fill in the alt text. It describes the picture for people using a screen reader, and shows if the image fails to load. A few words is enough, e.g. "Aurora Mk II on the launch rail".
-- Some images offer a drag-to-position control. Use it when the crop cuts off the important part.
+- Go for landscape photos where you can. Portrait posters are fine for events, but they get cropped on wide screens everywhere else.
+- Always fill in the alt text. It describes the photo for anyone using a screen reader, and it shows if the image fails to load. A few words does the job, like "Aurora Mk II on the launch rail".
+- Some images have a drag-to-position control. Use it if the crop is cutting off the important bit.
 
-> **You cannot delete an image that is in use.** The Used in column shows where each one appears. Remove it from those pages first, then delete it. This is deliberate: it stops a photo vanishing from a page nobody was looking at.
+> **You can't delete an image that's in use.** The Used in column tells you where each one shows up. Take it off those pages first, then delete it. That's on purpose, so a photo can't quietly vanish from a page nobody was looking at.
 
 ## Ordering things on a page
 
-Anything that appears in a row or list has an Order field: exec members, stats, team roles, journey items, what-we-do blocks and sponsor tiers. Position 1 comes first.
+Anything that shows up in a row or a list has an Order field: exec members, stats, team roles, journey items, what-we-do blocks and sponsor tiers. Position 1 goes first.
 
-Give something a position that is already taken and the others shift down when you publish, so you never have to renumber a whole list by hand.
+Give something a position that's already taken and the rest shift down when you publish, so you never have to renumber a whole list by hand.
 
 ## When storage runs low
 
-The dashboard shows how much room the site is using, so you can see it without needing a Supabase login. Two bars: one for everything written on the site, one for the photos and files uploaded to it.
+The dashboard shows how much room the site has left, so you can check without needing a Supabase login. One bar is everything written on the site, the other is the photos and files uploaded to it.
 
-If either is getting close to full, the quickest win is deleting images nothing uses. Open Media and look for entries with nothing in the Used in column. If it is still tight after that, the club needs to move to a paid plan, which is a decision for the committee rather than something to fix here.
+If either is getting full, the quickest win is deleting images nothing uses. Open Media and look for ones with an empty Used in column. If it's still tight after that, the club needs a paid plan, and that's a committee call rather than something you can fix in here.
 
 ## Accounts
 
-- Editors can change everything on the site but cannot manage accounts. This is the right role for most committee members.
-- Admins can additionally create, edit and delete accounts.
+- Editors can change everything on the site but can't manage accounts. That's the right role for most committee members.
+- Admins can do all that plus create, edit and delete accounts.
 
-> **Keep at least two admins.** If the only admin leaves the club or loses access, nobody can create accounts for the next committee, and fixing that needs developer access to the database.
+> **Keep at least two admins.** If the only admin leaves the club or loses access, nobody can make accounts for the next committee, and sorting that out needs developer access to the database.
 
-At handover, create accounts for the incoming committee before the outgoing one loses access, and delete accounts for people who have left.
+At handover, make accounts for the incoming committee before the outgoing one loses access, and delete the accounts of anyone who's left.
 
 ## Who to ask
 
-This site was built and handed over by Jerry Kim. If something here is broken, or you want to change something the admin does not let you change, get in touch rather than guessing.
+I built this site and handed it over. If something's broken, or you want to change something this admin won't let you change, message me instead of guessing at it. Happy to help.
 
 - Email: jerryputhikunkim@gmail.com
 - LinkedIn: [Puthikun (Jerry) Kim](https://www.linkedin.com/in/puthikun-jerry-kim/)

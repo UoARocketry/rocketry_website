@@ -28,8 +28,8 @@ export default function StartHere() {
           maxWidth: "60ch",
         }}
       >
-        Everything on this dashboard controls part of the public website. The
-        guide walks through the jobs you will actually do: adding an event,
+        Everything on this dashboard controls part of the website. The guide
+        covers the stuff you&rsquo;ll actually be doing: adding an event,
         updating the exec team, adding a sponsor, and the difference between
         saving a draft and publishing.
       </p>
