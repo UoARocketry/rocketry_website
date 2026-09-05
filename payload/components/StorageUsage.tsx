@@ -180,7 +180,10 @@ export default async function StorageUsage() {
         </div>
       )}
 
-      <p
+      {/* A div rather than a p, because a p may not contain <details>: the
+          browser would close the paragraph early and React would report a
+          hydration mismatch. */}
+      <div
         style={{
           margin: "1rem 0 0",
           fontSize: "0.75rem",
@@ -188,23 +191,37 @@ export default async function StorageUsage() {
           lineHeight: 1.5,
         }}
       >
-        Running low? Check which bar is high first. For photos and files, open
-        Media and delete anything with an empty &ldquo;Used in&rdquo; column.
-        For site content, clear out events from years ago and exec years you no
-        longer show. Deleting an event doesn&rsquo;t remove its photos, so do
-        that first and then tidy Media. Still tight? The club needs a paid plan,
-        and that&rsquo;s a committee call. These figures are measured live, and
-        the limits they&rsquo;re measured against are set in Site Settings to
-        match the free plan. For billing, see the{" "}
-        <a
-          href={SUPABASE_DASHBOARD_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Supabase dashboard
-        </a>
-        .
-      </p>
+        {/* A native <details>, so the long version stays one click away
+            without this server component needing to become a client one. */}
+        <details>
+          <summary style={{ cursor: "pointer" }}>
+            Running low? Check which bar is high first.
+          </summary>
+          <div style={{ marginTop: "0.5rem" }}>
+            <p style={{ margin: "0 0 0.5rem" }}>
+              For photos and files, open Media and delete anything with an empty
+              &ldquo;Used in&rdquo; column. For site content, clear out events
+              from years ago and exec years you no longer show. Deleting an
+              event doesn&rsquo;t remove its photos, so do that first and then
+              tidy Media.
+            </p>
+            <p style={{ margin: 0 }}>
+              Still tight? The club needs a paid plan, and that&rsquo;s a
+              committee call. These figures are measured live, and the limits
+              they&rsquo;re measured against are set in Site Settings to match
+              the free plan. For billing, see the{" "}
+              <a
+                href={SUPABASE_DASHBOARD_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Supabase dashboard
+              </a>
+              .
+            </p>
+          </div>
+        </details>
+      </div>
     </div>
   );
 }
