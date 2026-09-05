@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import {
   buildAllowedOrigins,
   isProductionRuntime,
-  resolveDatabaseUrl,
   resolvePayloadSecret,
   resolveServerUrl,
 } from "@/lib/env";
@@ -21,17 +20,6 @@ describe("isProductionRuntime", () => {
   });
   it("is true at production runtime", () => {
     expect(isProductionRuntime({ NODE_ENV: "production" })).toBe(true);
-  });
-});
-
-describe("resolveDatabaseUrl", () => {
-  it("prefers DATABASE_URL", () => {
-    expect(
-      resolveDatabaseUrl({ DIRECT_URL: "a", DATABASE_URL: "b" }),
-    ).toBe("b");
-  });
-  it("throws when neither is set", () => {
-    expect(() => resolveDatabaseUrl({})).toThrow(/database/i);
   });
 });
 
@@ -67,6 +55,25 @@ describe("buildAllowedOrigins", () => {
     expect(buildAllowedOrigins({ NODE_ENV: "development" })).toContain(
       "http://localhost:3000",
     );
+  });
+
+  // Payload answers a form-state request from an unlisted origin with a 401,
+  // and the admin shows that as a skeleton that never resolves. Browsing the
+  // admin on 127.0.0.1 rather than localhost made every "Add row" button
+  // appear to hang, with no error anywhere in the interface.
+  it("also adds the 127.0.0.1 spelling of localhost in development", () => {
+    expect(buildAllowedOrigins({ NODE_ENV: "development" })).toContain(
+      "http://127.0.0.1:3000",
+    );
+  });
+
+  it("keeps both loopback origins out of production", () => {
+    const origins = buildAllowedOrigins({
+      NODE_ENV: "production",
+      SERVER_URL: "https://www.uoarocketry.com",
+    });
+
+    expect(origins).toEqual(["https://www.uoarocketry.com"]);
   });
 });
 

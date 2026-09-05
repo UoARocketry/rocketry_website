@@ -7,7 +7,7 @@ import ScrollToTop from "@/components/ScrollToTop";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { getSiteSettings } from "@/lib/site-data";
-import { resolveServerUrl } from "@/lib/env";
+import { resolveSiteUrl } from "@/lib/env";
 import { toSafeJsonLd } from "@/lib/utils";
 import {
   DEFAULT_CONTACT_EMAIL,
@@ -33,7 +33,7 @@ const SITE_NAME = "University of Auckland Rocketry Club";
 const SITE_TITLE = `${SITE_NAME} (UARC)`;
 const SITE_DESCRIPTION =
   "UARC is the University of Auckland Rocketry Club, a student-led club dedicated to designing, building, and launching rockets. Join us in exploring aerospace engineering and space exploration.";
-const SITE_URL = resolveServerUrl() ?? "https://www.uoarocketry.com";
+const SITE_URL = resolveSiteUrl();
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
   description: SITE_DESCRIPTION,
   // No `keywords`: Google has ignored the meta keywords tag since 2009
   // (developers.google.com/search/blog/2009/09/google-does-not-use-keywords-meta-tag),
-  // so it was carrying the only on-site mention of "UARC" nowhere.
+  // which is why the acronym has to sit in the title and the page itself.
   alternates: {
     canonical: "/",
   },
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
     // so the icon is a dedicated square rocket mark instead.
     //
     // The 96px PNG exists for Google Search, which recommends a favicon larger
-    // than 48x48 and was previously only offered the 32px one via `shortcut`.
+    // than 48x48, and `shortcut` points at it for the same reason.
     // https://developers.google.com/search/docs/appearance/favicon-in-search
     icon: [
       { url: "/icon.svg", type: "image/svg+xml" },
@@ -129,9 +129,23 @@ export default async function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: toSafeJsonLd(organizationJsonLd) }}
         />
+        {/* Every page repeats the same nav, so a keyboard or screen reader
+            user otherwise tabs through all of it before reaching the content,
+            on every navigation (WCAG 2.4.1). Hidden until focused, so it costs
+            the visual design nothing. */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-100 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-text-main focus:outline-none focus:ring-2 focus:ring-text-main"
+        >
+          Skip to main content
+        </a>
         <Navigation joinUrl={joinUrl} />
         <ScrollToTop />
-        <div className="relative pt-16 min-h-screen mt-16 mb-16">
+        <div
+          id="main-content"
+          tabIndex={-1}
+          className="relative pt-16 min-h-screen mt-16 mb-16"
+        >
           {children}
         </div>
         <Footer />

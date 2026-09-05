@@ -59,7 +59,7 @@ export default async function HomePage() {
           />
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 tracking-tight text-balance">
             University of Auckland
-            <span className="block text-primary">Rocketry Club</span>
+            <span className="block text-primary text-primary-deep">Rocketry Club</span>
           </h1>
           {/* The acronym is spelled out here on purpose: it is the term people
               search for, and it previously appeared nowhere in visible text. */}

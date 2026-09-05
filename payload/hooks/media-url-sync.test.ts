@@ -57,6 +57,25 @@ describe("syncMediaRelationToUrlField", () => {
     expect(data.photo).toBe(good);
   });
 
+  it("keeps the existing URL when the configured storage base is not absolute", async () => {
+    // Same failure as an unset base, reached the other way: a relative
+    // SUPABASE_STORAGE_PUBLIC_URL would otherwise be concatenated into a
+    // relative URL and written into the field the public site reads.
+    process.env.SUPABASE_STORAGE_PUBLIC_URL = "images";
+    const good = "https://x.supabase.co/storage/v1/object/public/images/a.jpg";
+    const data: Record<string, unknown> = { photoMedia: 7 };
+
+    await syncMediaRelationToUrlField({
+      data,
+      originalDoc: { photoMedia: 7, photo: good },
+      req: makeReq({ id: 7, filename: "a.jpg", prefix: "media" }),
+      relationField: "photoMedia",
+      urlField: "photo",
+    });
+
+    expect(data.photo).toBe(good);
+  });
+
   it("rebuilds the public URL from the filename when storage is configured", async () => {
     process.env.SUPABASE_STORAGE_PUBLIC_URL =
       "https://x.supabase.co/storage/v1/object/public/images";

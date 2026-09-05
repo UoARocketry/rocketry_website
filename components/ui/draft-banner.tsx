@@ -8,8 +8,8 @@ import React from "react";
  *
  * Draft mode means "render the newest saved version", which is not the same as
  * "this document is unpublished". The Preview button turns it on for every
- * document, so a banner that always claimed the content was unpublished told
- * editors their live, published pages were invisible to the public.
+ * document, so a banner that always claims the content is unpublished would
+ * tell editors their live, published pages are invisible to the public.
  */
 export default function DraftBanner({
   returnTo,

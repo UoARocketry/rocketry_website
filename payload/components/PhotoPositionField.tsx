@@ -20,7 +20,7 @@ const ZOOM_STEP = 0.25;
 /**
  * Supplied per field via `clientProps` in `createImagePairFields`, so one
  * component serves the circular exec headshot and the landscape card frames.
- * Defaults describe the exec photo, which was the original caller.
+ * The defaults describe the exec photo.
  */
 type FramingProps = {
   uploadField?: string;

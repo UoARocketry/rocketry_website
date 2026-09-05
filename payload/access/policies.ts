@@ -22,7 +22,38 @@ function hasAdminRole(user: unknown): boolean {
   );
 }
 
+/**
+ * Unrestricted read. Correct only for collections with no draft workflow,
+ * where every row is publishable content (tags, tiers, media).
+ * For anything with `versions.drafts`, use `isPublicReadPublished`.
+ */
 export const isPublicRead: Access = () => true;
+
+/**
+ * Read policy for collections that have drafts enabled.
+ *
+ * `isPublicRead` is not sufficient for those. Payload generates a public
+ * REST and GraphQL API from every collection, and a document that has only
+ * ever been a draft lives in the main table with `_status: 'draft'` and no
+ * published version behind it. So an anonymous `GET /api/rockets` returned
+ * unpublished documents in full, even though the website never showed them:
+ * `lib/site-data.ts` filters `_status` itself, but nothing was filtering the
+ * generated API.
+ *
+ * Returning a constraint rather than `true` pushes the filter into every read
+ * path at once, which is the only way to cover endpoints we do not hand-write.
+ *
+ * Signed-in users still see drafts, which is what the admin UI and the preview
+ * flow depend on. `lib/site-data.ts` is unaffected either way: the Local API
+ * runs with `overrideAccess`, and it applies its own explicit filter anyway.
+ */
+export const isPublicReadPublished: Access = ({ req }) => {
+  if (req.user) {
+    return true;
+  }
+
+  return { _status: { equals: "published" } };
+};
 
 export const isLoggedIn: Access = ({ req }) => Boolean(req.user);
 

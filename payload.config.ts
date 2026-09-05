@@ -4,7 +4,11 @@ import { resendAdapter } from "@payloadcms/email-resend";
 import { postgresAdapter } from "@payloadcms/db-postgres";
 import { s3Storage } from "@payloadcms/storage-s3";
 import { buildConfig } from "payload";
-import { buildAllowedOrigins, resolveServerUrl } from "./lib/env.ts";
+import {
+  buildAllowedOrigins,
+  resolvePayloadSecret,
+  resolveServerUrl,
+} from "./lib/env.ts";
 import { EventTags } from "./payload/collections/EventTags.ts";
 import { Events } from "./payload/collections/Events.ts";
 import { Executives } from "./payload/collections/Executives.ts";
@@ -22,11 +26,17 @@ import { SiteSettings } from "./payload/globals/SiteSettings.ts";
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 
+// Read inline, and allowed to be empty rather than routed through a helper that
+// throws: `payload generate:importmap` and `generate:types` both load this
+// config with no database configured, so a guard here would break codegen. CI
+// validates the connection string separately, before the build.
 const databaseUrl =
   process.env.DATABASE_URL?.trim() || process.env.DIRECT_URL?.trim() || "";
-const payloadSecret =
-  process.env.PAYLOAD_SECRET?.trim() ||
-  "dev-only-secret-change-before-production";
+// Deliberately routed through lib/env.ts rather than read inline: that helper
+// refuses to fall back to the committed dev secret at production runtime, so a
+// missing PAYLOAD_SECRET fails loudly instead of signing admin sessions with a
+// value that is public on GitHub. Build phase still gets the dev fallback.
+const payloadSecret = resolvePayloadSecret();
 const resendApiKey = process.env.RESEND_API_KEY?.trim() || "";
 const resendFromAddress =
   process.env.PAYLOAD_EMAIL_FROM_ADDRESS?.trim() || "no-reply@example.com";
@@ -120,7 +130,27 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
     components: {
-      beforeDashboard: ["/payload/components/StorageUsage.tsx#default"],
+      // Orientation first, then the storage meter. A committee member landing
+      // here for the first time should meet "here is how this works" before a
+      // pair of usage bars.
+      beforeDashboard: [
+        "/payload/components/StartHere.tsx#default",
+        "/payload/components/StorageUsage.tsx#default",
+      ],
+      // Also linked from the nav, so it can be reached from any screen rather
+      // than only by going back to the dashboard.
+      afterNavLinks: ["/payload/components/GuideNavLink.tsx#default"],
+      views: {
+        execGuide: {
+          Component: "/payload/views/ExecGuide.tsx#default",
+          path: "/guide",
+          meta: {
+            title: "Guide",
+            description:
+              "How to keep the UARC website up to date, for committee members.",
+          },
+        },
+      },
     },
   },
   i18n: {

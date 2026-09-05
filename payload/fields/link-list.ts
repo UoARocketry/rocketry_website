@@ -1,4 +1,5 @@
 import type { Field } from "payload";
+import { fieldHelp } from "./help.ts";
 import { urlFieldHooks, validateRequiredUrl } from "./validators.ts";
 
 type LinkListOptions = {
@@ -11,6 +12,8 @@ type LinkListOptions = {
   singular: string;
   plural: string;
   description: string;
+  /** Detail kept behind the "More help" toggle, for anything that runs long. */
+  descriptionMore?: string;
   headingDescription: string;
   labelPlaceholder: string;
 };
@@ -33,6 +36,7 @@ export function createLinkListFields({
   singular,
   plural,
   description,
+  descriptionMore,
   headingDescription,
   labelPlaceholder,
 }: LinkListOptions): Field[] {
@@ -59,7 +63,10 @@ export function createLinkListFields({
       type: "array",
       required: false,
       labels: { singular, plural },
-      admin: { initCollapsed: true, description },
+      admin: {
+        initCollapsed: true,
+        ...fieldHelp(description, descriptionMore),
+      },
       fields: [
         {
           name: "label",

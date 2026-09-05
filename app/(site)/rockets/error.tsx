@@ -1,13 +1,13 @@
 "use client";
 import React, { useEffect } from "react";
-import SectionFallback from "@/components/SectionFallback";
+import ErrorState from "@/components/ErrorState";
 
 type ErrorProps = {
   error: Error;
   reset: () => void;
 };
 
-export default function RocketsError({ error }: ErrorProps) {
+export default function RocketsError({ error, reset }: ErrorProps) {
   useEffect(() => {
     console.error("[error-boundary/rockets] Render error:", error);
   }, [error]);
@@ -18,7 +18,7 @@ export default function RocketsError({ error }: ErrorProps) {
         <h1 className="text-5xl font-extrabold mb-4 text-primary">
           Our Rockets
         </h1>
-        <SectionFallback align="left" />
+        <ErrorState align="left" onRetry={reset} />
       </section>
     </main>
   );

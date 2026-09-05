@@ -58,6 +58,14 @@ function getSupabasePublicBaseUrl(): string | null {
     return null;
   }
 
+  // A misconfigured base (a bare bucket path, say) would otherwise be
+  // concatenated into a relative URL and written into the flattened field,
+  // which is the exact failure `isAbsoluteUrl` exists to prevent on the other
+  // branch. Returning null instead makes the caller keep the existing URL.
+  if (!isAbsoluteUrl(configured)) {
+    return null;
+  }
+
   return configured.replace(/\/+$/, "");
 }
 
@@ -136,7 +144,14 @@ async function resolveMediaUrl(
     })) as unknown as UnknownRecord;
 
     return extractUrlFromMediaDoc(mediaDoc);
-  } catch {
+  } catch (error) {
+    // Returning null makes the caller keep whatever URL the document already
+    // had, which is the right outcome either way. Log it so a database problem
+    // is distinguishable from a media row that genuinely is not there.
+    console.warn(
+      `[media-url-sync] Could not read media ${String(relationId)}:`,
+      error instanceof Error ? error.message : error,
+    );
     return null;
   }
 }

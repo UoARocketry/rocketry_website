@@ -1,5 +1,6 @@
 import type { CollectionConfig } from "payload";
-import { isLoggedIn, isPublicRead } from "../access/policies.ts";
+import { isLoggedIn, isPublicReadPublished } from "../access/policies.ts";
+import { fieldHelp } from "../fields/help.ts";
 import {
   getStringField,
   revalidatePaths,
@@ -27,8 +28,11 @@ export const Events: CollectionConfig = {
     useAsTitle: "title",
     defaultColumns: ["title", "date", "eventTag", "_status"],
     group: "Events",
+    // Payload shows this on the create and edit screens as well as the list,
+    // so it has to read correctly when you are looking at a single event.
+    // "Everything listed, newest first" made sense only on the list.
     description:
-      "Everything listed on the Events page, newest first. Unpublished drafts appear at the top and are not visible on the site.",
+      "Talks, workshops and launches shown on the Events page. A draft stays off the site until you publish it.",
     preview: createPreviewUrl("events"),
     components: {
       edit: {
@@ -44,7 +48,7 @@ export const Events: CollectionConfig = {
   },
   trash: true,
   access: {
-    read: isPublicRead,
+    read: isPublicReadPublished,
     create: isLoggedIn,
     update: isLoggedIn,
     delete: isLoggedIn,
@@ -124,8 +128,10 @@ export const Events: CollectionConfig = {
       required: false,
       admin: {
         date: { pickerAppearance: "dayAndTime", timeFormat: "HH:mm" },
-        description:
-          "When the event starts. For an event running over more than one day, this is the first day. Optional: leave it empty for a series where only the sessions below have dates.",
+        ...fieldHelp(
+          "When the event starts. For a multi-day event, this is the first day.",
+          "It's optional. Leave it empty for a series where only the sessions below have dates.",
+        ),
       },
     },
     {
@@ -148,8 +154,10 @@ export const Events: CollectionConfig = {
       labels: { singular: "Extra day or time", plural: "Extra days and times" },
       admin: {
         initCollapsed: true,
-        description:
-          "Optional. Two uses. For an event running across several days, add each further day and the page reads 'September 3 & 4'. For an event running twice in one day, add the same date again with its own start and end time, and the page lists both sittings under that date. For a workshop series with different content each week, use Sessions below instead.",
+        ...fieldHelp(
+          "Optional. Extra days for an event that runs across more than one, like a build weekend.",
+          "The page then reads 'September 3 & 4'. Running the same day twice? Add that date again with its own start and end time, and the page lists both sittings under it. If it's a workshop series with different content each week, use Sessions below instead.",
+        ),
       },
       fields: [
         {
@@ -287,7 +295,9 @@ export const Events: CollectionConfig = {
       singular: "Link",
       plural: "Links",
       description:
-        "Optional. Anything worth linking to alongside the event: slides, a reading list, an OpenRocket starter file. Shown in their own section on the event page.",
+        "Optional. Anything worth linking alongside the event, like slides or a reading list.",
+      descriptionMore:
+        "An OpenRocket starter file works too. They show in their own section on the event page.",
       headingDescription:
         'What this section is called. Leave empty for "Resources".',
       labelPlaceholder: "Workshop slides",
@@ -300,8 +310,10 @@ export const Events: CollectionConfig = {
       labels: { singular: "Session", plural: "Sessions" },
       admin: {
         initCollapsed: true,
-        description:
-          "Optional. For a multi-session series (e.g. Level 1 build workshops), add each session. The site puts them in date order for you, so it does not matter what order you add them in. Leave empty for a normal one-off event.",
+        ...fieldHelp(
+          "Optional. For a series like Level 1 build workshops, add each session here.",
+          "The site puts them in date order for you, so it doesn't matter what order you add them in. Leave it empty for a normal one-off event.",
+        ),
       },
       fields: [
         { name: "title", type: "text", required: true },
@@ -332,8 +344,10 @@ export const Events: CollectionConfig = {
           labels: { singular: "Extra day or time", plural: "Extra days and times" },
           admin: {
             initCollapsed: true,
-            description:
-              "Optional. For a session running across more than one day, e.g. a build workshop held on the Saturday and the Sunday. For a session running twice in one day, add the same date again with its own start and end time. Either way it still counts as one session.",
+            ...fieldHelp(
+              "Optional. Extra days for a session that runs across more than one.",
+              "Like a build workshop held on the Saturday and the Sunday. Running it twice in one day? Add that date again with its own start and end time. Either way it still counts as one session.",
+            ),
           },
           fields: [
             {
@@ -355,8 +369,10 @@ export const Events: CollectionConfig = {
               required: false,
               admin: {
                 date: { pickerAppearance: "timeOnly", timeFormat: "HH:mm" },
-                description:
-                  "Leave empty to run the same hours as the session's first day. Fill both in if this day differs, or to add a second sitting on a date already listed.",
+                ...fieldHelp(
+                  "Leave empty to run the same hours as the session's first day.",
+                  "Fill both in if this day is different, or to add a second sitting on a date that's already listed.",
+                ),
               },
               validate: validateStartTimePresent,
             },

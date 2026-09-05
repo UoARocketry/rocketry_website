@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload";
+import { fieldHelp } from "../fields/help.ts";
 import {
   ADMIN_ROLE,
   EDITOR_ROLE,
@@ -20,9 +21,9 @@ export const Users: CollectionConfig = {
     group: "Admin",
     description:
       "Who can sign in to this admin. Admins manage accounts; editors can change site content but not accounts.",
-    // Access control already limited an editor to their own row, but the
-    // collection still appeared in the nav, which reads as a hole. Hiding it
-    // matches the expectation that accounts are admin-only.
+    // Access control limits an editor to their own row, but the collection
+    // would still sit in the nav, which reads as a hole. Hiding it matches the
+    // expectation that accounts are admin-only.
     //
     // Read access stays `isAdminOrSelf` rather than `isAdmin` on purpose: the
     // /admin/account page loads the signed-in user's own document, so an
@@ -60,8 +61,10 @@ export const Users: CollectionConfig = {
         update: isAdminFieldLevel,
       },
       admin: {
-        description:
-          "Editors can manage all site content. Admins can additionally create, edit and delete accounts. Keep at least two admins so nobody is locked out.",
+        ...fieldHelp(
+          "Editors can manage all site content. Admins can also manage accounts.",
+          "Keep at least two admins so nobody gets locked out.",
+        ),
       },
     },
   ],

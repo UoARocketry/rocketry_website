@@ -6,11 +6,11 @@ import type { ReactNode } from "react";
 /**
  * A disclosure that opens and closes smoothly.
  *
- * This replaced a native `<details>`, which every browser snaps open with no
- * animation. The height animates through a one-row grid going `0fr` to `1fr`
- * rather than by measuring the content: measuring needs a layout pass on every
- * open and gets the answer wrong whenever the content reflows underneath it,
- * such as a long description rewrapping on a phone rotate.
+ * Not a native `<details>`: every browser snaps that open with no animation.
+ * The height animates through a one-row grid going `0fr` to `1fr` rather than
+ * by measuring the content: measuring needs a layout pass on every open and
+ * gets the answer wrong whenever the content reflows underneath it, such as a
+ * long description rewrapping on a phone rotate.
  *
  * `children` is still rendered on the server and handed over as a prop, so
  * only the open/closed state ships as client JavaScript.

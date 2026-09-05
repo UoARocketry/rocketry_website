@@ -1,4 +1,5 @@
 import type { Field, GeneratePreviewURL } from "payload";
+import { fieldHelp } from "./help.ts";
 
 /**
  * Builds the "Preview" button target for a slug-addressed collection.
@@ -65,7 +66,10 @@ export function createSlugField({
     index: true,
     admin: {
       position: "sidebar",
-      description: `The URL for this page: ${pathPrefix}/your-slug. Filled in automatically from the ${sourceField} when you first save. Changing it later breaks any link already shared, so only edit it if you mean to.`,
+      ...fieldHelp(
+        `The web address for this page: ${pathPrefix}/your-slug.`,
+        `It fills in from the ${sourceField} when you first save. Changing it later breaks any link that's already been shared, so only edit it if you mean to.`,
+      ),
     },
     hooks: {
       beforeValidate: [

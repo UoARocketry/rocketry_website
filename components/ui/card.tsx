@@ -142,14 +142,14 @@ export default function Card({
             ) : (
               <ImagePlaceholder className="absolute inset-0" />
             )}
-            {/* The hover wash. Dropping this was what made these cards feel
-                dead on hover: the card still lifts, but on a frame this large
-                a 4px lift is invisible, so the overlay is the signal. */}
+            {/* The hover wash, and the only visible hover signal on a frame
+                this large: the card does lift, but a 4px lift at this size
+                reads as nothing. */}
             <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </div>
         ) : (
-          // The height moves to the wrapper because a framed image is
-          // positioned absolutely, so it can no longer give the box its height.
+          // The height lives on the wrapper because a framed image is
+          // positioned absolutely and cannot give the box its height.
           <div className="relative h-48 overflow-hidden">
             {hasImage ? (
               <ImageWithFallback
@@ -211,8 +211,8 @@ export default function Card({
   return (
     <div
       // Taller than a text-led card needs to be, because this layout carries
-      // rocket photos, which are usually portrait. At the old h-72 a 2:3 photo
-      // showed as a thin horizontal band whatever you framed it on.
+      // rocket photos, which are usually portrait. Much shorter and a 2:3 photo
+      // shows as a thin horizontal band whatever you frame it on.
       className={`group bg-card rounded-xl border overflow-hidden flex h-88 md:h-96 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 ${seriesShell} ${
         reverse
           ? "flex-col-reverse md:flex-row-reverse"

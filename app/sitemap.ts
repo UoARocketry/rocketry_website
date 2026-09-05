@@ -1,8 +1,8 @@
 import type { MetadataRoute } from "next";
 import { getAllRockets, getEventsOverview } from "@/lib/site-data";
-import { resolveServerUrl } from "@/lib/env";
+import { resolveSiteUrl } from "@/lib/env";
 
-const SITE_URL = resolveServerUrl() ?? "https://www.uoarocketry.com";
+const SITE_URL = resolveSiteUrl();
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [

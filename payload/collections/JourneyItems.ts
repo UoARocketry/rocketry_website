@@ -1,5 +1,5 @@
 import type { CollectionConfig } from "payload";
-import { isLoggedIn, isPublicRead } from "../access/policies.ts";
+import { isLoggedIn, isPublicReadPublished } from "../access/policies.ts";
 import { BACKGROUND_SURFACE_OPTIONS } from "../fields/options.ts";
 import { createMediaRelationUrlSyncHook } from "../hooks/media-url-sync.ts";
 import {
@@ -27,7 +27,7 @@ export const JourneyItems: CollectionConfig = {
   },
   trash: true,
   access: {
-    read: isPublicRead,
+    read: isPublicReadPublished,
     create: isLoggedIn,
     update: isLoggedIn,
     delete: isLoggedIn,

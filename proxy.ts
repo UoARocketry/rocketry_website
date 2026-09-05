@@ -13,25 +13,53 @@ export const config = {
 // rendering pipeline runs, lets us rewrite to a genuinely unmatched path so
 // the app's working global-not-found handling produces a real 404 — while
 // keeping the original URL visible to the browser.
+/**
+ * `decodeURIComponent` throws on malformed percent-encoding such as `/rockets/%`.
+ * That must not reach the catch below: failing open there lets the request
+ * through to the page, which then throws on the same input and returns a 500.
+ * A slug that cannot be decoded cannot match a stored slug either, so the
+ * honest answer is the same as any other unknown slug, a 404.
+ *
+ * Vercel's edge currently rejects these with a 400 before Next is reached, so
+ * this is defence for any other host rather than a live fix.
+ */
+function decodeSlug(rawSlug: string): string | null {
+  try {
+    return decodeURIComponent(rawSlug);
+  } catch {
+    return null;
+  }
+}
+
 export async function proxy(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl;
+  const notFound = () =>
+    NextResponse.rewrite(new URL("/__not_found__", request.url));
 
   try {
     const rocketMatch = pathname.match(/^\/rockets\/([^/]+)$/);
     if (rocketMatch) {
-      const rocket = await getRocketBySlug(
-        decodeURIComponent(rocketMatch[1]),
-      );
+      const slug = decodeSlug(rocketMatch[1]);
+      if (slug === null) {
+        return notFound();
+      }
+
+      const rocket = await getRocketBySlug(slug);
       if (!rocket) {
-        return NextResponse.rewrite(new URL("/__not_found__", request.url));
+        return notFound();
       }
     }
 
     const eventMatch = pathname.match(/^\/events\/([^/]+)$/);
     if (eventMatch) {
-      const event = await getEventBySlug(decodeURIComponent(eventMatch[1]));
+      const slug = decodeSlug(eventMatch[1]);
+      if (slug === null) {
+        return notFound();
+      }
+
+      const event = await getEventBySlug(slug);
       if (!event) {
-        return NextResponse.rewrite(new URL("/__not_found__", request.url));
+        return notFound();
       }
     }
   } catch (error) {

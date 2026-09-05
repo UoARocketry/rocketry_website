@@ -77,6 +77,12 @@ export default async function AboutPage() {
 
   return (
     <main className="min-h-screen bg-background text-text-main">
+      {/* This page leads with the team photo rather than a title, so its only
+          heading was an h2. Every other page has an h1, and a page without one
+          gives assistive tech no top-level label and weakens the page for
+          search. Visually hidden so the design is unchanged. */}
+      <h1 className="sr-only">About Us</h1>
+
       {/* Hero Section */}
       <section className="relative pt-24 pb-16 px-4 bg-background overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />

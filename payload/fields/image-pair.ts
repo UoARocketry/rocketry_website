@@ -1,4 +1,5 @@
 import type { Field } from "payload";
+import { fieldHelp } from "./help.ts";
 import {
   urlFieldHooks,
   validateOptionalUrl,
@@ -28,7 +29,10 @@ type ImagePairOptions = {
   uploadName: string;
   /** Name of the flattened public-URL text field, e.g. "photo". */
   urlName: string;
-  /** Human label used in validation messages, e.g. "Photo". */
+  /**
+   * Human label for the field, e.g. "Photo". Used for the upload field itself,
+   * for the URL field beside it, and in validation messages.
+   */
   label: string;
   /** Whether an image must be supplied at all. */
   required: boolean;
@@ -41,11 +45,9 @@ type ImagePairOptions = {
 /**
  * The upload-plus-flattened-URL pair used by every image on the site.
  *
- * The URL field only appears when no file has been chosen. Previously both
- * were always visible, each carrying a paragraph explaining that saving would
- * overwrite one with the other, which was the most repeated source of
- * confusion in the admin. Collapsing it to "upload a file, or reveal the field
- * and paste a link" removes the choice rather than explaining it.
+ * The URL field only appears when no file has been chosen. Showing both at once
+ * means explaining in prose which one wins on save, so the condition removes
+ * the choice instead: upload a file, or reveal the field and paste a link.
  *
  * The URL field still holds the value the frontend reads; it is populated by
  * `createMediaRelationUrlSyncHook` on save.
@@ -104,13 +106,18 @@ export function createImagePairFields({
     {
       name: uploadName,
       type: "upload",
+      // Without this Payload titles the field from the variable name, so the
+      // field an editor uses nearly every time read "Image Media" / "Photo
+      // Media" / "Logo Media", while the fallback field beside it was properly
+      // labelled. The better name belonged on the primary control.
+      label,
       relationTo: "media" as never,
       required: false,
-      admin: {
-        description: uploadDescription
-          ? `${baseDescription} ${uploadDescription}`
-          : baseDescription,
-      },
+      // The generic instruction stays on screen and the collection's own
+      // advice moves behind the toggle. Concatenating the two ran to 208
+      // characters on Sponsors, which is a paragraph sitting above an upload
+      // box you already know how to use.
+      admin: fieldHelp(baseDescription, uploadDescription),
     },
     {
       name: urlName,

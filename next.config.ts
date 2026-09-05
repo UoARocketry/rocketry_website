@@ -60,10 +60,15 @@ const nextConfig: NextConfig = {
 
     const csp = [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com",
+      // No 'unsafe-eval': a production Next build does not use eval, and it was
+      // only ever needed by the dev-mode React refresh runtime, which never
+      // reaches this policy because these headers are enforced on the public
+      // site only. 'unsafe-inline' has to stay for Next's bootstrap scripts.
+      "script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com",
       "style-src 'self' 'unsafe-inline'",
-      // https: covers externally-linked images from CMS image URL fields.
-      `img-src 'self' data: blob: https: ${supabaseSrc}`.trim(),
+      // https: covers externally-linked images from CMS image URL fields, and
+      // already subsumes the Supabase host, so naming it as well added nothing.
+      "img-src 'self' data: blob: https:",
       "font-src 'self' data:",
       `connect-src 'self' https://vitals.vercel-insights.com ${supabaseSrc}`.trim(),
       "frame-ancestors 'none'",
@@ -71,25 +76,53 @@ const nextConfig: NextConfig = {
       "form-action 'self'",
     ].join("; ");
 
+    const securityHeaders = [
+      {
+        key: "Strict-Transport-Security",
+        value: "max-age=63072000; includeSubDomains; preload",
+      },
+      { key: "X-Content-Type-Options", value: "nosniff" },
+      { key: "X-Frame-Options", value: "DENY" },
+      {
+        key: "Referrer-Policy",
+        value: "strict-origin-when-cross-origin",
+      },
+      {
+        key: "Permissions-Policy",
+        value: "camera=(), microphone=(), geolocation=()",
+      },
+    ];
+
+    /*
+     * Enforced on the public site. Note what this does and does not buy:
+     * `script-src` still needs 'unsafe-inline' for Next, so this is not
+     * meaningful XSS protection. What it does enforce is `form-action` (an
+     * injected form cannot post off-site), `base-uri` (no injected <base> can
+     * rewrite every relative URL) and `connect-src`.
+     *
+     * A `Report-Only` policy with no `report-uri` or `report-to` directive
+     * enforces nothing and reports nothing, so never widen this to
+     * Report-Only-everywhere without adding a reporting endpoint.
+     *
+     * /admin and /api stay Report-Only. Payload's admin ships its own bundle,
+     * and breaking the CMS to harden a surface only logged-in editors reach is
+     * a bad trade. The two sources are mutually exclusive on purpose: Next
+     * appends the headers of *every* matching entry, so an overlapping pair
+     * would send both an enforcing and a report-only policy to the admin.
+     */
     return [
       {
-        source: "/:path*",
+        source: "/:path((?:admin|api)(?:/.*)?)",
         headers: [
-          {
-            key: "Strict-Transport-Security",
-            value: "max-age=63072000; includeSubDomains; preload",
-          },
-          { key: "X-Content-Type-Options", value: "nosniff" },
-          { key: "X-Frame-Options", value: "DENY" },
-          {
-            key: "Referrer-Policy",
-            value: "strict-origin-when-cross-origin",
-          },
-          {
-            key: "Permissions-Policy",
-            value: "camera=(), microphone=(), geolocation=()",
-          },
+          ...securityHeaders,
           { key: "Content-Security-Policy-Report-Only", value: csp },
+        ],
+      },
+      {
+        source: "/:path((?!admin|api).*)",
+        headers: [
+          ...securityHeaders,
+          { key: "Content-Security-Policy", value: csp },
         ],
       },
     ];

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { resolveSiteUrl } from "@/lib/env";
 import Link from "next/link";
 import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
@@ -75,7 +76,7 @@ export default async function EventPage({ params }: EventPageProps) {
   const nextSessionIndex = findNextSessionIndex(sessions);
   const seriesStart = hasSessions ? sessions[0].date : event.date;
   // Not the last session's own date: a session carrying extra days runs past
-  // it, so a series ending in a two-day workshop reported the wrong end.
+  // it, so a series ending in a two-day workshop would report the wrong end.
   const seriesEnd = hasSessions ? getSeriesEndDate(sessions) : null;
 
   const when = formatEventWhen(event);
@@ -98,7 +99,7 @@ export default async function EventPage({ params }: EventPageProps) {
   const organizer = {
     "@type": "CollegeOrUniversity",
     name: "University of Auckland Rocketry Club",
-    url: "https://www.uoarocketry.com",
+    url: resolveSiteUrl(),
   };
 
   const eventJsonLd = {

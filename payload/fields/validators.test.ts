@@ -85,8 +85,8 @@ describe("normalizeUrlValue", () => {
 
 describe("validation agrees with what will be stored", () => {
   // The admin validates in the browser, before the server-side hook prepends
-  // the scheme. Without normalising here first, a bare domain flashed an error
-  // and then saved anyway.
+  // the scheme. Without normalising here first, a bare domain flashes an error
+  // and then saves anyway.
   it("accepts a scheme-less domain the hook will repair", () => {
     expect(validateRequiredUrl("docs.google.com/spreadsheets/d/abc")).toBe(true);
     expect(validateOptionalUrl("tr.ee/DKA8yiAigc")).toBe(true);

@@ -13,16 +13,6 @@ export function isProductionRuntime(env: EnvRecord = process.env): boolean {
   );
 }
 
-export function resolveDatabaseUrl(env: EnvRecord = process.env): string {
-  const url = (env.DATABASE_URL || env.DIRECT_URL || "").trim();
-  if (!url) {
-    throw new Error(
-      "Missing database connection string. Set DIRECT_URL or DATABASE_URL.",
-    );
-  }
-  return url;
-}
-
 export function resolvePayloadSecret(env: EnvRecord = process.env): string {
   const secret = (env.PAYLOAD_SECRET || "").trim();
   if (secret) {
@@ -41,6 +31,17 @@ export function resolveServerUrl(env: EnvRecord = process.env): string | undefin
   return serverUrl ? trimTrailingSlashes(serverUrl) : undefined;
 }
 
+/**
+ * Where the site lives when SERVER_URL is not set. Kept here rather than
+ * repeated at each call site so the canonical URLs, the sitemap, robots.txt and
+ * the structured data cannot disagree about the domain.
+ */
+export const DEFAULT_SITE_URL = "https://www.uoarocketry.com";
+
+export function resolveSiteUrl(env: EnvRecord = process.env): string {
+  return resolveServerUrl(env) ?? DEFAULT_SITE_URL;
+}
+
 export function buildAllowedOrigins(env: EnvRecord = process.env): string[] {
   const origins = new Set<string>();
   const serverUrl = resolveServerUrl(env);
@@ -48,7 +49,13 @@ export function buildAllowedOrigins(env: EnvRecord = process.env): string[] {
     origins.add(serverUrl);
   }
   if (env.NODE_ENV !== "production") {
+    // Both spellings of the loopback host. They are separate origins to a
+    // browser, and Payload rejects a form-state request whose origin is not
+    // listed here with a 401. The admin renders that as a skeleton that never
+    // resolves, so opening the admin on 127.0.0.1 made "Add Link" and every
+    // other array row appear to hang with no error shown anywhere.
     origins.add("http://localhost:3000");
+    origins.add("http://127.0.0.1:3000");
   }
   return Array.from(origins);
 }
