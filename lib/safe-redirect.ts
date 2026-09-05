@@ -8,8 +8,7 @@ const INTERNAL_BASE = "http://internal.invalid";
  * follow the WHATWG URL rules when parsing a Location header: a backslash is
  * normalised to a forward slash, and tab, newline and carriage return are
  * stripped before parsing. So `/\evil.com` and `/<tab>/evil.com` both become
- * the protocol-relative `//evil.com` and navigate off-site. Both were confirmed
- * in a real browser against this route, landing on an external origin.
+ * the protocol-relative `//evil.com` and navigate off-site.
  *
  * Rather than blocklisting each spelling, resolve the value against a throwaway
  * origin and reject anything that escapes it, then rebuild the redirect from

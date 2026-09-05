@@ -26,9 +26,6 @@ export type ResourceLink = {
   url: string;
 };
 
-/** Kept as an alias so existing callers reading `videos` still typecheck. */
-export type RocketVideo = ResourceLink;
-
 export type RocketDetail = RocketSummary & {
   images: string[];
   specs: RocketSpec[];

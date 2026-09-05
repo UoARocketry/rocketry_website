@@ -68,10 +68,10 @@ export function resolveOrder(
  * Copies a shifted row's new `order` onto its latest version row.
  *
  * `payload.db.updateOne` writes the main table only, which is what the public
- * site reads, so the site was always correct. The admin list view is
+ * site reads, so the site stays correct either way. The admin list view is
  * draft-aware and reads the latest version instead, so without this the list
- * showed a shifted document's old position — the admin quietly disagreeing
- * with the site, which invites someone to "fix" numbers that are already right.
+ * shows a shifted document's old position — the admin quietly disagreeing with
+ * the site, which invites someone to "fix" numbers that are already right.
  *
  * Patching the latest version also stops a pending draft from reverting the
  * reorder the moment it is published. Only `order` is touched; every other

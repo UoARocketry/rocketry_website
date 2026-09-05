@@ -3,12 +3,11 @@ import { PuffLoader } from "react-spinners";
 /**
  * Shown by every route's `loading.tsx` while a segment streams in.
  *
- * The colour comes from the theme rather than a literal. This previously used
- * `#F97316` for the spinner and `text-orange-400` for the label, which are
- * Tailwind's oranges rather than the brand's `#C25632` family, so the one thing
- * a visitor sees on every single navigation was the only off-brand colour left
- * on the site. `PuffLoader` interpolates `color` straight into a border
- * shorthand, so a custom property resolves normally.
+ * The colour comes from the theme rather than a literal, because this is the
+ * one thing a visitor sees on every single navigation and Tailwind's own
+ * oranges are not the brand's `#C25632` family. `PuffLoader` interpolates
+ * `color` straight into a border shorthand, so a custom property resolves
+ * normally.
  */
 export default function RouteLoading() {
   return (

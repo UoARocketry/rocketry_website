@@ -84,9 +84,9 @@ describe("proxy", () => {
     expect(getEventBySlug).not.toHaveBeenCalled();
   });
 
-  // Malformed percent-encoding used to throw out of decodeURIComponent into
-  // the fail-open catch, letting the request reach the page, which threw on the
-  // same input and returned a 500 rather than a 404.
+  // Malformed percent-encoding throws out of decodeURIComponent. Unguarded it
+  // lands in the fail-open catch and the request reaches the page, which throws
+  // on the same input and returns a 500 rather than a 404.
   describe("malformed percent-encoding", () => {
     for (const badSlug of ["%", "%zz", "%e0%a4%a"]) {
       it(`treats /rockets/${badSlug} as not found without querying`, async () => {

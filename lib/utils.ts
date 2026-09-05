@@ -342,9 +342,9 @@ export function formatEventWhen(
       location: baseLocation,
     },
     ...(event.extraDates ?? []).map((extra) => {
-      // Hours are inherited as a pair, never half of one. A day that set only
-      // its own start used to pick up the event's finish as well, printing
-      // impossible ranges like "4:30 PM – 3:00 PM".
+      // Hours are inherited as a pair, never half of one. A day that states
+      // only its own start must not pick up the event's finish as well, or it
+      // prints impossible ranges like "4:30 PM – 3:00 PM".
       const statesOwnHours = Boolean(
         blankToNull(extra.startTime) || blankToNull(extra.endTime),
       );
@@ -560,10 +560,10 @@ export function sortByDate<T extends { readonly date: string }>(
 /**
  * When a session starts and when its last day is over.
  *
- * A session is no longer a single instant: like the event itself it can run
- * across several days, so "has it finished" has to look at its final day
- * rather than its start. Extra days come from a day-only picker, hence the
- * same "runs until the next midnight" rule the event uses.
+ * A session is not a single instant: like the event itself it can run across
+ * several days, so "has it finished" has to look at its final day rather than
+ * its start. Extra days come from a day-only picker, hence the same "runs
+ * until the next midnight" rule the event uses.
  */
 type SessionSpan = { start: number; end: number };
 
@@ -590,8 +590,9 @@ function getSessionSpans(sessions: readonly SessionLike[]): SessionSpan[] {
  * The last calendar day a series runs on, as a stored date value.
  *
  * The final session is not necessarily the one that finishes last: a session
- * carrying extra days runs past its own date. Reading only `date` off the last
- * session made a series ending with a two-day workshop report the wrong end.
+ * carrying extra days runs past its own date, so reading only `date` off the
+ * last session reports the wrong end for a series closing on a two-day
+ * workshop.
  */
 export function getSeriesEndDate(
   sessions: readonly SessionLike[],
@@ -752,8 +753,8 @@ export const ROCKET_STATUS_LABELS: Record<RocketStatus, string> = {
 /**
  * A rocket has no status field in the CMS — its state is derived from
  * `launchedAt` alone. Note the three-way split: a date in the *future* means
- * the flight is booked but has not happened, which the older
- * `launchedAt ? "Launched" : "In Development"` check reported as already flown.
+ * the flight is booked but has not happened, so the presence of `launchedAt`
+ * on its own must never be read as "flown".
  */
 export function getRocketStatus(
   rocket: RocketLike,
@@ -804,7 +805,7 @@ function compareRockets(
  *
  * Sorted here rather than in the Payload query because the Postgres adapter
  * emits a bare `desc()` with no NULLS clause, and Postgres defaults `DESC` to
- * NULLS FIRST — so `sort: "-launchedAt"` silently floated every undated rocket
+ * NULLS FIRST — so `sort: "-launchedAt"` silently floats every undated rocket
  * above the flown ones.
  *
  * `now` is snapshotted once so a rocket cannot change status partway through

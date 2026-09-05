@@ -64,10 +64,10 @@ function isValidUrl(value: string): boolean {
  * that was typed.
  *
  * `urlFieldHooks` prepends the scheme, but a field hook only runs on the
- * server. The admin validates in the browser first, so typing a bare
- * "docs.google.com/..." flashed "must be a valid http(s) URL" before the save
- * went through and quietly succeeded. Normalising here first makes the two
- * agree, and it is the same function the hook uses, so they cannot drift.
+ * server. The admin validates in the browser first, so without normalising
+ * here a bare "docs.google.com/..." flashes "must be a valid http(s) URL" and
+ * then saves anyway. Normalising first makes the two agree, and it is the same
+ * function the hook uses, so they cannot drift.
  */
 export function validateOptionalUrl(
   value: unknown,
@@ -98,10 +98,10 @@ export function validateRequiredUrl(
 /**
  * Rejects an end time at or before the start time it belongs to.
  *
- * Nothing stopped a session being saved as "1:30 PM – 12:30 PM", which the
- * site then printed exactly as entered. Both values are compared on their
- * clock part alone, because a `timeOnly` field carries a real but meaningless
- * date alongside the time.
+ * Without it a session saves as "1:30 PM – 12:30 PM" and the site prints that
+ * exactly as entered. Both values are compared on their clock part alone,
+ * because a `timeOnly` field carries a real but meaningless date alongside the
+ * time.
  *
  * Blank passes: an end time is optional everywhere it appears, and an extra
  * day with no start of its own inherits the parent's hours, so there is no

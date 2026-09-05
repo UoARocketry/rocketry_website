@@ -21,9 +21,9 @@ export const Users: CollectionConfig = {
     group: "Admin",
     description:
       "Who can sign in to this admin. Admins manage accounts; editors can change site content but not accounts.",
-    // Access control already limited an editor to their own row, but the
-    // collection still appeared in the nav, which reads as a hole. Hiding it
-    // matches the expectation that accounts are admin-only.
+    // Access control limits an editor to their own row, but the collection
+    // would still sit in the nav, which reads as a hole. Hiding it matches the
+    // expectation that accounts are admin-only.
     //
     // Read access stays `isAdminOrSelf` rather than `isAdmin` on purpose: the
     // /admin/account page loads the signed-in user's own document, so an

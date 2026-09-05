@@ -98,8 +98,8 @@ describe("formatEventWhen fallbacks", () => {
   });
 
   it("keeps two sittings on one day as one day with two times", () => {
-    // A workshop run in the morning and again in the afternoon. Previously the
-    // second row was dropped for sharing a calendar day.
+    // A workshop run in the morning and again in the afternoon. Collapsing by
+    // calendar day must not drop the second row.
     const when = formatEventWhen({
       date: "2026-08-30T00:00:00.000Z",
       endTime: at(14),

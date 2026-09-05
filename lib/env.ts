@@ -13,13 +13,6 @@ export function isProductionRuntime(env: EnvRecord = process.env): boolean {
   );
 }
 
-// There is deliberately no `resolveDatabaseUrl` helper here. One existed, was
-// tested, and was never called: payload.config.ts reads the connection string
-// inline. Wiring it in is not the fix, because it throws when both variables
-// are unset, and `payload generate:importmap` and `generate:types` both load
-// the config with no database configured. A tested helper nothing calls is
-// worse than no helper, so it was removed rather than left looking like a guard.
-
 export function resolvePayloadSecret(env: EnvRecord = process.env): string {
   const secret = (env.PAYLOAD_SECRET || "").trim();
   if (secret) {

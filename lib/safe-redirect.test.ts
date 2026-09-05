@@ -22,9 +22,8 @@ describe("resolveSafeReturnPath", () => {
     expect(resolveSafeReturnPath("rockets")).toBe("/");
   });
 
-  // Each of these was verified to redirect off-site before the fix. The
-  // backslash and tab cases were reproduced in a real browser, which followed
-  // them to an external origin.
+  // Every spelling here resolves to an external origin under the browser's own
+  // URL parsing, so each must be rejected rather than treated as a local path.
   describe("off-site escapes", () => {
     const escapes = [
       ["protocol-relative", "//evil.com"],

@@ -12,11 +12,10 @@ type Props = {
 /**
  * A field hint that leads with one line and keeps the detail behind a toggle.
  *
- * Several fields here needed a lot of explaining. "Extra days and times" ran to
- * 350 characters, which rendered as a paragraph of grey text above an empty
- * input and made the Events form look far harder than it is. The detail is
- * worth keeping, it just should not be the first thing you meet, so the summary
- * stays visible and the rest is one click away.
+ * A description of a few hundred characters renders as a paragraph of grey text
+ * above an empty input, which makes a form look far harder than it is. The
+ * detail is worth keeping, it just should not be the first thing you meet, so
+ * the summary stays visible and the rest is one click away.
  */
 export function FieldHelp({ short, more }: Props) {
   const [open, setOpen] = useState(false);

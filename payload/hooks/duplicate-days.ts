@@ -109,10 +109,9 @@ function findRepeats(
 /**
  * Finds extra days that repeat a day the same event or session already runs on.
  *
- * Such a row used to be dropped silently when the page collapsed its date
- * list, taking that day's own hours and location with it. Two *sessions*
- * sharing a day is left alone: a series legitimately runs two workshops on the
- * same afternoon.
+ * Such a row is dropped silently when the page collapses its date list, taking
+ * that day's own hours and location with it. Two *sessions* sharing a day is
+ * left alone: a series legitimately runs two workshops on the same afternoon.
  */
 export function findDuplicateDays(doc: EventDoc): string[] {
   const errors = findRepeats(

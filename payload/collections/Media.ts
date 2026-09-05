@@ -9,7 +9,7 @@ const DEFAULT_MEDIA_PREFIX = "media";
 
 /** 8 MB. A backstop only: CompressedUpload already shrinks most images
  *  client-side, but it runs in the browser and skips GIFs and anything it
- *  cannot decode, so nothing server-side was enforcing a ceiling. */
+ *  cannot decode, so the ceiling has to be enforced on the server too. */
 const MAX_UPLOAD_BYTES = 8 * 1024 * 1024;
 
 export function assertWithinSizeLimit(size: unknown): void {

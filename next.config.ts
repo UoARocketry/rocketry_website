@@ -94,17 +94,15 @@ const nextConfig: NextConfig = {
     ];
 
     /*
-     * The policy was previously sent as `Report-Only` everywhere, with no
-     * `report-uri` or `report-to` directive. That combination enforces nothing
-     * and reports nothing, so the header looked like protection in a scan while
-     * providing none.
+     * Enforced on the public site. Note what this does and does not buy:
+     * `script-src` still needs 'unsafe-inline' for Next, so this is not
+     * meaningful XSS protection. What it does enforce is `form-action` (an
+     * injected form cannot post off-site), `base-uri` (no injected <base> can
+     * rewrite every relative URL) and `connect-src`.
      *
-     * It is now enforced on the public site, where the policy was measured in a
-     * real browser across every page with zero violations. Note what this does
-     * and does not buy: `script-src` still needs 'unsafe-inline' for Next, so
-     * this is not meaningful XSS protection. What it does enforce is
-     * `form-action` (an injected form cannot post off-site), `base-uri` (no
-     * injected <base> can rewrite every relative URL) and `connect-src`.
+     * A `Report-Only` policy with no `report-uri` or `report-to` directive
+     * enforces nothing and reports nothing, so never widen this to
+     * Report-Only-everywhere without adding a reporting endpoint.
      *
      * /admin and /api stay Report-Only. Payload's admin ships its own bundle,
      * and breaking the CMS to harden a surface only logged-in editors reach is

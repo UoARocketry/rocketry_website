@@ -45,11 +45,9 @@ type ImagePairOptions = {
 /**
  * The upload-plus-flattened-URL pair used by every image on the site.
  *
- * The URL field only appears when no file has been chosen. Previously both
- * were always visible, each carrying a paragraph explaining that saving would
- * overwrite one with the other, which was the most repeated source of
- * confusion in the admin. Collapsing it to "upload a file, or reveal the field
- * and paste a link" removes the choice rather than explaining it.
+ * The URL field only appears when no file has been chosen. Showing both at once
+ * means explaining in prose which one wins on save, so the condition removes
+ * the choice instead: upload a file, or reveal the field and paste a link.
  *
  * The URL field still holds the value the frontend reads; it is populated by
  * `createMediaRelationUrlSyncHook` on save.

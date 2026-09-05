@@ -14,10 +14,9 @@ type Props = {
  *
  * Deliberately separate from `SectionFallback`, which says "Coming Soon" and is
  * the right answer for a section the club has not filled in yet. Using it for a
- * thrown error told the visitor the content did not exist, when in fact it
- * exists and we failed to load it, and it offered no way forward. Next passes
- * every error boundary a `reset` function for exactly this, and none of ours
- * were calling it.
+ * thrown error tells the visitor the content does not exist, when in fact it
+ * exists and we failed to load it, and offers no way forward. Next passes every
+ * error boundary a `reset` function for exactly this case, so call it.
  */
 export default function ErrorState({
   onRetry,

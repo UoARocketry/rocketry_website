@@ -26,6 +26,10 @@ import { SiteSettings } from "./payload/globals/SiteSettings.ts";
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 
+// Read inline, and allowed to be empty rather than routed through a helper that
+// throws: `payload generate:importmap` and `generate:types` both load this
+// config with no database configured, so a guard here would break codegen. CI
+// validates the connection string separately, before the build.
 const databaseUrl =
   process.env.DATABASE_URL?.trim() || process.env.DIRECT_URL?.trim() || "";
 // Deliberately routed through lib/env.ts rather than read inline: that helper

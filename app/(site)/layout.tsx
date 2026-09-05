@@ -44,7 +44,7 @@ export const metadata: Metadata = {
   description: SITE_DESCRIPTION,
   // No `keywords`: Google has ignored the meta keywords tag since 2009
   // (developers.google.com/search/blog/2009/09/google-does-not-use-keywords-meta-tag),
-  // so it was carrying the only on-site mention of "UARC" nowhere.
+  // which is why the acronym has to sit in the title and the page itself.
   alternates: {
     canonical: "/",
   },
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
     // so the icon is a dedicated square rocket mark instead.
     //
     // The 96px PNG exists for Google Search, which recommends a favicon larger
-    // than 48x48 and was previously only offered the 32px one via `shortcut`.
+    // than 48x48, and `shortcut` points at it for the same reason.
     // https://developers.google.com/search/docs/appearance/favicon-in-search
     icon: [
       { url: "/icon.svg", type: "image/svg+xml" },

@@ -128,10 +128,10 @@ export default function ImageLightbox({
    * Focus management for the dialog.
    *
    * `role="dialog"` and `aria-modal` describe the intent, but the browser does
-   * nothing on their own. Without this, opening the lightbox left focus on the
-   * thumbnail behind the overlay, so a screen reader was never moved into the
-   * dialog and Tab walked through the page underneath it, which is invisible
-   * but still focusable. Verified in a real browser before this was added.
+   * nothing on their own. Without this, opening the lightbox leaves focus on
+   * the thumbnail behind the overlay, so a screen reader is never moved into
+   * the dialog and Tab walks through the page underneath it, which is invisible
+   * but still focusable.
    *
    * On open: remember what was focused and move focus into the dialog.
    * While open: keep Tab inside it.
@@ -398,8 +398,8 @@ export default function ImageLightbox({
         onPointerUp={endPointer}
         onPointerCancel={endPointer}
         // Without this the browser claims the gesture as a page scroll or its
-        // own pinch, and the pointer events stop arriving mid-drag. It is the
-        // single reason dragging felt broken on a phone.
+        // own pinch, and the pointer events stop arriving mid-drag, which
+        // breaks dragging on a phone.
         style={{ touchAction: "none" }}
         className={`flex h-[90vh] w-[95vw] items-center justify-center overflow-hidden ${
           view.zoom > MIN_ZOOM ? "cursor-grab active:cursor-grabbing" : ""

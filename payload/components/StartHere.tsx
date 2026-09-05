@@ -3,9 +3,9 @@ import Link from "next/link";
 /**
  * The first thing on the dashboard, above the storage meter.
  *
- * A new committee member's first screen was previously a pair of usage bars and
+ * Without it a new committee member's first screen is a pair of usage bars and
  * a grid of twelve collection names, with nothing explaining what any of it
- * controlled. This is the orientation, and the way into the full guide.
+ * controls. This is the orientation, and the way into the full guide.
  */
 export default function StartHere() {
   return (
