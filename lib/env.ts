@@ -13,15 +13,12 @@ export function isProductionRuntime(env: EnvRecord = process.env): boolean {
   );
 }
 
-export function resolveDatabaseUrl(env: EnvRecord = process.env): string {
-  const url = (env.DATABASE_URL || env.DIRECT_URL || "").trim();
-  if (!url) {
-    throw new Error(
-      "Missing database connection string. Set DIRECT_URL or DATABASE_URL.",
-    );
-  }
-  return url;
-}
+// There is deliberately no `resolveDatabaseUrl` helper here. One existed, was
+// tested, and was never called: payload.config.ts reads the connection string
+// inline. Wiring it in is not the fix, because it throws when both variables
+// are unset, and `payload generate:importmap` and `generate:types` both load
+// the config with no database configured. A tested helper nothing calls is
+// worse than no helper, so it was removed rather than left looking like a guard.
 
 export function resolvePayloadSecret(env: EnvRecord = process.env): string {
   const secret = (env.PAYLOAD_SECRET || "").trim();

@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import {
   buildAllowedOrigins,
   isProductionRuntime,
-  resolveDatabaseUrl,
   resolvePayloadSecret,
   resolveServerUrl,
 } from "@/lib/env";
@@ -21,17 +20,6 @@ describe("isProductionRuntime", () => {
   });
   it("is true at production runtime", () => {
     expect(isProductionRuntime({ NODE_ENV: "production" })).toBe(true);
-  });
-});
-
-describe("resolveDatabaseUrl", () => {
-  it("prefers DATABASE_URL", () => {
-    expect(
-      resolveDatabaseUrl({ DIRECT_URL: "a", DATABASE_URL: "b" }),
-    ).toBe("b");
-  });
-  it("throws when neither is set", () => {
-    expect(() => resolveDatabaseUrl({})).toThrow(/database/i);
   });
 });
 
