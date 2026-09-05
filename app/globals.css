@@ -26,7 +26,11 @@
   /* Text colors */
   --color-text-main: #ffffff;
   --color-text-secondary: #888888;
-  --color-text-muted: #555555;
+  /* Was #555555, which is 2.47:1 on --color-surface and fails WCAG AA for body
+     text. It carries real content (the footer copyright, event meta, image
+     fallback labels), so it has to be legible. #808080 measures 4.67:1 on
+     surface and 5.01:1 on background. */
+  --color-text-muted: #808080;
   
   /* Brand colors - refined orange palette */
   --color-primary: #C25632;
@@ -46,6 +50,15 @@
   --color-border: #222222;
   --color-border-hover: #333333;
   --color-border-active: #C25632;
+
+  /* Motion.
+     One easing curve for the whole site. This is the same curve Tailwind's
+     `transition-*` utilities use, so a hover styled here and a hover styled
+     with a utility class decelerate identically instead of drifting apart. */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast: 0.15s;
+  --duration-base: 0.2s;
+  --duration-slow: 0.3s;
 }
 
 /* Base body styling */
@@ -80,7 +93,7 @@ h3, h4, h5, h6 {
 /* Links with smooth transitions */
 a {
   color: var(--color-primary);
-  transition: color 0.2s ease;
+  transition: color var(--duration-base) var(--ease-standard);
 }
 a:hover, a:focus {
   color: var(--color-primary-light);
@@ -93,7 +106,13 @@ a:hover, a:focus {
   border-radius: 8px;
   padding: 0.75rem 1.5rem;
   font-weight: 600;
-  transition: all 0.2s ease;
+  /* Named properties rather than `all`: `all` also transitions layout
+     properties, so any class change that alters padding or size animates by
+     accident, and it forces the browser to watch every property. */
+  transition:
+    background-color var(--duration-base) var(--ease-standard),
+    box-shadow var(--duration-base) var(--ease-standard),
+    transform var(--duration-base) var(--ease-standard);
   border: none;
   cursor: pointer;
   display: inline-flex;
@@ -114,7 +133,10 @@ a:hover, a:focus {
   border-radius: 8px;
   padding: 0.75rem 1.5rem;
   font-weight: 600;
-  transition: all 0.2s ease;
+  transition:
+    background-color var(--duration-base) var(--ease-standard),
+    border-color var(--duration-base) var(--ease-standard),
+    color var(--duration-base) var(--ease-standard);
   cursor: pointer;
 }
 .button-secondary:hover {
@@ -129,7 +151,10 @@ a:hover, a:focus {
   border-radius: 12px;
   border: 1px solid var(--color-border);
   padding: 1.5rem;
-  transition: all 0.3s ease;
+  transition:
+    border-color var(--duration-slow) var(--ease-standard),
+    background-color var(--duration-slow) var(--ease-standard),
+    box-shadow var(--duration-slow) var(--ease-standard);
 }
 .card:hover, .section:hover {
   border-color: var(--color-border-hover);
@@ -150,7 +175,7 @@ a:hover, a:focus {
   background: var(--color-primary);
   transform: scaleX(0);
   transform-origin: right;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform var(--duration-slow) var(--ease-standard);
 }
 .underline-animate:hover::after,
 .underline-animate:focus::after {
@@ -174,7 +199,7 @@ a:hover, a:focus {
 
 /* Glow effect for interactive elements */
 .glow-hover {
-  transition: box-shadow 0.3s ease;
+  transition: box-shadow var(--duration-slow) var(--ease-standard);
 }
 .glow-hover:hover {
   box-shadow: 0 0 20px var(--color-primary-glow), 0 0 40px var(--color-primary-glow);
@@ -190,4 +215,29 @@ a:hover, a:focus {
 ::selection {
   background: var(--color-primary);
   color: white;
+}
+
+/*
+ * Honour the operating system's "reduce motion" setting.
+ *
+ * Only one component was checking for this, so everything else animated
+ * regardless: every hover lift and image zoom, and the hero's `animate-bounce`
+ * arrow, which loops forever. For someone with a vestibular disorder that is
+ * not a stylistic preference, it is the difference between a usable page and a
+ * nauseating one.
+ *
+ * Near-zero rather than `none` so that transitions still *complete* and any
+ * state that depends on them settles; the change simply happens at once.
+ * Nothing in this codebase listens for transitionend or animationend, so this
+ * cannot strand a component mid-state.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
