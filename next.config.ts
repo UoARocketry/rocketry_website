@@ -60,10 +60,15 @@ const nextConfig: NextConfig = {
 
     const csp = [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com",
+      // No 'unsafe-eval': a production Next build does not use eval, and it was
+      // only ever needed by the dev-mode React refresh runtime, which never
+      // reaches this policy because these headers are enforced on the public
+      // site only. 'unsafe-inline' has to stay for Next's bootstrap scripts.
+      "script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com",
       "style-src 'self' 'unsafe-inline'",
-      // https: covers externally-linked images from CMS image URL fields.
-      `img-src 'self' data: blob: https: ${supabaseSrc}`.trim(),
+      // https: covers externally-linked images from CMS image URL fields, and
+      // already subsumes the Supabase host, so naming it as well added nothing.
+      "img-src 'self' data: blob: https:",
       "font-src 'self' data:",
       `connect-src 'self' https://vitals.vercel-insights.com ${supabaseSrc}`.trim(),
       "frame-ancestors 'none'",

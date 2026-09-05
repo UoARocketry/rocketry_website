@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { resolveSiteUrl } from "@/lib/env";
 import Link from "next/link";
 import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
@@ -98,7 +99,7 @@ export default async function EventPage({ params }: EventPageProps) {
   const organizer = {
     "@type": "CollegeOrUniversity",
     name: "University of Auckland Rocketry Club",
-    url: "https://www.uoarocketry.com",
+    url: resolveSiteUrl(),
   };
 
   const eventJsonLd = {

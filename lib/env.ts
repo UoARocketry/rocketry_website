@@ -38,6 +38,17 @@ export function resolveServerUrl(env: EnvRecord = process.env): string | undefin
   return serverUrl ? trimTrailingSlashes(serverUrl) : undefined;
 }
 
+/**
+ * Where the site lives when SERVER_URL is not set. Kept here rather than
+ * repeated at each call site so the canonical URLs, the sitemap, robots.txt and
+ * the structured data cannot disagree about the domain.
+ */
+export const DEFAULT_SITE_URL = "https://www.uoarocketry.com";
+
+export function resolveSiteUrl(env: EnvRecord = process.env): string {
+  return resolveServerUrl(env) ?? DEFAULT_SITE_URL;
+}
+
 export function buildAllowedOrigins(env: EnvRecord = process.env): string[] {
   const origins = new Set<string>();
   const serverUrl = resolveServerUrl(env);

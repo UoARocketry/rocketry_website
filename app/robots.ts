@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
-import { resolveServerUrl } from "@/lib/env";
+import { resolveSiteUrl } from "@/lib/env";
 
-const SITE_URL = resolveServerUrl() ?? "https://www.uoarocketry.com";
+const SITE_URL = resolveSiteUrl();
 
 export default function robots(): MetadataRoute.Robots {
   return {

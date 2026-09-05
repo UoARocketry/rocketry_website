@@ -7,7 +7,7 @@ import ScrollToTop from "@/components/ScrollToTop";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { getSiteSettings } from "@/lib/site-data";
-import { resolveServerUrl } from "@/lib/env";
+import { resolveSiteUrl } from "@/lib/env";
 import { toSafeJsonLd } from "@/lib/utils";
 import {
   DEFAULT_CONTACT_EMAIL,
@@ -33,7 +33,7 @@ const SITE_NAME = "University of Auckland Rocketry Club";
 const SITE_TITLE = `${SITE_NAME} (UARC)`;
 const SITE_DESCRIPTION =
   "UARC is the University of Auckland Rocketry Club, a student-led club dedicated to designing, building, and launching rockets. Join us in exploring aerospace engineering and space exploration.";
-const SITE_URL = resolveServerUrl() ?? "https://www.uoarocketry.com";
+const SITE_URL = resolveSiteUrl();
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
