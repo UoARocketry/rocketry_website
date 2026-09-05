@@ -1,4 +1,5 @@
 import type { GlobalConfig } from "payload";
+import { fieldHelp } from "../fields/help.ts";
 import { isLoggedIn } from "../access/policies.ts";
 import { createMediaRelationUrlSyncHook } from "../hooks/media-url-sync.ts";
 import { refreshMediaUsageFor } from "../hooks/media-usage.ts";
@@ -116,8 +117,10 @@ export const SiteSettings: GlobalConfig = {
               type: "email",
               required: false,
               admin: {
-                description:
-                  "Used by every Contact / email link on the site (footer, sponsorship enquiries) and in search-engine structured data. Leave blank to fall back to the built-in default.",
+                ...fieldHelp(
+                  "Used by every Contact and email link on the site.",
+                  "That covers the footer, sponsorship enquiries and the data search engines read. Leave it blank to fall back to the built-in default.",
+                ),
               },
             },
           ],

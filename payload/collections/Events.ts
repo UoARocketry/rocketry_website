@@ -295,7 +295,9 @@ export const Events: CollectionConfig = {
       singular: "Link",
       plural: "Links",
       description:
-        "Optional. Anything worth linking to alongside the event: slides, a reading list, an OpenRocket starter file. Shown in their own section on the event page.",
+        "Optional. Anything worth linking alongside the event, like slides or a reading list.",
+      descriptionMore:
+        "An OpenRocket starter file works too. They show in their own section on the event page.",
       headingDescription:
         'What this section is called. Leave empty for "Resources".',
       labelPlaceholder: "Workshop slides",
@@ -367,8 +369,10 @@ export const Events: CollectionConfig = {
               required: false,
               admin: {
                 date: { pickerAppearance: "timeOnly", timeFormat: "HH:mm" },
-                description:
-                  "Leave empty to run the same hours as the session's first day. Fill both in if this day differs, or to add a second sitting on a date already listed.",
+                ...fieldHelp(
+                  "Leave empty to run the same hours as the session's first day.",
+                  "Fill both in if this day is different, or to add a second sitting on a date that's already listed.",
+                ),
               },
               validate: validateStartTimePresent,
             },

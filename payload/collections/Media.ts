@@ -1,4 +1,5 @@
 import { APIError } from "payload";
+import { fieldHelp } from "../fields/help.ts";
 import type { CollectionConfig } from "payload";
 import { isLoggedIn, isPublicRead } from "../access/policies.ts";
 import { createReferenceGuardHook } from "../hooks/reference-guard.ts";
@@ -133,8 +134,10 @@ export const Media: CollectionConfig = {
         // Maintained by hooks on every collection that references an image, so
         // typing here would only be overwritten on the next save.
         readOnly: true,
-        description:
-          "Filled in automatically. Filter the list by this to find every image used in one part of the site, or leave the filter empty to find images nothing uses.",
+        ...fieldHelp(
+          "Filled in automatically.",
+          "Filter the list by this to find every image used in one part of the site, or leave the filter empty to find the ones nothing uses.",
+        ),
       },
     },
     {

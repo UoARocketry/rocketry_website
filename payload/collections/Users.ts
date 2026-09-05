@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload";
+import { fieldHelp } from "../fields/help.ts";
 import {
   ADMIN_ROLE,
   EDITOR_ROLE,
@@ -60,8 +61,10 @@ export const Users: CollectionConfig = {
         update: isAdminFieldLevel,
       },
       admin: {
-        description:
-          "Editors can manage all site content. Admins can additionally create, edit and delete accounts. Keep at least two admins so nobody is locked out.",
+        ...fieldHelp(
+          "Editors can manage all site content. Admins can also manage accounts.",
+          "Keep at least two admins so nobody gets locked out.",
+        ),
       },
     },
   ],

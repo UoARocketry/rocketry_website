@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload";
+import { fieldHelp } from "../fields/help.ts";
 import { isLoggedIn, isPublicReadPublished } from "../access/policies.ts";
 import {
   getStringField,
@@ -132,7 +133,9 @@ export const Rockets: CollectionConfig = {
       singular: "Video",
       plural: "Videos",
       description:
-        "Optional. YouTube, Instagram or Drive links to footage of this rocket. They appear together in their own section on the rocket page, in this order.",
+        "Optional. YouTube, Instagram or Drive links to footage of this rocket.",
+      descriptionMore:
+        "They appear together in their own section on the rocket page, in this order.",
       headingDescription:
         'What this section is called. Leave empty for "Videos".',
       labelPlaceholder: "Launch",
@@ -144,7 +147,9 @@ export const Rockets: CollectionConfig = {
       singular: "Link",
       plural: "Links",
       description:
-        "Optional. Anything else worth linking to: a telemetry spreadsheet, an OpenRocket file, a write-up. Shown in their own section on the rocket page.",
+        "Optional. Anything else worth linking to, like a telemetry spreadsheet or a write-up.",
+      descriptionMore:
+        "An OpenRocket file works too. They show in their own section on the rocket page.",
       headingDescription:
         'What this section is called. Leave empty for "Resources".',
       labelPlaceholder: "Telemetry data",
@@ -156,8 +161,10 @@ export const Rockets: CollectionConfig = {
       defaultValue: false,
       index: true,
       admin: {
-        description:
-          "Tick to feature this rocket in the Featured Rockets section on the home page. Up to 3 are shown, next launch first. If none are ticked the home page falls back to the most recently launched rockets.",
+        ...fieldHelp(
+          "Tick to show this rocket in Featured Rockets on the home page.",
+          "It shows up to 3, next launch first. If you don't tick any, the home page falls back to the most recently launched ones.",
+        ),
       },
     },
     {
@@ -166,8 +173,10 @@ export const Rockets: CollectionConfig = {
       required: false,
       admin: {
         date: { pickerAppearance: "dayAndTime", timeFormat: "HH:mm" },
-        description:
-          "Leave empty while the rocket is still in development. A date in the future marks it as a scheduled launch; a date in the past marks it as launched.",
+        ...fieldHelp(
+          "Leave empty while the rocket is still in development.",
+          "A date in the future marks it as a scheduled launch, and a date in the past marks it as launched.",
+        ),
       },
     },
     {

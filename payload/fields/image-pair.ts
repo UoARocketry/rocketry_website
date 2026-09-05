@@ -1,4 +1,5 @@
 import type { Field } from "payload";
+import { fieldHelp } from "./help.ts";
 import {
   urlFieldHooks,
   validateOptionalUrl,
@@ -114,11 +115,11 @@ export function createImagePairFields({
       label,
       relationTo: "media" as never,
       required: false,
-      admin: {
-        description: uploadDescription
-          ? `${baseDescription} ${uploadDescription}`
-          : baseDescription,
-      },
+      // The generic instruction stays on screen and the collection's own
+      // advice moves behind the toggle. Concatenating the two ran to 208
+      // characters on Sponsors, which is a paragraph sitting above an upload
+      // box you already know how to use.
+      admin: fieldHelp(baseDescription, uploadDescription),
     },
     {
       name: urlName,
