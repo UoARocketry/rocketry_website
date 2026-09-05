@@ -1,10 +1,13 @@
 import type { GlobalConfig } from "payload";
-import { revalidatePath } from "next/cache.js";
-import { isLoggedIn, isPublicRead } from "../access/policies.ts";
+import { isLoggedIn } from "../access/policies.ts";
 import { createMediaRelationUrlSyncHook } from "../hooks/media-url-sync.ts";
 import { refreshMediaUsageFor } from "../hooks/media-usage.ts";
 import { createImagePairFields } from "../fields/image-pair.ts";
-import { revalidatePaths, revalidateTags } from "../hooks/revalidation.ts";
+import {
+  revalidateLayout,
+  revalidatePaths,
+  revalidateTags,
+} from "../hooks/revalidation.ts";
 import { urlFieldHooks, validateOptionalUrl } from "../fields/validators.ts";
 
 export const SiteSettings: GlobalConfig = {
@@ -16,7 +19,16 @@ export const SiteSettings: GlobalConfig = {
       "Site-wide links, contact details and dashboard settings. Changes here affect every page.",
   },
   access: {
-    read: isPublicRead,
+    // Not public. This global has drafts enabled, and a global's access
+    // callback cannot return a query constraint the way a collection's can, so
+    // there is no way to serve only the published version over the generated
+    // REST API: `GET /api/globals/site-settings?draft=true` handed an
+    // anonymous caller the unpublished draft.
+    //
+    // Nothing public reads this endpoint. The site loads these settings server
+    // side through lib/site-data.ts, which uses the Local API with
+    // overrideAccess, so requiring auth here costs the website nothing.
+    read: isLoggedIn,
     update: isLoggedIn,
   },
   hooks: {
@@ -36,7 +48,7 @@ export const SiteSettings: GlobalConfig = {
       },
       () => {
         revalidateTags(["settings"]);
-        revalidatePath("/", "layout");
+        revalidateLayout("/");
         revalidatePaths(["/about", "/events", "/rockets", "/sponsors"]);
       },
     ],

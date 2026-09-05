@@ -58,6 +58,14 @@ function getSupabasePublicBaseUrl(): string | null {
     return null;
   }
 
+  // A misconfigured base (a bare bucket path, say) would otherwise be
+  // concatenated into a relative URL and written into the flattened field,
+  // which is the exact failure `isAbsoluteUrl` exists to prevent on the other
+  // branch. Returning null instead makes the caller keep the existing URL.
+  if (!isAbsoluteUrl(configured)) {
+    return null;
+  }
+
   return configured.replace(/\/+$/, "");
 }
 
