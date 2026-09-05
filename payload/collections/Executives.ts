@@ -1,5 +1,5 @@
 import type { CollectionConfig } from "payload";
-import { isLoggedIn, isPublicRead } from "../access/policies.ts";
+import { isLoggedIn, isPublicReadPublished } from "../access/policies.ts";
 import {
   getNumberField,
   revalidatePaths,
@@ -32,7 +32,7 @@ export const Executives: CollectionConfig = {
   },
   trash: true,
   access: {
-    read: isPublicRead,
+    read: isPublicReadPublished,
     create: isLoggedIn,
     update: isLoggedIn,
     delete: isLoggedIn,

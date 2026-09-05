@@ -1,5 +1,5 @@
 import type { CollectionConfig } from "payload";
-import { isLoggedIn, isPublicRead } from "../access/policies.ts";
+import { isLoggedIn, isPublicReadPublished } from "../access/policies.ts";
 import { createMediaRelationUrlSyncHook } from "../hooks/media-url-sync.ts";
 import {
   createMediaUsageDeleteHook,
@@ -25,7 +25,7 @@ export const Sponsors: CollectionConfig = {
   },
   trash: true,
   access: {
-    read: isPublicRead,
+    read: isPublicReadPublished,
     create: isLoggedIn,
     update: isLoggedIn,
     delete: isLoggedIn,

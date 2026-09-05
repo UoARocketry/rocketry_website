@@ -1,5 +1,5 @@
 import type { CollectionConfig } from "payload";
-import { isLoggedIn, isPublicRead } from "../access/policies.ts";
+import { isLoggedIn, isPublicReadPublished } from "../access/policies.ts";
 import { BACKGROUND_SURFACE_OPTIONS } from "../fields/options.ts";
 import { createOrderCollisionHook } from "../hooks/order-collision.ts";
 import { revalidateAboutContent } from "../hooks/revalidation.ts";
@@ -21,7 +21,7 @@ export const TeamRoles: CollectionConfig = {
   },
   trash: true,
   access: {
-    read: isPublicRead,
+    read: isPublicReadPublished,
     create: isLoggedIn,
     update: isLoggedIn,
     delete: isLoggedIn,

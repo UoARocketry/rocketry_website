@@ -1,5 +1,5 @@
 import type { CollectionConfig } from "payload";
-import { isLoggedIn, isPublicRead } from "../access/policies.ts";
+import { isLoggedIn, isPublicReadPublished } from "../access/policies.ts";
 import {
   getStringField,
   revalidatePaths,
@@ -37,7 +37,7 @@ export const Rockets: CollectionConfig = {
   },
   trash: true,
   access: {
-    read: isPublicRead,
+    read: isPublicReadPublished,
     create: isLoggedIn,
     update: isLoggedIn,
     delete: isLoggedIn,
