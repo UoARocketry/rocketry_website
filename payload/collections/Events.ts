@@ -27,8 +27,11 @@ export const Events: CollectionConfig = {
     useAsTitle: "title",
     defaultColumns: ["title", "date", "eventTag", "_status"],
     group: "Events",
+    // Payload shows this on the create and edit screens as well as the list,
+    // so it has to read correctly when you are looking at a single event.
+    // "Everything listed, newest first" made sense only on the list.
     description:
-      "Everything listed on the Events page, newest first. Unpublished drafts appear at the top and are not visible on the site.",
+      "Talks, workshops and launches shown on the Events page. A draft stays off the site until you publish it.",
     preview: createPreviewUrl("events"),
     components: {
       edit: {
