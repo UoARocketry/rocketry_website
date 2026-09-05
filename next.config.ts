@@ -71,25 +71,55 @@ const nextConfig: NextConfig = {
       "form-action 'self'",
     ].join("; ");
 
+    const securityHeaders = [
+      {
+        key: "Strict-Transport-Security",
+        value: "max-age=63072000; includeSubDomains; preload",
+      },
+      { key: "X-Content-Type-Options", value: "nosniff" },
+      { key: "X-Frame-Options", value: "DENY" },
+      {
+        key: "Referrer-Policy",
+        value: "strict-origin-when-cross-origin",
+      },
+      {
+        key: "Permissions-Policy",
+        value: "camera=(), microphone=(), geolocation=()",
+      },
+    ];
+
+    /*
+     * The policy was previously sent as `Report-Only` everywhere, with no
+     * `report-uri` or `report-to` directive. That combination enforces nothing
+     * and reports nothing, so the header looked like protection in a scan while
+     * providing none.
+     *
+     * It is now enforced on the public site, where the policy was measured in a
+     * real browser across every page with zero violations. Note what this does
+     * and does not buy: `script-src` still needs 'unsafe-inline' for Next, so
+     * this is not meaningful XSS protection. What it does enforce is
+     * `form-action` (an injected form cannot post off-site), `base-uri` (no
+     * injected <base> can rewrite every relative URL) and `connect-src`.
+     *
+     * /admin and /api stay Report-Only. Payload's admin ships its own bundle,
+     * and breaking the CMS to harden a surface only logged-in editors reach is
+     * a bad trade. The two sources are mutually exclusive on purpose: Next
+     * appends the headers of *every* matching entry, so an overlapping pair
+     * would send both an enforcing and a report-only policy to the admin.
+     */
     return [
       {
-        source: "/:path*",
+        source: "/:path((?:admin|api)(?:/.*)?)",
         headers: [
-          {
-            key: "Strict-Transport-Security",
-            value: "max-age=63072000; includeSubDomains; preload",
-          },
-          { key: "X-Content-Type-Options", value: "nosniff" },
-          { key: "X-Frame-Options", value: "DENY" },
-          {
-            key: "Referrer-Policy",
-            value: "strict-origin-when-cross-origin",
-          },
-          {
-            key: "Permissions-Policy",
-            value: "camera=(), microphone=(), geolocation=()",
-          },
+          ...securityHeaders,
           { key: "Content-Security-Policy-Report-Only", value: csp },
+        ],
+      },
+      {
+        source: "/:path((?!admin|api).*)",
+        headers: [
+          ...securityHeaders,
+          { key: "Content-Security-Policy", value: csp },
         ],
       },
     ];
