@@ -50,7 +50,7 @@ export default function ExecCard({
             />
           ) : (
             <div
-              className="absolute inset-0 flex items-center justify-center bg-surface text-primary text-2xl font-semibold tracking-wide select-none transition-transform duration-500 group-hover:scale-110"
+              className="absolute inset-0 flex items-center justify-center bg-surface text-primary text-primary-deep text-2xl font-semibold tracking-wide select-none transition-transform duration-500 group-hover:scale-110"
               role="img"
               aria-label={exec.name}
             >

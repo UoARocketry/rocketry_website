@@ -91,12 +91,16 @@ h3, h4, h5, h6 {
 }
 
 /* Links with smooth transitions */
+/* Links default to the lighter orange for the same legibility reason as
+   `.text-primary` below: link text is almost always small, and the deeper
+   orange sits just under AA against these dark grounds. Hover then has to go
+   lighter still, or hovering would move the text back below the threshold. */
 a {
-  color: var(--color-primary);
+  color: var(--color-primary-light);
   transition: color var(--duration-base) var(--ease-standard);
 }
 a:hover, a:focus {
-  color: var(--color-primary-light);
+  color: color-mix(in srgb, var(--color-primary-light) 75%, white);
 }
 
 /* Primary button styling */
@@ -203,6 +207,35 @@ a:hover, a:focus {
 }
 .glow-hover:hover {
   box-shadow: 0 0 20px var(--color-primary-glow), 0 0 40px var(--color-primary-glow);
+}
+
+/*
+ * Legibility of the brand orange as text.
+ *
+ * --color-primary measures 4.1:1 on --color-surface and 4.4:1 on
+ * --color-background. WCAG AA wants 4.5:1 for body text, so nearly every piece
+ * of orange text on the site (section eyebrows, "View all" links, nav items,
+ * status chips) sat just under the line. --color-primary-light measures 5.35:1
+ * and is already in the palette, so this is a legibility fix rather than a new
+ * colour.
+ *
+ * Done centrally instead of editing ~90 call sites, so a future `text-primary`
+ * is legible by default. The hover variants are included deliberately: without
+ * them, hovering would move text back to the darker orange, which is both
+ * backwards and below the threshold.
+ *
+ * Large text only needs 3:1, which the deeper orange already clears. The two
+ * places it is used that large opt back in with `text-primary-deep`, so the
+ * hero keeps the stronger brand colour.
+ */
+.text-primary,
+.hover\:text-primary:hover,
+.group:hover .group-hover\:text-primary {
+  color: var(--color-primary-light);
+}
+
+.text-primary-deep {
+  color: var(--color-primary);
 }
 
 /* Focus ring styling */
