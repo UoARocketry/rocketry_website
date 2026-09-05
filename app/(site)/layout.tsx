@@ -129,9 +129,23 @@ export default async function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: toSafeJsonLd(organizationJsonLd) }}
         />
+        {/* Every page repeats the same nav, so a keyboard or screen reader
+            user otherwise tabs through all of it before reaching the content,
+            on every navigation (WCAG 2.4.1). Hidden until focused, so it costs
+            the visual design nothing. */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-100 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-text-main focus:outline-none focus:ring-2 focus:ring-text-main"
+        >
+          Skip to main content
+        </a>
         <Navigation joinUrl={joinUrl} />
         <ScrollToTop />
-        <div className="relative pt-16 min-h-screen mt-16 mb-16">
+        <div
+          id="main-content"
+          tabIndex={-1}
+          className="relative pt-16 min-h-screen mt-16 mb-16"
+        >
           {children}
         </div>
         <Footer />

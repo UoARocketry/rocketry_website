@@ -44,6 +44,7 @@ export default function ImageLightbox({
   const [view, setView] = useState<View>(RESET);
   const [isGesturing, setIsGesturing] = useState(false);
   const viewportRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   /**
    * Live pointers, keyed by id. Two at once is a pinch, one is a drag.
@@ -123,6 +124,29 @@ export default function ImageLightbox({
     setView(RESET);
   }, [index]);
 
+  /**
+   * Focus management for the dialog.
+   *
+   * `role="dialog"` and `aria-modal` describe the intent, but the browser does
+   * nothing on their own. Without this, opening the lightbox left focus on the
+   * thumbnail behind the overlay, so a screen reader was never moved into the
+   * dialog and Tab walked through the page underneath it, which is invisible
+   * but still focusable. Verified in a real browser before this was added.
+   *
+   * On open: remember what was focused and move focus into the dialog.
+   * While open: keep Tab inside it.
+   * On close: put focus back where it started, so the keyboard position is not
+   * lost.
+   */
+  useEffect(() => {
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    dialogRef.current?.focus();
+
+    return () => {
+      previouslyFocused?.focus?.();
+    };
+  }, []);
+
   useEffect(() => {
     const originalOverflow = document.body.style.overflow;
     const originalOverscroll = document.body.style.overscrollBehavior;
@@ -131,7 +155,36 @@ export default function ImageLightbox({
     document.body.style.overscrollBehavior = "none";
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
+      if (event.key === "Tab") {
+        const dialog = dialogRef.current;
+        if (!dialog) return;
+
+        const focusable = [
+          ...dialog.querySelectorAll<HTMLElement>(
+            'button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])',
+          ),
+        ].filter((element) => element.offsetParent !== null);
+
+        if (focusable.length === 0) {
+          event.preventDefault();
+          dialog.focus();
+          return;
+        }
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        const active = document.activeElement;
+
+        // Wrap at both ends, and pull focus back in if it has escaped the
+        // dialog entirely (which is the state the page starts in).
+        if (event.shiftKey && (active === first || !dialog.contains(active))) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && (active === last || !dialog.contains(active))) {
+          event.preventDefault();
+          first.focus();
+        }
+      } else if (event.key === "Escape") {
         onClose();
       } else if (hasMultiple && event.key === "ArrowLeft") {
         goTo(index - 1);
@@ -279,7 +332,11 @@ export default function ImageLightbox({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
+      ref={dialogRef}
+      // -1 so the container itself can receive focus on open without joining
+      // the tab order.
+      tabIndex={-1}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 outline-none"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
