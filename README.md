@@ -1,108 +1,133 @@
 # University of Auckland Rocketry Club Website
 
-Official website for the University of Auckland Rocketry Club, built with Next.js App Router, TypeScript, Tailwind CSS, and Supabase.
+Official website for the University of Auckland Rocketry Club: a server-rendered Next.js site with an embedded Payload CMS backend, so committee members edit the site themselves at `/admin`.
+
+Live at https://www.uoarocketry.com.
 
 ## Overview
 
-This project is a content-driven site with server-rendered pages backed by Supabase. It includes:
-
 - Home landing page with featured rockets and upcoming events
-- About page with team information and exec-year browsing
-- Events list and event detail pages
+- About page with the exec team and historical exec-year browsing
+- Events list and event detail pages, including multi-session series
 - Rockets list and rocket detail pages
-- Sponsors page
-- API routes for site content
+- Sponsors page, grouped by tier
+- Payload admin at `/admin`, with a committee guide at `/admin/guide`
 
-## Tech Stack
+## Tech stack
 
-- Next.js 16 (App Router)
-- React 19
+- Next.js 16 (App Router) and React 19
 - TypeScript
 - Tailwind CSS 4
-- Supabase (PostgreSQL)
+- Payload CMS 3, with the Postgres adapter
+- Postgres and S3-compatible media storage, both hosted on Supabase
+- Vitest for unit tests
+- Deployed on Vercel
 
-## Project Structure
+## Project structure
 
 ```
 app/
-	page.tsx
-	layout.tsx
-	about/
-	events/
-	rockets/
-	sponsors/
-	api/
-components/
-	ui/
+  (site)/          public website: home, about, events, rockets, sponsors
+  (payload)/       Payload admin UI and its generated REST/GraphQL API
+components/        shared React components
+  ui/
 lib/
-	site-data.ts
-	supabase.ts
-scripts/
-public/
+  site-data.ts     every read the public site makes, cached and mapped
+  payload.ts       cached Payload Local API client
+payload/
+  collections/     one CollectionConfig per content type
+  globals/         SiteSettings
+  access/          read/write access policies
+  fields/          shared field builders and validators
+  hooks/           cache revalidation, media URL sync, integrity guards
+  views/           the committee guide rendered inside the admin
+migrations/        source of truth for the database schema
+scripts/           generate-exec-guide.ts
+docs/
+  exec-guide.md    generated mirror of the in-admin guide
 ```
 
-## Data Model (High Level)
+Pages never call Payload directly. They import typed view models from `lib/site-data.ts`, which queries Payload's Local API, caches with `unstable_cache` and cache tags, and maps raw documents into trimmed types from `lib/site-data.types.ts`.
 
-- `Event`
-- `Rocket`
-- `Exec` (includes `year` for historical team browsing)
-- `Sponsor`
-- `WhatWeDo`
-- `JourneyItem`
-- `TeamRole`
-- `Stat`
-- `SiteSettings`
+## Content model
 
-## Local Development
+Collections: `Events`, `EventTags`, `Rockets`, `Executives`, `Sponsors`, `SponsorTiers`, `WhatWeDo`, `JourneyItems`, `TeamRoles`, `Stats`, `Media`, `Users`. One global: `SiteSettings`.
+
+Most content collections have drafts enabled, so a document is only public once published.
+
+## Local development
 
 ### Prerequisites
 
-- Node.js (latest LTS or latest current)
-- npm
-- Supabase project credentials in environment variables
+- Node.js 20.9 or newer (Next 16's own minimum), and npm
+- A Postgres database (a local container is fine)
+- Copy `.env.example` to `.env` and fill it in
+
+The app needs a connection string (`DATABASE_URL` or `DIRECT_URL`) and `PAYLOAD_SECRET` to boot. The `SUPABASE_STORAGE_*` group is optional locally: without all five values the S3 storage plugin is skipped and uploads have no remote URL.
+
+Do not point a local dev server at the production database without the storage env set. See `CLAUDE.md` for why, and for the placeholder values that make `payload generate:importmap` produce a complete map.
 
 ### Commands
 
-- `npm run dev` - start development server
-- `npm run build` - create production build
-- `npm run start` - run production build locally
-- `npm run lint` - run ESLint
-- `npm run db:grant` - apply DB grants
-- `npm run seed` - run seed + schema sync script
+```bash
+npm run dev                        # dev server
+npm run dev:turbo                  # dev server with Turbopack
+npm run build                      # production build
+npm run start                      # serve the production build
+npm run lint                       # eslint
+npm test                           # vitest
+npm run test:watch
 
-## Environment Variables
+npm run payload                    # Payload CLI passthrough
+npm run payload:migrate            # apply database migrations
+npm run payload:generate:types     # regenerate payload-types.ts
+npm run payload:generate:importmap # regenerate the admin importMap
+npm run guide:docs                 # regenerate docs/exec-guide.md
+```
 
-Required server variables are validated in `lib/supabase.ts`:
+### Database migrations
 
-- `SUPABASE_SERVICE_ROLE_KEY`
-- `SUPABASE_URL` or `NEXT_PUBLIC_SUPABASE_URL`
+`push: false` — the schema is not auto-synced. Migrations in `migrations/` are the source of truth. After changing a collection, write a migration by hand, apply it with `npm run payload:migrate`, and run `npm run payload:generate:types`. `payload migrate:create` is not usable in this repo; `CLAUDE.md` explains why.
 
-For scripts and media URLs, you may also need:
+## Environment variables
 
-- `DIRECT_URL`
-- `NEXT_PUBLIC_SUPABASE_STORAGE_URL`
+See `.env.example` for the full list with descriptions. In short:
 
-## Notes
+| Variable | Needed for |
+| --- | --- |
+| `DATABASE_URL` | runtime database access (Supabase transaction pooler, port 6543) |
+| `DIRECT_URL` | fallback, and local migrations (port 5432) |
+| `PAYLOAD_SECRET` | signing admin sessions; required in production |
+| `SERVER_URL` | the deployed base URL, used for the CORS/CSRF allowlist |
+| `SUPABASE_STORAGE_*` | media uploads to Supabase S3 storage |
+| `NEXT_PUBLIC_SUPABASE_STORAGE_URL` | the `next/image` remote host allowlist |
+| `RESEND_API_KEY`, `PAYLOAD_EMAIL_FROM_*` | admin password-reset email |
 
-- Data-fetching is centralized in `lib/site-data.ts` with Next cache revalidation.
-- API routes are in `app/api/**/route.ts`.
-- Images use `next/image` where appropriate with host allowlists in `next.config.ts`.
+## Verification
 
-## Regression Checklist
+Full check before merging:
 
-Run these checks before merging significant UI/data changes:
+```bash
+npm test
+npm run lint
+npx tsc --noEmit
+npm run build
+```
 
-1. `npm run lint`
-2. `npm run build`
-3. Manual smoke test:
-   - Home page loads featured rockets and upcoming events
-   - About page loads and exec year switching works
-   - Events and Rockets detail pages render images and content correctly
-   - Sponsors page renders external logos without `next/image` host errors
-4. API spot checks:
-   - `/api/exec?year=2026` returns data
-   - `/api/exec?year=abcd` returns `400`
-   - `/api/test` returns `{ ok: true, now: ... }`
+Run `tsc` explicitly. ESLint does not typecheck, and Payload config mistakes surface only there.
+
+Manual smoke test for UI or data changes:
+
+1. Home page loads featured rockets and upcoming events
+2. About page loads and exec-year switching works
+3. Event and rocket detail pages render images and content
+4. Sponsors page renders external logos without `next/image` host errors
+5. `/admin` loads, and saving a document with an image keeps an absolute media URL
+
+## Further reading
+
+- `CLAUDE.md` — architecture, conventions, and the traps worth knowing before changing anything
+- `docs/exec-guide.md` — the committee-facing guide, generated from `payload/views/guide-content.ts`
 
 ## Contact
 
