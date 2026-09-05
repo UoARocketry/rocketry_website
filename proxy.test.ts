@@ -83,4 +83,29 @@ describe("proxy", () => {
     expect(getRocketBySlug).not.toHaveBeenCalled();
     expect(getEventBySlug).not.toHaveBeenCalled();
   });
+
+  // Malformed percent-encoding used to throw out of decodeURIComponent into
+  // the fail-open catch, letting the request reach the page, which threw on the
+  // same input and returned a 500 rather than a 404.
+  describe("malformed percent-encoding", () => {
+    for (const badSlug of ["%", "%zz", "%e0%a4%a"]) {
+      it(`treats /rockets/${badSlug} as not found without querying`, async () => {
+        const response = await proxy(makeRequest(`/rockets/${badSlug}`));
+
+        expect(response.headers.get("x-middleware-rewrite")).toBe(
+          "https://www.uoarocketry.com/__not_found__",
+        );
+        expect(getRocketBySlug).not.toHaveBeenCalled();
+      });
+
+      it(`treats /events/${badSlug} as not found without querying`, async () => {
+        const response = await proxy(makeRequest(`/events/${badSlug}`));
+
+        expect(response.headers.get("x-middleware-rewrite")).toBe(
+          "https://www.uoarocketry.com/__not_found__",
+        );
+        expect(getEventBySlug).not.toHaveBeenCalled();
+      });
+    }
+  });
 });
