@@ -28,7 +28,10 @@ type ImagePairOptions = {
   uploadName: string;
   /** Name of the flattened public-URL text field, e.g. "photo". */
   urlName: string;
-  /** Human label used in validation messages, e.g. "Photo". */
+  /**
+   * Human label for the field, e.g. "Photo". Used for the upload field itself,
+   * for the URL field beside it, and in validation messages.
+   */
   label: string;
   /** Whether an image must be supplied at all. */
   required: boolean;
@@ -104,6 +107,11 @@ export function createImagePairFields({
     {
       name: uploadName,
       type: "upload",
+      // Without this Payload titles the field from the variable name, so the
+      // field an editor uses nearly every time read "Image Media" / "Photo
+      // Media" / "Logo Media", while the fallback field beside it was properly
+      // labelled. The better name belonged on the primary control.
+      label,
       relationTo: "media" as never,
       required: false,
       admin: {
