@@ -56,6 +56,25 @@ describe("buildAllowedOrigins", () => {
       "http://localhost:3000",
     );
   });
+
+  // Payload answers a form-state request from an unlisted origin with a 401,
+  // and the admin shows that as a skeleton that never resolves. Browsing the
+  // admin on 127.0.0.1 rather than localhost made every "Add row" button
+  // appear to hang, with no error anywhere in the interface.
+  it("also adds the 127.0.0.1 spelling of localhost in development", () => {
+    expect(buildAllowedOrigins({ NODE_ENV: "development" })).toContain(
+      "http://127.0.0.1:3000",
+    );
+  });
+
+  it("keeps both loopback origins out of production", () => {
+    const origins = buildAllowedOrigins({
+      NODE_ENV: "production",
+      SERVER_URL: "https://www.uoarocketry.com",
+    });
+
+    expect(origins).toEqual(["https://www.uoarocketry.com"]);
+  });
 });
 
 describe("resolveServerUrl", () => {

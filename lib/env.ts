@@ -45,7 +45,13 @@ export function buildAllowedOrigins(env: EnvRecord = process.env): string[] {
     origins.add(serverUrl);
   }
   if (env.NODE_ENV !== "production") {
+    // Both spellings of the loopback host. They are separate origins to a
+    // browser, and Payload rejects a form-state request whose origin is not
+    // listed here with a 401. The admin renders that as a skeleton that never
+    // resolves, so opening the admin on 127.0.0.1 made "Add Link" and every
+    // other array row appear to hang with no error shown anywhere.
     origins.add("http://localhost:3000");
+    origins.add("http://127.0.0.1:3000");
   }
   return Array.from(origins);
 }
