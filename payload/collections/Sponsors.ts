@@ -1,5 +1,6 @@
 import type { CollectionConfig } from "payload";
 import { isLoggedIn, isPublicReadPublished } from "../access/policies.ts";
+import { fieldHelp } from "../fields/help.ts";
 import { createMediaRelationUrlSyncHook } from "../hooks/media-url-sync.ts";
 import {
   createMediaUsageDeleteHook,
@@ -75,10 +76,10 @@ export const Sponsors: CollectionConfig = {
         { label: "Light (default)", value: "light" },
         { label: "Dark — for a white or pale logo", value: "dark" },
       ],
-      admin: {
-        description:
-          "Logos sit on a white plate, which suits dark and full-colour artwork. Switch to dark only for a logo that is white or very pale AND has a transparent background. A logo with white baked into the file will show as a white rectangle on a dark backing.",
-      },
+      admin: fieldHelp(
+        "Logos sit on a white plate, which works for most artwork.",
+        "Only switch to dark if the logo is white or very pale and its background is see-through. If the logo has white baked into the image, a dark backing just gives you a white rectangle.",
+      ),
     },
     {
       name: "url",
