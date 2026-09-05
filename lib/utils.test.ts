@@ -7,6 +7,7 @@ import {
   isEventUpcoming,
   sortByDate,
   sortRockets,
+  toSafeJsonLd,
 } from "./utils.ts";
 
 const NOW = new Date("2026-06-15T12:00:00.000Z");
@@ -358,5 +359,59 @@ describe("sortRockets", () => {
     const sorted = sortRockets([rocket("Undated"), rocket("Booked", future(1).date)]);
 
     expect(sorted[0].name).toBe("Booked");
+  });
+});
+
+/**
+ * This is the escaping boundary for the two `dangerouslySetInnerHTML` call
+ * sites on the site (the JSON-LD blocks in the site layout and the event detail
+ * page). Its input is CMS text an editor can type, so it had no business being
+ * untested.
+ */
+describe("toSafeJsonLd", () => {
+  it("produces valid JSON for ordinary content", () => {
+    const data = { "@type": "Event", name: "Level 1 Build Workshop" };
+
+    expect(JSON.parse(toSafeJsonLd(data))).toEqual(data);
+  });
+
+  it("escapes the closing script tag that would break out of the block", () => {
+    const output = toSafeJsonLd({
+      name: "</script><img src=x onerror=alert(1)>",
+    });
+
+    expect(output).not.toContain("</script>");
+    expect(output).not.toContain("<img");
+    // String.raw keeps this as the six characters \u003c, not the < they encode.
+    expect(output).toContain(String.raw`\u003c`);
+  });
+
+  it("escapes every angle bracket, not just the first", () => {
+    const output = toSafeJsonLd({ a: "<one>", b: "<two>" });
+
+    expect(output).not.toContain("<");
+  });
+
+  it("escapes an HTML comment opener, which also ends a script block", () => {
+    const output = toSafeJsonLd({ name: "<!--" });
+
+    expect(output).not.toContain("<!--");
+  });
+
+  it("survives a round trip so the escaping does not corrupt the content", () => {
+    const name = "</script> & <b>bold</b> \"quoted\" 'single'";
+
+    expect(JSON.parse(toSafeJsonLd({ name })).name).toBe(name);
+  });
+
+  it("handles nested and array values", () => {
+    const data = {
+      organizer: { name: "</script>UARC" },
+      tags: ["<a>", "<b>"],
+    };
+    const output = toSafeJsonLd(data);
+
+    expect(output).not.toContain("<");
+    expect(JSON.parse(output)).toEqual(data);
   });
 });
