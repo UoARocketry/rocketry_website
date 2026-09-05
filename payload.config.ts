@@ -4,7 +4,11 @@ import { resendAdapter } from "@payloadcms/email-resend";
 import { postgresAdapter } from "@payloadcms/db-postgres";
 import { s3Storage } from "@payloadcms/storage-s3";
 import { buildConfig } from "payload";
-import { buildAllowedOrigins, resolveServerUrl } from "./lib/env.ts";
+import {
+  buildAllowedOrigins,
+  resolvePayloadSecret,
+  resolveServerUrl,
+} from "./lib/env.ts";
 import { EventTags } from "./payload/collections/EventTags.ts";
 import { Events } from "./payload/collections/Events.ts";
 import { Executives } from "./payload/collections/Executives.ts";
@@ -24,9 +28,11 @@ const dirname = path.dirname(filename);
 
 const databaseUrl =
   process.env.DATABASE_URL?.trim() || process.env.DIRECT_URL?.trim() || "";
-const payloadSecret =
-  process.env.PAYLOAD_SECRET?.trim() ||
-  "dev-only-secret-change-before-production";
+// Deliberately routed through lib/env.ts rather than read inline: that helper
+// refuses to fall back to the committed dev secret at production runtime, so a
+// missing PAYLOAD_SECRET fails loudly instead of signing admin sessions with a
+// value that is public on GitHub. Build phase still gets the dev fallback.
+const payloadSecret = resolvePayloadSecret();
 const resendApiKey = process.env.RESEND_API_KEY?.trim() || "";
 const resendFromAddress =
   process.env.PAYLOAD_EMAIL_FROM_ADDRESS?.trim() || "no-reply@example.com";
