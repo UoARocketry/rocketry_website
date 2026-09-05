@@ -126,7 +126,27 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
     components: {
-      beforeDashboard: ["/payload/components/StorageUsage.tsx#default"],
+      // Orientation first, then the storage meter. A committee member landing
+      // here for the first time should meet "here is how this works" before a
+      // pair of usage bars.
+      beforeDashboard: [
+        "/payload/components/StartHere.tsx#default",
+        "/payload/components/StorageUsage.tsx#default",
+      ],
+      // Also linked from the nav, so it can be reached from any screen rather
+      // than only by going back to the dashboard.
+      afterNavLinks: ["/payload/components/GuideNavLink.tsx#default"],
+      views: {
+        execGuide: {
+          Component: "/payload/views/ExecGuide.tsx#default",
+          path: "/guide",
+          meta: {
+            title: "Guide",
+            description:
+              "How to keep the UARC website up to date, for committee members.",
+          },
+        },
+      },
     },
   },
   i18n: {

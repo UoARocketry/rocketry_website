@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "guide:docs": "tsx scripts/generate-exec-guide.ts",
     "payload": "payload",
     "payload:generate:types": "payload generate:types",
     "payload:generate:importmap": "payload generate:importmap",
