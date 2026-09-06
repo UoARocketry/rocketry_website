@@ -1,4 +1,4 @@
-# University of Auckland Rocketry Club Website 
+# University of Auckland Rocketry Club Website
 
 Official website for the University of Auckland Rocketry Club, live at https://www.uoarocketry.com.
 

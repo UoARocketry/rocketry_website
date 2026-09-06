@@ -13,7 +13,11 @@ jobs:
     permissions: {}
     steps:
       - name: Keep cronjob based triggers of GitHub workflows alive
-        uses: PhrozenByte/gh-workflow-immortality@v1
+        # Pinned to a commit, not the mutable @v1 tag. This step is handed a PAT
+        # with Administration write on the repo, so if the tag were re-pointed at
+        # compromised code that token would go with it. Bump deliberately after
+        # reading the diff: 39378c2 is v1.2.0.
+        uses: PhrozenByte/gh-workflow-immortality@39378c27dcacbc17e6fbf83057d1fc40c574000d
         with:
           secret: ${{ secrets.PERSONAL_ACCESS_TOKEN_KEEP_ALIVE }}
           repos: ${{ github.repository }} # Keeps the current repository alive

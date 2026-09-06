@@ -74,9 +74,32 @@ What each one does, and what breaks without it:
 | `SERVER_URL` | Goes into the CORS and CSRF allowlist | Admin form submissions get rejected and array rows hang. Section 6 |
 | `SUPABASE_STORAGE_*` | Registers the S3 upload plugin. All five must be non-empty | The plugin is skipped, and two silent failure modes open up. Section 6 |
 
-`.env.example` in the repo root is the full list including the production-only ones. For production values, the database strings and storage keys come from the Supabase dashboard, under Project Settings. `RESEND_API_KEY` is only needed for admin password-reset email.
+`.env.example` in the repo root is the full list including the production-only ones.
 
 Note the production `DATABASE_URL` should be Supabase's transaction pooler on port 6543, not the session pooler on 5432. The session pooler caps concurrent clients low and ran out in production once already.
+
+### Where each production value comes from
+
+You can always work out *which* variables are needed by grepping `process.env` across the repo. What you can't work out from the code is where the values live, and most of them are marked Sensitive in Vercel, which means nobody can read them back out of the dashboard. If you ever need to rebuild the project, this is the table that matters:
+
+| Variable(s) | Where to get it |
+| --- | --- |
+| `DATABASE_URL`, `DIRECT_URL` | Supabase → Project Settings → Database. Use the 6543 transaction pooler for `DATABASE_URL` |
+| The six `SUPABASE_STORAGE_*` | Supabase → Project Settings → Storage → S3 access keys. The bucket is `images` |
+| `SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_STORAGE_URL` | Supabase project URL. Not secret |
+| `RESEND_API_KEY` | Resend dashboard → API keys. Create a new one; existing keys can't be re-read |
+| `PAYLOAD_SECRET` | Generate any long random string. Changing it logs every admin out once but loses no data |
+| `SERVER_URL`, `PAYLOAD_EMAIL_FROM_*` | Plain config, not secret. Shapes are in `.env.example` |
+
+### Secrets that live in GitHub, not Vercel
+
+The Actions workflows need their own secrets, set under repository Settings → Secrets and variables → Actions. These are invisible from the Vercel dashboard, so they're easy to forget:
+
+| Secret | Used by |
+| --- | --- |
+| `DATABASE_URL`, `DIRECT_URL` | `ci.yml`, so the build can run |
+| `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` | `keep-alive.yaml` |
+| `PERSONAL_ACCESS_TOKEN_KEEP_ALIVE` | `keepactionsalive.yml`. See section 5 for the scopes it needs |
 
 ### Start it
 
@@ -178,13 +201,19 @@ There's no staging environment. `main` is production.
 
 If a deploy goes wrong, don't try to patch it live. Vercel keeps previous deployments, and you can roll back instantly from the Vercel dashboard. Roll back first, fix on a branch after.
 
-### The keep-alive cron
+### The two keep-alive crons
 
-`.github/workflows/keep-alive.yaml` pings the Supabase REST API at 12:00 UTC every Monday and Thursday.
+There are two, and they protect each other. Both matter more than they look.
 
-Supabase pauses free-tier projects that get no activity for a week. If this workflow stops running, and the site is quiet enough, the project pauses and the whole site goes down until somebody logs into Supabase and resumes it. GitHub also disables scheduled workflows in repositories with no activity for 60 days, which is a realistic way for this to fail quietly over a summer break.
+`.github/workflows/keep-alive.yaml` pings the Supabase REST API at 12:00 UTC every Monday and Thursday. Supabase pauses free-tier projects that get no activity for a week, and a paused project takes the whole site down until somebody logs into Supabase and resumes it.
 
-If the site is down and nothing has changed, check Supabase first.
+`.github/workflows/keepactionsalive.yml` runs monthly and keeps the *first one* alive. GitHub disables scheduled workflows in repositories with no activity for 60 days, which a quiet summer break would trigger easily.
+
+So the failure chain runs: that monthly job stops → GitHub disables the scheduled workflows → the Supabase ping stops → Supabase pauses the project → the site goes down, possibly months later, with nothing in the code having changed.
+
+The monthly job needs a `PERSONAL_ACCESS_TOKEN_KEEP_ALIVE` secret. It's the one credential here that can't be recovered from a dashboard, because it has to be *created* with the right scopes: a fine-grained token with resource owner `UoARocketry`, access to this repository only, and Actions plus Administration set to read and write. If it expires or belongs to someone who has left, recreate it with exactly those scopes and update the repository secret.
+
+If the site is down and nothing has changed, check Supabase first, then check whether these two workflows are still enabled.
 
 ## 6. The traps
 
