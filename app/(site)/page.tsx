@@ -54,7 +54,7 @@ export default async function HomePage() {
             alt="UARC Logo"
             width={360}
             height={144}
-            className="h-20 md:h-24 mb-8 mx-auto"
+            className="h-20 md:h-24 w-auto object-contain mb-8 mx-auto"
             priority
           />
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 tracking-tight text-balance">
