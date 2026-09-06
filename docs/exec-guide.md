@@ -22,11 +22,12 @@ the bottom of the admin sidebar.
 4. [Add or update a rocket](#add-or-update-a-rocket)
 5. [Update the exec team](#update-the-exec-team)
 6. [Add a sponsor](#add-a-sponsor)
-7. [The About page](#the-about-page)
-8. [Images](#images)
-9. [Ordering things on a page](#ordering-things-on-a-page)
-10. [When storage runs low](#when-storage-runs-low)
-11. [Accounts](#accounts)
+7. [Event tags and sponsor tiers](#event-tags-and-sponsor-tiers)
+8. [The About page](#the-about-page)
+9. [Images](#images)
+10. [Ordering things on a page](#ordering-things-on-a-page)
+11. [When storage runs low](#when-storage-runs-low)
+12. [Accounts](#accounts)
 
 ## How this works
 
@@ -117,6 +118,25 @@ There's also Photo position, which only shows once you've added a photo. Use it 
 Logos sit on a white plate by default, which works for most of them. Only switch Logo backing to dark if the logo is white or very pale and its background is see-through. If the logo has white baked into the image, a dark backing just gives you a white rectangle.
 
 The tiers themselves live in Sponsor Tiers, so you can rename or reorder them there. You can't delete a tier while sponsors are still in it.
+
+## Event tags and sponsor tiers
+
+These two are lists that other things point at. Event Tags are the filter buttons along the top of the Events page. Sponsor Tiers are the sections the Sponsors page is split into. You'll only touch them when the club adds a new kind of event or a new sponsorship level.
+
+1. For a tag, open Event Tags under Events. For a tier, open Sponsor Tiers under Sponsors.
+2. Hit Create New.
+3. Type the Name. This is what people see on the site, so write it the way you want it to read.
+4. For a tier you can also add a Description, which shows under the section heading. It's optional.
+5. Set the Order, which is where it sits in the row or down the page. Position 1 goes first.
+6. Hit Save.
+
+> **These two save straight away.** There's no Save Draft or Publish changes on tags and tiers, just a Save button, and it's live the moment you hit it. Everything else in this guide has a draft step, so it's worth knowing these two don't.
+
+Renaming works the way you'd hope. Events and sponsors point at the tag or tier rather than keeping their own copy of the name, so renaming one updates it everywhere it appears. You don't need to go back and re-tag anything.
+
+- Deleting a tag is safe. It just clears off any event that used it, and those events stay published.
+- Deleting a tier is blocked while sponsors are still in it. Move them to another tier first, then delete the empty one. The message tells you which sponsors are holding it.
+- A tier with no sponsors in it doesn't show on the Sponsors page at all, so an empty tier isn't a problem, it's just invisible until you put someone in it.
 
 ## The About page
 
