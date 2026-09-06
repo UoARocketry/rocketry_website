@@ -210,6 +210,44 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     ],
   },
   {
+    id: "tags-and-tiers",
+    title: "Event tags and sponsor tiers",
+    blocks: [
+      {
+        type: "text",
+        text: "These two are lists that other things point at. Event Tags are the filter buttons along the top of the Events page. Sponsor Tiers are the sections the Sponsors page is split into. You'll only touch them when the club adds a new kind of event or a new sponsorship level.",
+      },
+      {
+        type: "steps",
+        items: [
+          "For a tag, open Event Tags under Events. For a tier, open Sponsor Tiers under Sponsors.",
+          "Hit Create New.",
+          "Type the Name. This is what people see on the site, so write it the way you want it to read.",
+          "For a tier you can also add a Description, which shows under the section heading. It's optional.",
+          "Set the Order, which is where it sits in the row or down the page. Position 1 goes first.",
+          "Hit Save.",
+        ],
+      },
+      {
+        type: "callout",
+        label: "These two save straight away.",
+        text: "There's no Save Draft or Publish changes on tags and tiers, just a Save button, and it's live the moment you hit it. Everything else in this guide has a draft step, so it's worth knowing these two don't.",
+      },
+      {
+        type: "text",
+        text: "Renaming works the way you'd hope. Events and sponsors point at the tag or tier rather than keeping their own copy of the name, so renaming one updates it everywhere it appears. You don't need to go back and re-tag anything.",
+      },
+      {
+        type: "list",
+        items: [
+          "Deleting a tag is safe. It just clears off any event that used it, and those events stay published.",
+          "Deleting a tier is blocked while sponsors are still in it. Move them to another tier first, then delete the empty one. The message tells you which sponsors are holding it.",
+          "A tier with no sponsors in it doesn't show on the Sponsors page at all, so an empty tier isn't a problem, it's just invisible until you put someone in it.",
+        ],
+      },
+    ],
+  },
+  {
     id: "about-page",
     title: "The About page",
     blocks: [

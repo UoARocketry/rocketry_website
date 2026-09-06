@@ -1,4 +1,4 @@
-import type { CollectionBeforeValidateHook } from "payload";
+import { APIError, type CollectionBeforeValidateHook } from "payload";
 import { toDayInputValue } from "../../lib/day-date.ts";
 import { minutesOfDay, nzCalendarDay } from "../../lib/utils.ts";
 
@@ -144,7 +144,11 @@ export const rejectDuplicateDays: CollectionBeforeValidateHook = ({ data }) => {
   const errors = findDuplicateDays((data ?? {}) as EventDoc);
 
   if (errors.length > 0) {
-    throw new Error(errors.join(" "));
+    // `APIError` with an explicit 400 and `isPublic`, not a plain `Error`.
+    // Payload hides the message of anything it does not consider public behind
+    // "Something went wrong.", so a plain Error tells the editor nothing about
+    // which day clashes. See `isErrorPublic` in payload's source.
+    throw new APIError(errors.join(" "), 400, undefined, true);
   }
 
   return data;

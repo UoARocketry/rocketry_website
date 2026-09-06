@@ -1,5 +1,6 @@
+import { APIError } from "payload";
 import { beforeAll, describe, expect, it } from "vitest";
-import { findDuplicateDays } from "./duplicate-days.ts";
+import { findDuplicateDays, rejectDuplicateDays } from "./duplicate-days.ts";
 
 /** A day-only value as the picker stores it: noon UTC of that day. */
 const day = (iso: string) => `${iso}T12:00:00.000Z`;
@@ -141,5 +142,57 @@ describe("findDuplicateDays", () => {
     });
 
     expect(errors).toHaveLength(2);
+  });
+});
+
+describe("rejectDuplicateDays", () => {
+  beforeAll(() => {
+    process.env.TZ = "UTC";
+  });
+
+  const clashing = {
+    date: nzNoon("2026-09-03"),
+    extraDates: [{ date: day("2026-09-03") }],
+  };
+
+  it("lets a document with no clashes through untouched", () => {
+    const data = { date: nzNoon("2026-09-03") };
+
+    expect(rejectDuplicateDays({ data } as never)).toBe(data);
+  });
+
+  it("rejects a document whose days clash", () => {
+    expect(() => rejectDuplicateDays({ data: clashing } as never)).toThrow();
+  });
+
+  // Payload replaces the message of any error it does not consider public with
+  // a bare "Something went wrong.", so an editor is told nothing about what
+  // they actually did wrong. `isErrorPublic` only trusts an error carrying
+  // `isPublic: true` or a non-500 status, which a plain `Error` has neither of.
+  it("throws an error Payload will show to the editor", () => {
+    let thrown: unknown;
+    try {
+      rejectDuplicateDays({ data: clashing } as never);
+    } catch (error) {
+      thrown = error;
+    }
+
+    const error = thrown as { isPublic?: boolean; status?: number };
+
+    expect(error).toBeInstanceOf(APIError);
+    expect(error.isPublic).toBe(true);
+    expect(error.status).toBe(400);
+  });
+
+  it("keeps the specific wording rather than a generic failure", () => {
+    let message = "";
+    try {
+      rejectDuplicateDays({ data: clashing } as never);
+    } catch (error) {
+      message = (error as Error).message;
+    }
+
+    expect(message).toContain("3 September");
+    expect(message).not.toMatch(/something went wrong/i);
   });
 });
