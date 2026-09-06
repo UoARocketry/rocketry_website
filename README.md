@@ -39,4 +39,4 @@ See [.env.example](.env.example) for the full list. The app needs a database con
 
 ## Contact
 
-uoarocketryclub@auckland.ac.nz
+uoarocketryclub@gmail.com
